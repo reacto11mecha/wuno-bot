@@ -1,0 +1,30 @@
+{
+  "name": "wuno-bot",
+  "version": "1.0.0",
+  "description": "Whatsapp uno bot",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reacto11mecha/wuno-bot.git"
+  },
+  "author": "Ezra Khairan Permana",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/reacto11mecha/wuno-bot/issues"
+  },
+  "homepage": "https://github.com/reacto11mecha/wuno-bot#readme",
+  "dependencies": {
+    "@open-wa/wa-automate": "^4.24.2",
+    "mongoose": "^6.0.14",
+    "p-queue": "^7.1.0",
+    "sharp": "^0.29.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.3.0",
+    "eslint-config-prettier": "^8.3.0",
+    "prettier": "^2.5.0"
+  }
+}
