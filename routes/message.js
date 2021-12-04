@@ -4,6 +4,8 @@ import {
   isGroupChat as _group,
 } from "../lib/processMessage.js";
 
+import { controller } from "../lib/index.js";
+
 const _validatorBuilder = (checker, text) => (cb) => async (args) => {
   if (!checker(args.message)) {
     await args.client.reply(args.from, text, args.id, true);
@@ -22,29 +24,14 @@ const isGroupChat = _validatorBuilder(
 export default function initEmitter() {
   const messageHandler = new EventEmitter();
 
-  messageHandler.on("startgame", (args) => {});
-  messageHandler.on("joingame", (args) => {});
+  messageHandler.on("startgame", controller.startgame);
+  messageHandler.on("joingame", controller.joingame);
 
-  messageHandler.on(
-    "leavegame",
-    isDMChat((args) => {})
-  );
-  messageHandler.on(
-    "play",
-    isDMChat((args) => {})
-  );
-  messageHandler.on(
-    "say",
-    isDMChat((args) => {})
-  );
-  messageHandler.on(
-    "cards",
-    isDMChat((args) => {})
-  );
-  messageHandler.on(
-    "draw",
-    isDMChat((args) => {})
-  );
+  messageHandler.on("leavegame", isDMChat(controller.leavegame));
+  messageHandler.on("play", isDMChat(controller.play));
+  messageHandler.on("say", isDMChat(controller.say));
+  messageHandler.on("cards", isDMChat(controller.cards));
+  messageHandler.on("draw", isDMChat(controller.draw));
 
   return messageHandler;
 }

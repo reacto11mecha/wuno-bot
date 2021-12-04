@@ -3,6 +3,8 @@ import PQueue from "p-queue";
 import dotenv from "dotenv";
 import pino from "pino";
 
+import initDB from "./handler/database.js";
+
 dotenv.config();
 import handlerProc from "./handler/message.js";
 import { _processMessage } from "./lib/index.js";
@@ -31,6 +33,8 @@ const queue = new PQueue({
   concurrency: 4,
   autoStart: false,
 });
+
+initDB(process.env.MONGO_DB_CONNECTION_STRING, logger);
 
 async function start(client) {
   try {
