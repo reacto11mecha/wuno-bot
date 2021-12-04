@@ -2,7 +2,6 @@ import { create } from "@open-wa/wa-automate";
 import PQueue from "p-queue";
 import dotenv from "dotenv";
 import pino from "pino";
-import fs from "fs";
 
 dotenv.config();
 import handlerProc from "./handler/message.js";
