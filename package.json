@@ -20,6 +20,7 @@
   "dependencies": {
     "@open-wa/wa-automate": "^4.24.2",
     "dotenv": "^10.0.0",
+    "libphonenumber-js": "^1.9.44",
     "mongoose": "^6.0.14",
     "p-queue": "^7.1.0",
     "pino": "^7.5.1",
