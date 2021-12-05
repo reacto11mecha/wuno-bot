@@ -4,21 +4,28 @@ import User from "../models/user.js";
 const findOrCreateUser =
   (cb = false) =>
   async (args) => {
+    await args.client.simulateTyping(args.from, true);
+
     const user = await User.findOne({ phoneNumber: args.userNumber });
 
     if (!user) {
       try {
-        const newUser = new User({ phoneNumber: args.userNumber });
+        const newUser = new User({
+          phoneNumber: args.userNumber,
+          userName: args.sender.pushname,
+        });
         await newUser.save();
 
         args.logger.info(
           `[DB] Berhasil mendaftarkan user dengan username: ${args.sender.pushname}`
         );
 
-        if (cb) return await cb({ ...args, user: newUser });
-        else if (cb && !(cb instanceof Function))
+        await args.client.simulateTyping(args.from, false);
+
+        if (cb && !(cb instanceof Function))
           // Safety code
           throw new Error("Not a valid callback");
+        else if (cb) return await cb({ ...args, user: newUser });
         else return newUser;
       } catch (error) {
         // maybe it's a racing condition when the user is not registered,
@@ -27,18 +34,35 @@ const findOrCreateUser =
 
         const user = await User.findOne({ phoneNumber: args.userNumber });
 
-        if (cb && cb instanceof Function) return await cb({ ...args, user });
-        else if (cb && !(cb instanceof Function))
+        if (user.userName !== args.sender.pushname) {
+          user.userName = args.sender.pushname;
+
+          await user.save();
+        }
+
+        await args.client.simulateTyping(args.from, false);
+
+        if (cb && !(cb instanceof Function))
           // Safety code
           throw new Error("Not a valid callback");
+        else if (cb && cb instanceof Function)
+          return await cb({ ...args, user });
         else return user;
       }
     }
 
-    if (cb && cb instanceof Function) return await cb({ ...args, user });
-    else if (cb && !(cb instanceof Function))
+    if (user.userName !== args.sender.pushname) {
+      user.userName = args.sender.pushname;
+
+      await user.save();
+    }
+
+    await args.client.simulateTyping(args.from, false);
+
+    if (cb && !(cb instanceof Function))
       // Safety code
       throw new Error("Not a valid callback");
+    else if (cb && cb instanceof Function) return await cb({ ...args, user });
     else return user;
   };
 

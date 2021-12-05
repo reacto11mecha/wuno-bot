@@ -10,10 +10,18 @@ const User = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
-    gameID: {
+    gameUID: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Game",
     },
+    gameID: {
+      type: String,
+      ref: "Game.gameID",
+    },
+  },
+  userName: {
+    type: String,
+    default: "",
   },
   phoneNumber: {
     type: String,

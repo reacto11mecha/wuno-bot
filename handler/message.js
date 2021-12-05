@@ -32,33 +32,49 @@ const messageHandler = (client) => async (message, logger) => {
   };
 
   switch (command) {
+    case "c":
+    case "cg":
+    case "create":
+    case "creategame":
+      return handler.emit("creategame", commonArgs);
+    case "s":
     case "sg":
     case "start":
     case "startgame":
-      return await handler.emit("startgame", commonArgs);
+      return handler.emit("startgame", commonArgs);
     case "j":
     case "jg":
     case "join":
     case "joingame":
-      return await handler.emit("joingame", commonArgs);
+      return handler.emit("joingame", commonArgs);
+    case "i":
+    case "ig":
+    case "info":
+    case "infogame":
+      return handler.emit("infogame", commonArgs);
+    case "eg":
+    case "end":
+    case "endgame":
+      return handler.emit("endgame", commonArgs);
 
+    case "l":
     case "lg":
     case "quit":
     case "leave":
     case "leavegame":
-      return await handler.emit("leavegame", commonArgs);
+      return handler.emit("leavegame", commonArgs);
     case "p":
     case "play":
-      return await handler.emit("play", commonArgs);
+      return handler.emit("play", commonArgs);
     case "say":
-      return await handler.emit("say", commonArgs);
+      return handler.emit("say", commonArgs);
     case "cards":
-      return await handler.emit("cards", commonArgs);
+      return handler.emit("cards", commonArgs);
     case "d":
     case "pickup":
     case "newcard":
     case "draw":
-      return await handler.emit("draw", commonArgs);
+      return handler.emit("draw", commonArgs);
 
     default:
       await client.simulateTyping(from, true);
