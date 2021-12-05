@@ -5,6 +5,16 @@ const { AsYouType, isPossiblePhoneNumber, isValidPhoneNumber } =
   parsePhoneNumber;
 
 const User = new mongoose.Schema({
+  gameProperty: {
+    isJoiningGame: {
+      type: Boolean,
+      default: false,
+    },
+    gameID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Game",
+    },
+  },
   phoneNumber: {
     type: String,
     required: true,

@@ -7,14 +7,32 @@ const findOrCreateUser =
     const user = await User.findOne({ phoneNumber: args.userNumber });
 
     if (!user) {
-      const newUser = new User({ phoneNumber: args.userNumber });
-      await newUser.save();
+      try {
+        const newUser = new User({ phoneNumber: args.userNumber });
+        await newUser.save();
 
-      if (cb) return await cb({ ...args, user: newUser });
-      else if (cb && !(cb instanceof Function))
-        // Safety code
-        throw new Error("Not a valid callback");
-      else return newUser;
+        args.logger.info(
+          `[DB] Berhasil mendaftarkan user dengan username: ${args.sender.pushname}`
+        );
+
+        if (cb) return await cb({ ...args, user: newUser });
+        else if (cb && !(cb instanceof Function))
+          // Safety code
+          throw new Error("Not a valid callback");
+        else return newUser;
+      } catch (error) {
+        // maybe it's a racing condition when the user is not registered,
+        // but mongoose does the second registration from the same user
+        args.logger.error(error);
+
+        const user = await User.findOne({ phoneNumber: args.userNumber });
+
+        if (cb && cb instanceof Function) return await cb({ ...args, user });
+        else if (cb && !(cb instanceof Function))
+          // Safety code
+          throw new Error("Not a valid callback");
+        else return user;
+      }
     }
 
     if (cb && cb instanceof Function) return await cb({ ...args, user });
