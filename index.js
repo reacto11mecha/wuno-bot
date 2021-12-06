@@ -40,7 +40,7 @@ async function start(client) {
   try {
     logger.info("[BOT] Bot berhasil dihidupkan");
 
-    const proc = handlerProc(client);
+    const proc = await handlerProc(client);
     const onMessage = _processMessage(queue, proc, logger);
 
     const unreadMessages = await client.getAllUnreadMessages();

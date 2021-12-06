@@ -1,9 +1,8 @@
 import EventEmitter from "events";
 
-import { controller } from "../lib/index.js";
 import { isDMChat, findOrCreateUser } from "../utils/userHandler.js";
 
-export default function initEmitter() {
+export default function initEmitter(controller) {
   const messageHandler = new EventEmitter();
 
   messageHandler.on("creategame", findOrCreateUser(controller.creategame));

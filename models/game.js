@@ -24,7 +24,6 @@ const Game = new mongoose.Schema({
   },
   startTime: {
     type: Date,
-    default: Date.now,
   },
   endTime: {
     type: Date,
@@ -41,6 +40,7 @@ const Game = new mongoose.Schema({
   },
   playerOrder: [player],
   players: [player],
+  created_at: { type: Date, default: Date.now },
 });
 
 export default mongoose.model("Game", Game);
