@@ -1,47 +1,20 @@
-import Game from "../models/game.js";
-
 import { isGroupChat } from "../lib/processMessage.js";
+import { atLeastGameID } from "../lib/validator.js";
 
-export default async function joingame({
-  client,
-  from,
-  id,
-  sender,
-  args,
-  user,
-  message,
-  userNumber,
-}) {
-  await client.simulateTyping(from, true);
+export default atLeastGameID(
+  async ({
+    client,
+    from,
+    id,
+    sender,
+    user,
+    searchedGame,
+    userNumber,
+    players,
+  }) => {
+    await client.simulateTyping(from, true);
 
-  const gc = isGroupChat(message);
-  const gameID = args[0];
-
-  if (!user.gameProperty.isJoiningGame) {
-    if (!gameID || gameID === "") {
-      await client.reply(from, "Diperlukan parameter game id!", id, true);
-      await client.simulateTyping(from, false);
-      return false;
-    } else if (gameID.length < 11) {
-      await client.reply(
-        from,
-        "Minimal panjang game id adalah 11 karakter!",
-        id,
-        true
-      );
-      await client.simulateTyping(from, false);
-      return false;
-    }
-
-    const searchedGame = await Game.findOne({
-      gameID,
-    });
-
-    if (!searchedGame) {
-      await client.reply(from, "Game tidak ditemukan.", id, true);
-      await client.simulateTyping(from, false);
-      return false;
-    } else if (searchedGame.status === "PLAYING") {
+    if (searchedGame.status === "PLAYING") {
       await client.reply(
         from,
         "Game ini sedang bermain, konfirmasikan ke orang yang membuat game atau tunggu giliran selanjutnya!",
@@ -66,21 +39,15 @@ export default async function joingame({
 
     await client.reply(
       from,
-      `Berhasil join ke game "${gameID}", tunggu pembuat ruang game ini memulai permainannya!`,
+      `Berhasil join ke game "${searchedGame.gameID}", tunggu pembuat ruang game ini memulai permainannya!`,
       id,
       true
     );
     await client.simulateTyping(from, false);
 
-    const sendTo = await Game.findOne({ _id: searchedGame._id })
-      .populate("players.user_id")
-      .then((e) =>
-        e.players
-          .filter(({ user_id: user }) => user.phoneNumber !== userNumber)
-          .map(
-            ({ user_id: user }) => `${user.phoneNumber.replace("+", "")}@c.us`
-          )
-      );
+    const sendTo = players
+      .filter((user) => user.phoneNumber !== userNumber)
+      .map((user) => `${user.phoneNumber.replace("+", "")}@c.us`);
 
     sendTo.forEach(async (toSender) => {
       await client.simulateTyping(toSender, true);
@@ -90,7 +57,11 @@ export default async function joingame({
       );
       await client.simulateTyping(toSender, false);
     });
-  } else {
+  },
+  async ({ client, from, id, message, user }) => {
+    const gc = isGroupChat(message);
+
+    await client.simulateTyping(from, true);
     await client.reply(
       from,
       `Kamu sudah masuk ke sesi game ${
@@ -99,7 +70,6 @@ export default async function joingame({
       id,
       true
     );
-
     await client.simulateTyping(from, false);
   }
-}
+);

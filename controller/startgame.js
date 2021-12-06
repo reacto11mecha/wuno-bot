@@ -1,25 +1,9 @@
-import Game from "../models/game.js";
-
+import { requiredJoinGameSession } from "../lib/validator.js";
 import shuffleArray from "../utils/shuffleArray.js";
 
-export default async function startgame({
-  client,
-  from,
-  id,
-  user,
-  sender,
-  userNumber,
-}) {
-  await client.simulateTyping(from, true);
-
-  if (user.gameProperty.isJoiningGame) {
-    const game = await Game.findOne({
-      _id: user.gameProperty.gameUID,
-      gameID: user.gameProperty.gameID,
-    }).populate("players.user_id");
-    const creator = game.players.find(({ user_id: user }) =>
-      game.gameCreatorID.equals(user._id)
-    ).user_id;
+export default requiredJoinGameSession(
+  async ({ client, from, id, user, sender, userNumber, game, creator }) => {
+    await client.simulateTyping(from, true);
 
     if (!game) {
       await client.reply(
@@ -31,18 +15,19 @@ export default async function startgame({
       await client.simulateTyping(from, false);
       return false;
     } else if (game.gameCreatorID.equals(user._id)) {
-      // if (game.players.length === 1) {
-      //   await client.reply(
-      //     from,
-      //     "Minimal ada dua pemain yang tergabung!",
-      //     id,
-      //     true
-      //   );
-      //   await client.simulateTyping(from, false);
-      // } else
-      if (game.status === "PLAYING") {
+      if (game.players.length === 1) {
+        await client.reply(
+          from,
+          "Minimal ada dua pemain yang tergabung!",
+          id,
+          true
+        );
+        await client.simulateTyping(from, false);
+        return false;
+      } else if (game.status === "PLAYING") {
         await client.reply(from, "Game ini sedang dimainkan!", id, true);
         await client.simulateTyping(from, false);
+        return false;
       }
 
       const shuffledPlayer = shuffleArray(game.players).map(
@@ -53,8 +38,7 @@ export default async function startgame({
       const sendTo = game.players
         .map(({ user_id: user }) => user)
         .filter((user) => user.phoneNumber !== userNumber)
-        .filter((user) => user.phoneNumber !== currentPlayer.phoneNumber)
-        .map((user) => `${user.phoneNumber.replace("+", "")}@c.us`);
+        .filter((user) => user.phoneNumber !== currentPlayer.phoneNumber);
       const currentPlayerIsAuthor = creator._id.equals(currentPlayer._id);
 
       game.status = "PLAYING";
@@ -93,6 +77,7 @@ export default async function startgame({
         })(),
         ...sendTo
           .filter(({ _id }) => !_id.equals(currentPlayer._id))
+          .map((user) => `${user.phoneNumber.replace("+", "")}@c.us`)
           .map(async (toSender) => {
             await client.simulateTyping(toSender, true);
             await client.sendText(
@@ -103,13 +88,5 @@ export default async function startgame({
           }),
       ]);
     }
-  } else {
-    await client.reply(
-      from,
-      "Kamu belum masuk ke sesi game manapun!",
-      id,
-      true
-    );
-    await client.simulateTyping(from, false);
   }
-}
+);
