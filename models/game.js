@@ -1,6 +1,16 @@
 import mongoose from "mongoose";
 import { nanoid } from "nanoid";
 
+import cards from "../config/cards.js";
+const appropriateInitialCards = cards
+  .filter((e) => !e.startsWith("wild"))
+  .filter((e) => !e.endsWith("skip"))
+  .filter((e) => !e.endsWith("draw2"))
+  .filter((e) => !e.endsWith("reverse"));
+
+const getRandomIndex = () =>
+  Math.floor(Math.random() * appropriateInitialCards.length);
+
 const player = new mongoose.Schema({
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -28,11 +38,10 @@ const Game = new mongoose.Schema({
   endTime: {
     type: Date,
   },
-  currentCardColor: {
+  currentCard: {
     type: String,
-  },
-  currentCardNumber: {
-    type: Number,
+    enums: cards,
+    default: () => appropriateInitialCards[getRandomIndex()],
   },
   currentPosition: {
     type: mongoose.Schema.Types.ObjectId,

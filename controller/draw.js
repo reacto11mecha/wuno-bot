@@ -1,1 +1,3 @@
-export default async function draw({ client, from, id }) {}
+import { requiredJoinGameSession } from "../lib/validator.js";
+
+export default requiredJoinGameSession(async ({ client, from, id }) => {});
