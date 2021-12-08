@@ -1,7 +1,7 @@
 import { requiredJoinGameSession } from "../lib/validator.js";
 
 export default requiredJoinGameSession(
-  async ({ client, from, id, args, userNumber, game }) => {
+  async ({ client, from, id, args, userNumber, game, players }) => {
     await client.simulateTyping(from, true);
 
     if (!game) {
@@ -22,11 +22,18 @@ export default requiredJoinGameSession(
       );
       await client.simulateTyping(from, false);
       return false;
+    } else if (players.length < 1) {
+      await client.reply(
+        from,
+        "Tidak ada lawan bicara yang bisa diajak berkomunikasi.",
+        id,
+        true
+      );
+      await client.simulateTyping(from, false);
+      return false;
     }
 
     const message = args.join(" ");
-
-    const players = game.players.map(({ user_id }) => user_id);
     const sender = players.find(
       ({ phoneNumber }) => phoneNumber === userNumber
     );

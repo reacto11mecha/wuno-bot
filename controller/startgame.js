@@ -54,6 +54,7 @@ export default requiredJoinGameSession(
       game.status = "PLAYING";
       game.startTime = Date.now();
       game.playerOrder = shuffledPlayer.map(({ _id }) => ({ _id }));
+      game.currentPosition = currentPlayer._id;
 
       await game.save();
 
@@ -107,6 +108,7 @@ export default requiredJoinGameSession(
               `${sender.pushname} telah memulai permainan! Sekarang giliran kamu untuk bermain`
             );
             await client.sendText(
+              toSender,
               `Kartu kamu: ${thisPlayerCards.cards.join(", ")}.`
             );
 
@@ -132,6 +134,14 @@ export default requiredJoinGameSession(
       ]);
 
       logger.info(`[DB] Game ${game.gameID} dimulai`);
+    } else {
+      await client.reply(
+        from,
+        "Kamu bukanlah orang yang membuat sesi permainannya!",
+        id,
+        true
+      );
+      await client.simulateTyping(from, false);
     }
   }
 );

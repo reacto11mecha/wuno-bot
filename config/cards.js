@@ -59,6 +59,5 @@ export default [
   "yellowdraw2",
   "wildyellow",
 
-  "wild",
   "wilddraw4",
 ];
