@@ -1,4 +1,6 @@
 import User from "../models/user.js";
+import Card from "../models/card.js";
+
 import { requiredJoinGameSession } from "../lib/validator.js";
 
 export default requiredJoinGameSession(
@@ -39,7 +41,11 @@ export default requiredJoinGameSession(
         );
 
         game.players = [];
-        await game.save();
+
+        await Promise.all([
+          game.save(),
+          Card.deleteMany({ game_id: game._id }),
+        ]);
 
         await Promise.all([
           ...[...players]
