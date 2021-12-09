@@ -1,55 +1,24 @@
 import { requiredJoinGameSession } from "../lib/validator.js";
 
-export default requiredJoinGameSession(
-  async ({ client, from, id, args, userNumber, game, players }) => {
-    await client.simulateTyping(from, true);
+export default requiredJoinGameSession(async ({ chat, game }) => {
+  const message = chat.args.join(" ");
 
-    if (!game) {
-      await client.reply(
-        from,
-        "Sebuah kesalahan, game tidak ditemukan!",
-        id,
-        true
-      );
-      await client.simulateTyping(from, false);
-      return false;
-    } else if (args.length < 1) {
-      await client.reply(
-        from,
-        "Diperlukan pesan yang ingin dikirimkan!",
-        id,
-        true
-      );
-      await client.simulateTyping(from, false);
-      return false;
-    } else if (players.length < 1) {
-      await client.reply(
-        from,
-        "Tidak ada lawan bicara yang bisa diajak berkomunikasi.",
-        id,
-        true
-      );
-      await client.simulateTyping(from, false);
-      return false;
-    }
-
-    const message = args.join(" ");
-    const sender = players.find(
-      ({ phoneNumber }) => phoneNumber === userNumber
+  if (!game) {
+    await chat.replyToCurrentPerson("Sebuah kesalahan, game tidak ditemukan!");
+    return false;
+  } else if (chat.args.length < 1) {
+    await chat.replyToCurrentPerson("Diperlukan pesan yang ingin dikirimkan!");
+    return false;
+  } else if (game.players.length < 1) {
+    await chat.replyToCurrentPerson(
+      "Tidak ada lawan bicara yang bisa diajak berkomunikasi."
     );
-
-    await Promise.all(
-      players
-        .filter((user) => user.phoneNumber !== userNumber)
-        .map((user) => `${user.phoneNumber.replace("+", "")}@c.us`)
-        .map(async (toSender) => {
-          await client.simulateTyping(toSender, true);
-          await client.sendText(toSender, `${sender.userName}: ${message}`);
-          await client.simulateTyping(toSender, false);
-        })
-    );
-
-    await client.reply(from, "Pesan terkirim!", id, true);
-    await client.simulateTyping(from, false);
+    return false;
+  } else if (message === "") {
+    await chat.replyToCurrentPerson("Pesan tidak boleh kosong!");
+    return false;
   }
-);
+
+  await chat.sendToOtherPlayers(game.players, message);
+  await chat.replyToCurrentPerson("Pesan terkirim!");
+});

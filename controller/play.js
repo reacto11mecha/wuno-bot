@@ -1,60 +1,30 @@
 import { requiredJoinGameSession } from "../lib/validator.js";
 import { Card } from "../lib/index.js";
-import CardModel from "../models/card.js";
 
-export default requiredJoinGameSession(
-  async ({ client, from, id, user, game, players, args }) => {
-    const _card = await CardModel.findOne({
-      game_id: game._id,
-      user_id: user._id,
-    });
+export default requiredJoinGameSession(async ({ chat, game, card }) => {
+  const choosenCard = chat.args
+    .join("")
+    .trim()
+    .replace(" ", "")
+    .toLocaleLowerCase();
 
-    const card = new Card(_card, user, game, players);
-    const choosenCard = args
-      .join("")
-      .trim()
-      .replace(" ", "")
-      .toLocaleLowerCase();
-
-    await client.simulateTyping(from, true);
-
-    if (game.currentPosition.equals(user._id)) {
-      if (args.length < 1 || choosenCard === "") {
-        await client.reply(
-          from,
-          "Diperlukan kartu yang ingin dimainkan!",
-          id,
-          true
-        );
-        await client.simulateTyping(from, false);
-        return false;
-      } else if (!Card.isValidCard(choosenCard)) {
-        await client.reply(
-          from,
-          `${choosenCard} bukanlah sebuah kartu!`,
-          id,
-          true
-        );
-        await client.simulateTyping(from, false);
-        return false;
-      } else if (!_card.cards.includes(choosenCard)) {
-        await client.reply(
-          from,
-          `Kamu tidak memiliki kartu ${choosenCard}!`,
-          id,
-          true
-        );
-        await client.simulateTyping(from, false);
-        return false;
-      }
-
-      await card.solve(choosenCard);
-      await client.reply(from, JSON.stringify(game), id, true);
-
-      await client.simulateTyping(from, false);
-    } else {
-      await client.reply(from, "Bukan giliranmu saat ini!", id, true);
-      await client.simulateTyping(from, false);
+  if (game.currentPlayer._id.equals(chat.user._id)) {
+    if (chat.args.length < 1 || choosenCard === "") {
+      await chat.replyToCurrentPerson("Diperlukan kartu yang ingin dimainkan!");
+      return false;
+    } else if (!Card.isValidCard(choosenCard)) {
+      await chat.replyToCurrentPerson(`${choosenCard} bukanlah sebuah kartu!`);
+      return false;
+    } else if (!card.isIncluded(choosenCard)) {
+      await chat.replyToCurrentPerson(
+        `Kamu tidak memiliki kartu ${choosenCard}!`
+      );
+      return false;
     }
+
+    await card.solve(choosenCard);
+    await chat.replyToCurrentPerson(JSON.stringify(game));
+  } else {
+    await chat.replyToCurrentPerson("Bukan giliranmu saat ini!");
   }
-);
+});
