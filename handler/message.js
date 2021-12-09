@@ -1,95 +1,73 @@
 import getControllers from "../controller/index.js";
 import emitHandler from "../routes/message.js";
 
+import { Chat } from "../lib/index.js";
+
 const messageHandler = async (client) => {
   const controller = await getControllers();
   const handler = emitHandler(controller);
 
   return async (message, logger) => {
-    const { body, from, sender, id } = message;
-    const userNumber = `+${sender.id.replace("@c.us", "")}`;
-
-    const command = body
+    const command = message.body
       .slice(process.env.PREFIX.length)
       .trim()
       .split(/ +/)
       .shift()
       .toLowerCase();
-    const args = body
-      .slice(process.env.PREFIX.length)
-      .trim()
-      .split(/ +/)
-      .slice(1);
 
-    // Common args
-    const commonArgs = {
-      body,
-      from,
-      sender,
-      id,
-      userNumber,
-      args,
-      message,
-      client,
-      logger,
-    };
+    const chat = new Chat(client, message, logger);
 
     switch (command) {
       case "c":
       case "cg":
       case "create":
       case "creategame":
-        return handler.emit("creategame", commonArgs);
+        return handler.emit("creategame", chat);
       case "s":
       case "sg":
       case "start":
       case "startgame":
-        return handler.emit("startgame", commonArgs);
+        return handler.emit("startgame", chat);
       case "j":
       case "jg":
       case "join":
       case "joingame":
-        return handler.emit("joingame", commonArgs);
+        return handler.emit("joingame", chat);
       case "i":
       case "ig":
       case "info":
       case "infogame":
-        return handler.emit("infogame", commonArgs);
+        return handler.emit("infogame", chat);
       case "eg":
       case "end":
       case "endgame":
-        return handler.emit("endgame", commonArgs);
+        return handler.emit("endgame", chat);
 
       case "l":
       case "lg":
       case "quit":
       case "leave":
       case "leavegame":
-        return handler.emit("leavegame", commonArgs);
+        return handler.emit("leavegame", chat);
       case "p":
       case "play":
-        return handler.emit("play", commonArgs);
+        return handler.emit("play", chat);
       case "say":
-        return handler.emit("say", commonArgs);
+        return handler.emit("say", chat);
       case "cards":
-        return handler.emit("cards", commonArgs);
+        return handler.emit("cards", chat);
       case "d":
       case "pickup":
       case "newcard":
       case "draw":
-        return handler.emit("draw", commonArgs);
+        return handler.emit("draw", chat);
 
       default:
-        await client.simulateTyping(from, true);
-        await client.reply(
-          from,
+        await chat.replyToCurrentPerson(
           command.length > 0
             ? `Tidak ada perintah yang bernama '${command}'`
-            : "Under development",
-          id,
-          true
+            : "Under development"
         );
-        await client.simulateTyping(from, false);
     }
 
     return true;

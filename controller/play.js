@@ -37,6 +37,15 @@ export default requiredJoinGameSession(
         );
         await client.simulateTyping(from, false);
         return false;
+      } else if (!_card.cards.includes(choosenCard)) {
+        await client.reply(
+          from,
+          `Kamu tidak memiliki kartu ${choosenCard}!`,
+          id,
+          true
+        );
+        await client.simulateTyping(from, false);
+        return false;
       }
 
       await card.solve(choosenCard);
