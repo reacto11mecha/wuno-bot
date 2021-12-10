@@ -19,6 +19,6 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     return false;
   }
 
-  await chat.sendToOtherPlayers(game.players, message);
+  await chat.sendToOtherPlayers(game.players, `${chat.username}: ${message}`);
   await chat.replyToCurrentPerson("Pesan terkirim!");
 });

@@ -16,7 +16,7 @@ export default atLeastGameID(
 
     await Promise.all([
       await chat.replyToCurrentPerson(
-        `Berhasil join ke game "${game.game.gameID}", tunggu pembuat ruang game ini memulai permainannya!`
+        `Berhasil join ke game "${game.gameID}", tunggu pembuat ruang game ini memulai permainannya!`
       ),
       await chat.sendToOtherPlayers(
         game.players,
