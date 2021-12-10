@@ -1,6 +1,6 @@
 import Game from "../models/game.js";
 
-export default async function creategame({ chat }) {
+export default async function creategame(chat) {
   if (!chat.isJoiningGame) {
     const newGame = new Game({ gameCreatorID: chat.user._id });
     newGame.players.push({ user_id: chat.user._id });

@@ -24,7 +24,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
     await game.startGame();
 
-    const cards = await Card.find({ game_id: game._id });
+    const cards = await Card.find({ game_id: game.game._id });
 
     const thisPlayerCards = cards.find(({ user_id }) =>
       user_id.equals(game.currentPlayer._id)
@@ -73,7 +73,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       ),
     ]);
 
-    chat.logger.info(`[DB] Game ${game.gameID} dimulai`);
+    chat.logger.info(`[DB] Game ${game.game.gameID} dimulai`);
   } else {
     await chat.replyToCurrentPerson(
       "Kamu bukanlah orang yang membuat sesi permainannya!"

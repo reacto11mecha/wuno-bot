@@ -4,7 +4,7 @@ import { atLeastGameID } from "../lib/validator.js";
 
 const commonCallback = async ({ chat, game }) =>
   await chat.replyToCurrentPerson(
-    `Game ID: ${game.gameID}\nGame Status: ${
+    `Game ID: ${game.game.gameID}\nGame Status: ${
       game.translatedStatus
     }\nTanggal Dibuat: ${df(
       game.created_at,

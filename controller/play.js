@@ -23,7 +23,7 @@ export default requiredJoinGameSession(async ({ chat, game, card }) => {
     }
 
     await card.solve(choosenCard);
-    await chat.replyToCurrentPerson(JSON.stringify(game));
+    await chat.replyToCurrentPerson(JSON.stringify(game.game));
   } else {
     await chat.replyToCurrentPerson("Bukan giliranmu saat ini!");
   }

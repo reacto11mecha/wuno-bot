@@ -6,12 +6,12 @@ const findOrCreateUser =
   async (chat) => {
     await chat.typingToCurrentPerson(true);
 
-    const user = await User.findOne({ phoneNumber: chat.userNumber });
+    const user = await User.findOne({ phoneNumber: chat.message.userNumber });
 
     if (!user) {
       try {
         const newUser = new User({
-          phoneNumber: chat.userNumber,
+          phoneNumber: chat.message.userNumber,
           userName: chat.username,
         });
         await newUser.save();
@@ -20,7 +20,7 @@ const findOrCreateUser =
           `[DB] Berhasil mendaftarkan user dengan username: ${chat.username}`
         );
 
-        chat.setUser(newUser);
+        chat.setUser = newUser;
 
         await chat.typingToCurrentPerson(false);
 
@@ -34,13 +34,17 @@ const findOrCreateUser =
         // but mongoose does the second registration from the same user
         chat.logger.error(error);
 
-        const user = await User.findOne({ phoneNumber: chat.userNumber });
+        const user = await User.findOne({
+          phoneNumber: chat.message.userNumber,
+        });
 
         if (user.userName !== chat.username) {
           user.userName = chat.username;
 
           await user.save();
         }
+
+        chat.setUser = user;
 
         await chat.typingToCurrentPerson(false);
 
@@ -57,6 +61,8 @@ const findOrCreateUser =
 
       await user.save();
     }
+
+    chat.setUser = user;
 
     await chat.typingToCurrentPerson(false);
 
