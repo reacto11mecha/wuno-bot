@@ -9,9 +9,6 @@ export default [
   "red7",
   "red8",
   "red9",
-  "redreverse",
-  "redskip",
-  "reddraw2",
   "wildred",
 
   "green0",
@@ -24,9 +21,6 @@ export default [
   "green7",
   "green8",
   "green9",
-  "greenreverse",
-  "greenskip",
-  "greendraw2",
   "wildgreen",
 
   "blue0",
@@ -39,9 +33,6 @@ export default [
   "blue7",
   "blue8",
   "blue9",
-  "bluereverse",
-  "blueskip",
-  "bluedraw2",
   "wildblue",
 
   "yellow0",
@@ -54,10 +45,24 @@ export default [
   "yellow7",
   "yellow8",
   "yellow9",
+  "wildyellow",
+
+  // Lucky system
+  "redreverse",
+  "redskip",
+  "reddraw2",
+
+  "greenreverse",
+  "greenskip",
+  "greendraw2",
+
+  "bluereverse",
+  "blueskip",
+  "bluedraw2",
+
   "yellowreverse",
   "yellowskip",
   "yellowdraw2",
-  "wildyellow",
 
   "wilddraw4",
 ];

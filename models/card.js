@@ -1,15 +1,7 @@
 import mongoose from "mongoose";
 
 import cards from "../config/cards.js";
-
-const appropriateInitialCards = cards
-  .filter((e) => !e.startsWith("wild"))
-  .filter((e) => !e.endsWith("skip"))
-  .filter((e) => !e.endsWith("draw2"))
-  .filter((e) => !e.endsWith("reverse"));
-
-const getRandomIndex = () =>
-  Math.floor(Math.random() * appropriateInitialCards.length);
+import { Card as CardLib } from "../lib/index.js";
 
 const Card = new mongoose.Schema({
   user_id: {
@@ -23,8 +15,7 @@ const Card = new mongoose.Schema({
   cards: {
     type: [String],
     enums: cards,
-    default: () =>
-      [...new Array(6)].map(() => appropriateInitialCards[getRandomIndex()]),
+    default: () => [...new Array(6)].map(() => CardLib.pickRandomCard()),
   },
 });
 
