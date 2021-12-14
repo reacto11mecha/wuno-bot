@@ -1,30 +1,14 @@
 import { requiredJoinGameSession } from "../lib/validator.js";
 
-import User from "../models/user.js";
-import Card from "../models/card.js";
-
 export default requiredJoinGameSession(async ({ chat, game, card }) => {
-  const currentPlayer = game.currentPlayer;
-  const nextPlayer = game.getNextPosition();
-
-  await Promise.all([
-    User.findOneAndUpdate(
-      { _id: chat.game._id },
-      { gameProperty: { isJoiningGame: false } }
-    ),
-    Card.deleteOne({ user_id: chat.user._id, game_id: chat.game._id }),
-  ]);
-
+  const creator = Object.assign({}, game.creator)._doc;
   await game.removeUserFromArray(chat.user);
 
-  if (game.currentPlayerIsAuthor) {
-    if (game.players.length < 1) {
-      await game.endGame();
+  if (game.state.PLAYING) {
+    const currentPlayer = game.currentPlayer;
+    const nextPlayer = game.getNextPosition();
 
-      await chat.replyToCurrentPerson(
-        "Anda berhasil keluar dari game, tetapi karena hanya anda saja yang berada otomatis game dihentikan. Terimakasih sudah bermain!"
-      );
-    } else {
+    if (game.currentPlayerIsAuthor) {
       if (currentPlayer._id.equals(chat.user._id)) {
         await Promise.all([
           (async () => {
@@ -83,18 +67,38 @@ export default requiredJoinGameSession(async ({ chat, game, card }) => {
           ),
         ]);
       }
-    }
-  } else if (currentPlayer._id.equals(chat.user._id)) {
-    await game.updatePosition(nextPlayer._id);
+    } else if (currentPlayer._id.equals(chat.user._id)) {
+      await game.updatePosition(nextPlayer._id);
 
-    await Promise.all([
-      chat.replyToCurrentPerson(
-        `Anda berhasil keluar dari game. Terimakasih telah bermain!`
-      ),
-      game.sendToOtherPlayers(
-        game.players,
-        `${chat.username} telah keluar dari game`
-      ),
-    ]);
+      await Promise.all([
+        chat.replyToCurrentPerson(
+          `Anda berhasil keluar dari game. Terimakasih telah bermain!`
+        ),
+        chat.sendToOtherPlayers(
+          game.players,
+          `${chat.username} telah keluar dari game`
+        ),
+      ]);
+    }
+  } else {
+    // WAITING STATE
+
+    if (creator._id.equals(chat.user._id) && game.players.length < 2) {
+      await game.endGame();
+
+      await chat.replyToCurrentPerson(
+        "Anda berhasil keluar dari game, tetapi karena hanya anda saja yang berada otomatis game dihentikan. Terimakasih sudah bermain!"
+      );
+    } else {
+      await Promise.all([
+        chat.replyToCurrentPerson(
+          `Anda berhasil keluar dari game. Terimakasih telah bermain!`
+        ),
+        chat.sendToOtherPlayers(
+          game.players,
+          `${chat.username} telah keluar dari game`
+        ),
+      ]);
+    }
   }
 });
