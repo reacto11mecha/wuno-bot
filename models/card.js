@@ -15,7 +15,7 @@ const Card = new mongoose.Schema({
   cards: {
     type: [String],
     enums: cards,
-    default: () => [...new Array(6)].map(() => CardLib.pickRandomCard()),
+    default: () => [...new Array(6)].map(CardLib.pickRandomCard),
   },
 });
 

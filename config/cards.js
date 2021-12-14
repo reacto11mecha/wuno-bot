@@ -10,6 +10,7 @@ export default [
   "red8",
   "red9",
   "wildred",
+  "wilddraw4red",
 
   "green0",
   "green1",
@@ -22,6 +23,7 @@ export default [
   "green8",
   "green9",
   "wildgreen",
+  "wilddraw4green",
 
   "blue0",
   "blue1",
@@ -34,6 +36,7 @@ export default [
   "blue8",
   "blue9",
   "wildblue",
+  "wilddraw4blue",
 
   "yellow0",
   "yellow1",
@@ -46,8 +49,11 @@ export default [
   "yellow8",
   "yellow9",
   "wildyellow",
+  "wilddraw4yellow",
 
   // Lucky system
+  "wild",
+
   "redreverse",
   "redskip",
   "reddraw2",

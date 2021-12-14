@@ -1,4 +1,5 @@
 import { requiredJoinGameSession } from "../lib/validator.js";
+import Card from "../models/card.js";
 
 export default requiredJoinGameSession(async ({ chat, game, card }) => {
   const creator = Object.assign({}, game.creator)._doc;
