@@ -7,10 +7,11 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     await chat.replyToCurrentPerson("Sebuah kesalahan, game tidak ditemukan!");
     return false;
   } else if (game.isGameCreator) {
-    if (game.players.length === 1) {
-      await chat.replyToCurrentPerson("Minimal ada dua pemain yang tergabung!");
-      return false;
-    } else if (game.state.PLAYING) {
+    // if (game.players.length === 1) {
+    //   await chat.replyToCurrentPerson("Minimal ada dua pemain yang tergabung!");
+    //   return false;
+    // } else
+    if (game.state.PLAYING) {
       await chat.replyToCurrentPerson("Game ini sedang dimainkan!");
       return false;
     }
