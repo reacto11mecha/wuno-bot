@@ -3,10 +3,31 @@ import makeWASocket, {
   useMultiFileAuthState,
 } from "@adiwajshing/baileys";
 import { Boom } from "@hapi/boom";
+import PQueue from "p-queue";
+import dotenv from "dotenv";
 import path from "path";
 import P from "pino";
 
+import { messageHandler } from "./handler/message";
+
+dotenv.config();
+
 export default class Bot {
+  private queue = new PQueue({
+    concurrency: 4,
+    autoStart: false,
+  });
+
+  constructor() {
+    this.queue.start();
+  }
+
+  private isMessageValid(message: string | null | undefined) {
+    if (message) return message.startsWith(process.env.PREFIX || "U#");
+
+    return false;
+  }
+
   private async connectToWhatsApp() {
     const { state, saveCreds } = await useMultiFileAuthState(
       "auth_info_baileys"
@@ -41,6 +62,8 @@ export default class Bot {
       printQRInTerminal: true,
     });
 
+    const onMessageQueue = messageHandler(sock, logger);
+
     sock.ev.on("connection.update", (update) => {
       const { connection, lastDisconnect } = update;
 
@@ -72,12 +95,19 @@ export default class Bot {
     });
 
     sock.ev.on("messages.upsert", async (m) => {
+      const pesan = m.messages[0];
+
       if (
         m.type === "notify" &&
-        !m.messages[0].key.fromMe &&
-        m.messages[0].key.remoteJid !== "status@broadcast"
+        !pesan.key.fromMe &&
+        pesan.key.remoteJid !== "status@broadcast" &&
+        pesan?.message?.extendedTextMessage?.contextInfo?.remoteJid !==
+          "status@broadcast"
       ) {
-        console.log(JSON.stringify(m, null, 2));
+        if (this.isMessageValid(pesan?.message?.conversation)) {
+          logger.info(`[Pesan] Ada pesan dari: ${pesan?.pushName}`);
+          this.queue.add(() => onMessageQueue(pesan));
+        }
       }
     });
 

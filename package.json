@@ -37,7 +37,9 @@
   "dependencies": {
     "@adiwajshing/baileys": "^4.2.0",
     "@hapi/boom": "^10.0.0",
+    "dotenv": "^16.0.1",
     "mongoose": "^6.3.8",
+    "p-queue": "6.x.x",
     "pino": "^8.0.0",
     "pino-pretty": "^8.0.0",
     "qrcode-terminal": "^0.12.0"
