@@ -9,8 +9,32 @@ import path from "path";
 import P from "pino";
 
 import { messageHandler } from "./handler/message";
+import { connectDatabase } from "./handler/database";
 
 dotenv.config();
+
+const logger = P({
+  transport: {
+    targets: [
+      {
+        target: "pino-pretty",
+        level: "debug",
+        options: {
+          colorize: true,
+          ignore: "pid,hostname",
+          translateTime: "SYS:standard",
+        },
+      },
+      {
+        target: "pino/file",
+        level: "debug",
+        options: {
+          destination: path.join(__dirname, "..", "bot.log"),
+        },
+      },
+    ],
+  },
+});
 
 export default class Bot {
   private queue = new PQueue({
@@ -32,29 +56,6 @@ export default class Bot {
     const { state, saveCreds } = await useMultiFileAuthState(
       "auth_info_baileys"
     );
-
-    const logger = P({
-      transport: {
-        targets: [
-          {
-            target: "pino-pretty",
-            level: "debug",
-            options: {
-              colorize: true,
-              ignore: "pid,hostname",
-              translateTime: "SYS:standard",
-            },
-          },
-          {
-            target: "pino/file",
-            level: "debug",
-            options: {
-              destination: path.join(__dirname, "..", "bot.log"),
-            },
-          },
-        ],
-      },
-    });
 
     const sock = makeWASocket({
       logger,
@@ -114,7 +115,11 @@ export default class Bot {
     sock.ev.on("creds.update", saveCreds);
   }
 
-  init() {
+  async init() {
+    if (!process.env.MONGO_URI)
+      throw new Error("[DB] Diperlukan sebuah koneksi URI MongDB | MONGO_URI");
+
+    await connectDatabase(process.env.MONGO_URI, logger);
     this.connectToWhatsApp();
   }
 }

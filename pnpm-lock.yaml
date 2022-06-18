@@ -12,7 +12,9 @@ specifiers:
   eslint: ^8.17.0
   eslint-config-prettier: ^8.5.0
   husky: ^8.0.1
+  libphonenumber-js: ^1.10.6
   mongoose: ^6.3.8
+  nanoid: ^4.0.0
   nodemon: ^2.0.16
   p-queue: 6.x.x
   pino: ^8.0.0
@@ -26,7 +28,9 @@ dependencies:
   '@adiwajshing/baileys': 4.2.0_qrcode-terminal@0.12.0
   '@hapi/boom': 10.0.0
   dotenv: 16.0.1
+  libphonenumber-js: 1.10.6
   mongoose: 6.3.8
+  nanoid: 4.0.0
   p-queue: 6.6.2
   pino: 8.0.0
   pino-pretty: 8.0.0
@@ -1853,6 +1857,10 @@ packages:
       type-check: 0.4.0
     dev: true
 
+  /libphonenumber-js/1.10.6:
+    resolution: {integrity: sha512-CIjT100/SmntsUjsLVs2t3ufeN4KdNXUxhD07tH153pdbaCWuAjv0jK/gPuywR3IImB/U/MQM+x9RfhMs5XZiA==}
+    dev: false
+
   /lines-and-columns/1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
     dev: true
@@ -2071,6 +2079,12 @@ packages:
       token-types: 4.2.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /nanoid/4.0.0:
+    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
+    engines: {node: ^14 || ^16 || >=18}
+    hasBin: true
     dev: false
 
   /natural-compare/1.4.0:
