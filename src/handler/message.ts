@@ -1,9 +1,15 @@
 import type { proto, WASocket } from "@adiwajshing/baileys";
-import pino, { Logger } from "pino";
+import { Logger } from "pino";
 
-export const messageHandler =
-  (sock: WASocket, logger: Logger) =>
-  async (WebMessage: proto.IWebMessageInfo) => {
+import { Chat } from "../lib/Chat";
+import { emitHandler } from "./emitter";
+import { getController } from "./controller";
+
+export const messageHandler = async (sock: WASocket, logger: Logger) => {
+  const controller = await getController();
+  const emitter = emitHandler(controller);
+
+  return async (WebMessage: proto.IWebMessageInfo) => {
     const PREFIX = process.env.PREFIX || "U#";
     const text = WebMessage!.message!.conversation;
 
@@ -14,11 +20,14 @@ export const messageHandler =
       .shift()!
       .toLowerCase();
 
+    const chat = new Chat(sock, WebMessage, logger);
+
     switch (command) {
       case "c":
       case "cg":
       case "create":
       case "creategame":
+        emitter.emit("creategame", chat);
         break;
       case "s":
       case "sg":
@@ -60,7 +69,7 @@ export const messageHandler =
         break;
 
       default: {
-        await sock.sendMessage(WebMessage.key.remoteJid!, {
+        await chat.sendToCurrentPerson({
           text:
             command.length > 0
               ? `Tidak ada perintah yang bernama "${command}"`
@@ -70,3 +79,4 @@ export const messageHandler =
       }
     }
   };
+};

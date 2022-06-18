@@ -14,7 +14,7 @@ specifiers:
   husky: ^8.0.1
   libphonenumber-js: ^1.10.6
   mongoose: ^6.3.8
-  nanoid: ^4.0.0
+  nanoid: 3.x.x
   nodemon: ^2.0.16
   p-queue: 6.x.x
   pino: ^8.0.0
@@ -30,7 +30,7 @@ dependencies:
   dotenv: 16.0.1
   libphonenumber-js: 1.10.6
   mongoose: 6.3.8
-  nanoid: 4.0.0
+  nanoid: 3.3.4
   p-queue: 6.6.2
   pino: 8.0.0
   pino-pretty: 8.0.0
@@ -2081,9 +2081,9 @@ packages:
       - supports-color
     dev: false
 
-  /nanoid/4.0.0:
-    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
-    engines: {node: ^14 || ^16 || >=18}
+  /nanoid/3.3.4:
+    resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: false
 

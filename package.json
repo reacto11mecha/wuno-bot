@@ -40,7 +40,7 @@
     "dotenv": "^16.0.1",
     "libphonenumber-js": "^1.10.6",
     "mongoose": "^6.3.8",
-    "nanoid": "^4.0.0",
+    "nanoid": "3.x.x",
     "p-queue": "6.x.x",
     "pino": "^8.0.0",
     "pino-pretty": "^8.0.0",

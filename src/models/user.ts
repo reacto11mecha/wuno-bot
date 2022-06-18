@@ -1,11 +1,11 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema, Types, Model } from "mongoose";
 import {
   AsYouType,
   isPossiblePhoneNumber,
   isValidPhoneNumber,
 } from "libphonenumber-js";
 
-type IUser = {
+export type IUser = {
   gameProperty: {
     isJoiningGame: boolean;
     gameUID: Types.ObjectId;

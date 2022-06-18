@@ -1,21 +1,20 @@
 import { model, Schema, Types } from "mongoose";
 import { nanoid } from "nanoid";
-import crypto from "crypto";
 
-import { cards, type allCard } from "../config/cards.js";
+import { random } from "../utils";
+
+import { cards, type allCard } from "../config/cards";
 const appropriateInitialCards = cards
   .filter((e) => !e.startsWith("wild"))
   .filter((e) => !e.endsWith("skip"))
   .filter((e) => !e.endsWith("draw2"))
   .filter((e) => !e.endsWith("reverse"));
 
-const getRandomIndex = () => {
-  const random =
-    crypto.webcrypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32;
-  return Math.floor(random * appropriateInitialCards.length);
-};
+interface IPlayer {
+  user_id: Types.ObjectId;
+}
 
-const player = new Schema<{ user_id: Types.ObjectId }>({
+const player = new Schema<IPlayer>({
   user_id: {
     type: Schema.Types.ObjectId,
     ref: "User",
@@ -30,8 +29,8 @@ interface IGame {
   endTime: Date;
   currentCard: allCard;
   currentPosition: Types.ObjectId;
-  playersOrder: [typeof player];
-  players: [typeof player];
+  playersOrder: IPlayer[];
+  players: IPlayer[];
   created_at: Date;
 }
 
@@ -58,7 +57,10 @@ const Game = new Schema<IGame>({
   currentCard: {
     type: String,
     enums: cards,
-    default: () => appropriateInitialCards[getRandomIndex()],
+    default: () => {
+      const idx = Math.floor(random() * appropriateInitialCards.length);
+      return appropriateInitialCards[idx];
+    },
   },
   currentPosition: {
     type: Schema.Types.ObjectId,

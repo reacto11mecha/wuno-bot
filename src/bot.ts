@@ -63,7 +63,7 @@ export default class Bot {
       printQRInTerminal: true,
     });
 
-    const onMessageQueue = messageHandler(sock, logger);
+    const onMessageQueue = await messageHandler(sock, logger);
 
     sock.ev.on("connection.update", (update) => {
       const { connection, lastDisconnect } = update;
@@ -96,18 +96,18 @@ export default class Bot {
     });
 
     sock.ev.on("messages.upsert", async (m) => {
-      const pesan = m.messages[0];
+      const WebMessage = m.messages[0];
 
       if (
         m.type === "notify" &&
-        !pesan.key.fromMe &&
-        pesan.key.remoteJid !== "status@broadcast" &&
-        pesan?.message?.extendedTextMessage?.contextInfo?.remoteJid !==
+        !WebMessage.key.fromMe &&
+        WebMessage.key.remoteJid !== "status@broadcast" &&
+        WebMessage?.message?.extendedTextMessage?.contextInfo?.remoteJid !==
           "status@broadcast"
       ) {
-        if (this.isMessageValid(pesan?.message?.conversation)) {
-          logger.info(`[Pesan] Ada pesan dari: ${pesan?.pushName}`);
-          this.queue.add(() => onMessageQueue(pesan));
+        if (this.isMessageValid(WebMessage?.message?.conversation)) {
+          logger.info(`[Pesan] Ada pesan dari: ${WebMessage?.pushName}`);
+          this.queue.add(() => onMessageQueue(WebMessage));
         }
       }
     });
