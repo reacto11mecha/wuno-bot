@@ -3,7 +3,7 @@ import { model, Schema, Types } from "mongoose";
 import { cards, type allCard } from "../config/cards";
 import { Card as CardLib } from "../lib/Card";
 
-interface ICard {
+export interface ICard {
   user_id: Types.ObjectId;
   game_id: Types.ObjectId;
   cards: allCard[];

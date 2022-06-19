@@ -33,20 +33,24 @@ export const messageHandler = async (sock: WASocket, logger: Logger) => {
       case "sg":
       case "start":
       case "startgame":
+        emitter.emit("startgame", chat);
         break;
       case "j":
       case "jg":
       case "join":
       case "joingame":
+        emitter.emit("joingame", chat);
         break;
       case "i":
       case "ig":
       case "info":
       case "infogame":
+        emitter.emit("infogame", chat);
         break;
       case "eg":
       case "end":
       case "endgame":
+        emitter.emit("endgame", chat);
         break;
 
       case "l":
@@ -54,18 +58,23 @@ export const messageHandler = async (sock: WASocket, logger: Logger) => {
       case "quit":
       case "leave":
       case "leavegame":
+        emitter.emit("leavegame", chat);
         break;
       case "p":
       case "play":
+        emitter.emit("play", chat);
         break;
       case "say":
+        emitter.emit("say", chat);
         break;
       case "cards":
+        emitter.emit("cards", chat);
         break;
       case "d":
       case "pickup":
       case "newcard":
       case "draw":
+        emitter.emit("draw", chat);
         break;
 
       default: {

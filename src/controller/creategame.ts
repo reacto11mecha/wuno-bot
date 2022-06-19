@@ -1,14 +1,9 @@
 import { Types } from "mongoose";
 
-import { Chat } from "../lib/Chat";
-import Game from "../models/game";
+import { Chat } from "../lib";
+import { GameModel as Game } from "../models";
 
 export default async function creategame(chat: Chat) {
-  if (!chat.user)
-    return await chat.replyToCurrentPerson({
-      text: "Terjadi Kesalahan. Mohon dicoba perintah ini sekali lagi.",
-    });
-
   if (!chat.isJoiningGame) {
     const newGame = new Game({ gameCreatorID: chat.user!._id });
     newGame.players.push({ user_id: chat.user!._id });

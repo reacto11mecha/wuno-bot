@@ -1,4 +1,4 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema, Types, HydratedDocument } from "mongoose";
 import { nanoid } from "nanoid";
 
 import { random } from "../utils";
@@ -10,9 +10,12 @@ const appropriateInitialCards = cards
   .filter((e) => !e.endsWith("draw2"))
   .filter((e) => !e.endsWith("reverse"));
 
-interface IPlayer {
+export interface IPlayer {
   user_id: Types.ObjectId;
 }
+export type TPlayer =
+  | Array<never>
+  | Types.DocumentArray<HydratedDocument<IPlayer>>;
 
 const player = new Schema<IPlayer>({
   user_id: {
@@ -21,7 +24,7 @@ const player = new Schema<IPlayer>({
   },
 });
 
-interface IGame {
+export interface IGame {
   gameID: string;
   status: "WAITING" | "PLAYING" | "ENDED";
   gameCreatorID: Types.ObjectId;
@@ -29,8 +32,8 @@ interface IGame {
   endTime: Date;
   currentCard: allCard;
   currentPosition: Types.ObjectId;
-  playersOrder: IPlayer[];
-  players: IPlayer[];
+  playersOrder: TPlayer;
+  players: TPlayer;
   created_at: Date;
 }
 
