@@ -1,27 +1,28 @@
-import { HydratedDocument } from "mongoose";
+import { databaseSource } from "../handler/database";
+import { Chat, Game, Card } from "../lib";
 
-import GameModel from "../models/game";
-import CardModel from "../models/card";
-
-import { Chat } from "../lib/Chat";
-import { Game } from "../lib/Game";
-import { Card } from "../lib/Card";
+import { Game as GameModel, Card as CardModel } from "../entity";
 
 type TypeReqJGS = (cb: { chat: Chat; game: Game; card: Card }) => Promise<void>;
 export const requiredJoinGameSession =
   (cb: TypeReqJGS) => async (chat: Chat) => {
     try {
+      console.log(chat.user);
       if (chat.isJoiningGame) {
-        const gameData = await GameModel.findOne({
-          _id: chat.gameProperty!.gameUID,
-          gameID: chat.gameProperty!.gameID,
-        }).populate("players.user_id");
-
+        console.log("Joined");
+        const gameData = await databaseSource.manager.findOneBy(GameModel, {
+          // id: chat.gameProperty!.gameUID,
+          // gameID: chat.gameProperty!.gameID,
+          gameID: "xzb7Q01okHL",
+        });
         const game = new Game(gameData!, chat);
+        console.log(chat.gameProperty);
+        console.log(gameData);
+        // console.log(game);
 
-        const cardData = await CardModel.findOne({
+        const cardData = await databaseSource.manager.findOneBy(CardModel, {
           game_id: game.id,
-          user_id: chat.user!._id,
+          user_id: chat.user!.id,
         });
         const card = new Card(cardData!, chat, game);
 

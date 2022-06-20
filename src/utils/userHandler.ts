@@ -1,23 +1,22 @@
+import { databaseSource } from "../handler/database";
+
 import { Chat } from "../lib/Chat";
-import User from "../models/user";
+import { User } from "../entity";
 
 export const findOrCreateUser =
   (callback: (chat: Chat) => Promise<void>) => async (chat: Chat) => {
-    const properNumber = `+${chat.message.userNumber.replace(
-      "@s.whatsapp.net",
-      ""
-    )}`;
-
     await chat.simulateTypingToCurrentPerson(async () => {
-      const user = await User.findOne({ phoneNumber: properNumber });
+      const user = await databaseSource.manager.findOneBy(User, {
+        phoneNumber: chat.message.userNumber,
+      });
 
       if (!user) {
         try {
-          const newUser = new User({
-            phoneNumber: properNumber,
-            userName: chat.message.userName,
-          });
-          await newUser.save();
+          const newUser = new User();
+          newUser.phoneNumber = chat.message.userNumber;
+          newUser.userName = chat.message.userName;
+
+          await databaseSource.manager.save(newUser);
 
           chat.logger.info(
             `[DB] Berhasil mendaftarkan user dengan username: ${chat.message.userName}`
@@ -36,11 +35,12 @@ export const findOrCreateUser =
         if (user.userName !== chat.message.userName) {
           user.userName = chat.message.userName;
 
-          await user.save();
+          await databaseSource.manager.save(user);
         }
 
-        chat.setUser(user);
+        console.log(user);
 
+        chat.setUser(user);
         await callback(chat);
       }
     });

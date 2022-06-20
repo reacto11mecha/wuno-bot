@@ -1,30 +1,57 @@
-import { Types } from "mongoose";
+import { nanoid } from "nanoid";
 
 import { Chat } from "../lib";
-import { GameModel as Game } from "../models";
+import { Game, GameProperty } from "../entity";
+
+import { cards } from "../config/cards";
+
+import { random } from "../utils";
+import { databaseSource } from "../handler/database";
+
+const appropriateInitialCards = cards
+  .filter((e) => !e.startsWith("wild"))
+  .filter((e) => !e.endsWith("skip"))
+  .filter((e) => !e.endsWith("draw2"))
+  .filter((e) => !e.endsWith("reverse"));
+
+const getIntialCard = () => {
+  const idx = Math.floor(random() * appropriateInitialCards.length);
+  return appropriateInitialCards[idx];
+};
 
 export default async function creategame(chat: Chat) {
   if (!chat.isJoiningGame) {
-    const newGame = new Game({ gameCreatorID: chat.user!._id });
-    newGame.players.push({ user_id: chat.user!._id });
+    const newGame = new Game();
+    newGame.gameID = nanoid(11);
+    newGame.gameCreatorID = chat.user!.id;
+    newGame.currentCard = getIntialCard();
 
-    chat.user!.gameProperty.isJoiningGame = true;
-    chat.user!.gameProperty.gameUID = newGame._id;
-    chat.user!.gameProperty.gameID = newGame.gameID;
+    const actualGame = await databaseSource.manager.save(newGame);
 
-    await Promise.all([chat.user!.save(), newGame.save()]);
+    chat.user!.gameProperty = new GameProperty(
+      true,
+      actualGame.id,
+      actualGame.gameID
+    );
+    actualGame.players = [chat.user!];
+
+    console.log(chat.user!);
+    await Promise.all([
+      databaseSource.manager.save(actualGame),
+      databaseSource.manager.save(chat.user!),
+    ]);
 
     chat.logger.info(
-      `[DB] Berhasil membuat sesi game baru | ${newGame.gameID}`
+      `[DB] Berhasil membuat sesi game baru | ${actualGame.gameID}`
     );
 
     await chat.replyToCurrentPerson({
       text: `Game berhasil dibuat.\nAjak teman kamu untuk bermain.\n\nPemain yang sudah tergabung\n- ${
         chat.user!.userName
-      }\n\nKode: ${newGame.gameID}`,
+      }\n\nKode: ${actualGame.gameID}`,
     });
     await chat.replyToCurrentPerson({
-      text: `${process.env.PREFIX || "U#"}j ${newGame.gameID}`,
+      text: `${process.env.PREFIX || "U#"}j ${actualGame.gameID}`,
     });
   } else {
     await chat.replyToCurrentPerson({

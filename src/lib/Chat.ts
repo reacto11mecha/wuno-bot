@@ -1,8 +1,7 @@
 import type { proto, WASocket, AnyMessageContent } from "@adiwajshing/baileys";
-import { Document, Types, HydratedDocument } from "mongoose";
 import { Logger } from "pino";
 
-import { IUser } from "../models/user";
+import { User } from "../entity";
 
 interface IMessage {
   userNumber: string;
@@ -16,7 +15,7 @@ export class Chat {
   logger: Logger;
   message: IMessage;
   private WebMessage: proto.IWebMessageInfo;
-  user?: HydratedDocument<IUser>;
+  user?: User;
 
   constructor(
     sock: WASocket,
@@ -78,7 +77,7 @@ export class Chat {
     await this._sendTo(remoteJid, message);
   }
 
-  setUser(user: HydratedDocument<IUser>) {
+  setUser(user: User) {
     this.user = user;
   }
 
@@ -90,7 +89,7 @@ export class Chat {
   }
 
   get isJoiningGame() {
-    return this.user?.gameProperty.isJoiningGame;
+    return this.gameProperty?.isJoiningGame;
   }
   get gameProperty() {
     return this.user?.gameProperty;

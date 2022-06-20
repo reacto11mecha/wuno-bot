@@ -7,6 +7,7 @@
     "dev": "nodemon src/index.ts",
     "start": "node .",
     "build": "tsc",
+    "build:watch": "tsc --watch",
     "lint": "eslint ./src",
     "prepare": "husky install"
   },
@@ -39,12 +40,14 @@
     "@hapi/boom": "^10.0.0",
     "dotenv": "^16.0.1",
     "libphonenumber-js": "^1.10.6",
-    "mongoose": "^6.3.8",
+    "mongodb": "^3.6.0",
     "nanoid": "3.x.x",
     "p-queue": "6.x.x",
     "pino": "^8.0.0",
     "pino-pretty": "^8.0.0",
-    "qrcode-terminal": "^0.12.0"
+    "qrcode-terminal": "^0.12.0",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.3.6"
   },
   "lint-staged": {
     "*.{ts,js}": "eslint --cache --fix",

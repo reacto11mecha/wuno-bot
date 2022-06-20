@@ -1,6 +1,7 @@
 import { requiredJoinGameSession } from "../utils";
 
-import { CardModel as Card } from "../models";
+import { databaseSource } from "../handler/database";
+import { Card } from "../entity";
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.NotFound) {
@@ -19,18 +20,23 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     }
 
     await Promise.all(
-      game.players.map(
-        async (player) =>
-          await new Card({ user_id: player._id, game_id: game.id }).save()
-      )
+      game.players.map(async (player) => {
+        const card = new Card();
+        card.user_id = player.id;
+        card.game_id = game.id;
+
+        await databaseSource.manager.save(card);
+      })
     );
 
     await game.startGame();
 
-    const cards = await Card.find({ game_id: game.id });
+    const cards = await databaseSource.manager.findBy(Card, {
+      game_id: game.id,
+    });
 
     const thisPlayerCards = cards.find(({ user_id }) =>
-      user_id.equals(game.currentPlayer!._id)
+      user_id.equals(game.currentPlayer!.id)
     );
 
     await Promise.all([
@@ -70,11 +76,13 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           });
         }
       })(),
-      game.sendToOtherPlayersWithoutCurrentPlayer(
-        `${chat.message.userName} telah memulai permainan! Sekarang giliran ${
+      game.sendToOtherPlayersWithoutCurrentPlayer({
+        text: `${
+          chat.message.userName
+        } telah memulai permainan! Sekarang giliran ${
           game.currentPlayer!.userName
-        } untuk bermain`
-      ),
+        } untuk bermain`,
+      }),
     ]);
 
     chat.logger.info(`[DB] Game ${game.gameID} dimulai`);

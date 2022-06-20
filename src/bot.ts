@@ -9,7 +9,7 @@ import path from "path";
 import P from "pino";
 
 import { messageHandler } from "./handler/message";
-import { connectDatabase } from "./handler/database";
+import { databaseSource } from "./handler/database";
 
 dotenv.config();
 
@@ -100,7 +100,7 @@ export default class Bot {
 
       if (
         m.type === "notify" &&
-        !WebMessage.key.fromMe &&
+        // !WebMessage.key.fromMe &&
         WebMessage.key.remoteJid !== "status@broadcast" &&
         WebMessage?.message?.extendedTextMessage?.contextInfo?.remoteJid !==
           "status@broadcast"
@@ -115,11 +115,11 @@ export default class Bot {
     sock.ev.on("creds.update", saveCreds);
   }
 
-  async init() {
-    if (!process.env.MONGO_URI)
-      throw new Error("[DB] Diperlukan sebuah koneksi URI MongDB | MONGO_URI");
-
-    await connectDatabase(process.env.MONGO_URI, logger);
-    this.connectToWhatsApp();
+  init() {
+    databaseSource
+      .initialize()
+      .then(() => logger.info("[DB] Connected to database"))
+      .then(() => this.connectToWhatsApp())
+      .catch((error) => logger.error(error));
   }
 }
