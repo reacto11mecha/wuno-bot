@@ -11,18 +11,14 @@ export const requiredJoinGameSession =
       if (chat.isJoiningGame) {
         console.log("Joined");
         const gameData = await databaseSource.manager.findOneBy(GameModel, {
-          // id: chat.gameProperty!.gameUID,
-          // gameID: chat.gameProperty!.gameID,
-          gameID: "xzb7Q01okHL",
+          id: chat.gameProperty!.gameUID.id,
+          gameID: chat.gameProperty!.gameID.gameID,
         });
         const game = new Game(gameData!, chat);
-        console.log(chat.gameProperty);
-        console.log(gameData);
-        // console.log(game);
 
         const cardData = await databaseSource.manager.findOneBy(CardModel, {
-          game_id: game.id,
-          user_id: chat.user!.id,
+          game_id: gameData!,
+          user_id: chat.user!,
         });
         const card = new Card(cardData!, chat, game);
 

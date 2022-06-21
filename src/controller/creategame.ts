@@ -23,16 +23,12 @@ export default async function creategame(chat: Chat) {
   if (!chat.isJoiningGame) {
     const newGame = new Game();
     newGame.gameID = nanoid(11);
-    newGame.gameCreatorID = chat.user!.id;
+    newGame.gameCreatorID = chat.user!;
     newGame.currentCard = getIntialCard();
 
     const actualGame = await databaseSource.manager.save(newGame);
 
-    chat.user!.gameProperty = new GameProperty(
-      true,
-      actualGame.id,
-      actualGame.gameID
-    );
+    chat.user!.gameProperty = new GameProperty(true, actualGame);
     actualGame.players = [chat.user!];
 
     console.log(chat.user!);

@@ -1,28 +1,41 @@
-import { Entity, ObjectID, ObjectIdColumn, ManyToOne, Column } from "typeorm";
+import {
+  Entity,
+  ObjectIdColumn,
+  ObjectID,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+} from "typeorm";
 
 import { Game } from "./game";
 
 @Entity()
 export class GameProperty {
-  @Column({ default: false })
+  @Column()
   isJoiningGame: boolean;
 
-  @ManyToOne(() => Game, (game) => game.id)
-  gameUID: ObjectID;
+  @ManyToOne(() => Game, (game) => game.id, {
+    cascade: true,
+    onDelete: "SET NULL",
+  })
+  gameUID: Game;
 
-  @ManyToOne(() => Game, (game) => game.gameID)
-  gameID: string;
+  @ManyToOne(() => Game, (game) => game.gameID, {
+    cascade: true,
+    onDelete: "SET NULL",
+  })
+  gameID: Game;
 
-  constructor(isJoiningGame = false, gameUID: ObjectID, gameID: string) {
+  constructor(isJoiningGame = false, gameInstance: Game) {
     this.isJoiningGame = isJoiningGame;
-    this.gameUID = gameUID;
-    this.gameID = gameID;
+    this.gameUID = gameInstance;
+    this.gameID = gameInstance;
   }
 }
 
 @Entity()
 export class User {
-  @ObjectIdColumn()
+  @ObjectIdColumn({ primary: true })
   id: ObjectID;
 
   @Column(() => GameProperty)
@@ -31,6 +44,9 @@ export class User {
   @Column()
   userName: string;
 
-  @Column()
+  @Column({ unique: true })
   phoneNumber: string;
+
+  @CreateDateColumn()
+  created_at: Date;
 }

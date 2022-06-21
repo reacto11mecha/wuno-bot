@@ -18,7 +18,7 @@ import { Card as CardModel } from "../entity";
 //   `^(wilddraw4)(${COLOURS.join("|")})$`
 // );
 
-// const reducedByNumbers = [...new Array(14)].map((_, idx) => idx);
+const reducedByNumbers = [...new Array(14)].map((_, idx) => idx);
 // const filteredWildColor = cards
 //   .filter((card) => !regexValidWildColorOnly.test(card))
 //   .filter((card) => !regexValidWildColorPlus4Only.test(card));

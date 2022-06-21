@@ -22,8 +22,8 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     await Promise.all(
       game.players.map(async (player) => {
         const card = new Card();
-        card.user_id = player.id;
-        card.game_id = game.id;
+        card.user_id = player;
+        card.game_id = game.gameInstance;
 
         await databaseSource.manager.save(card);
       })
@@ -32,11 +32,11 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     await game.startGame();
 
     const cards = await databaseSource.manager.findBy(Card, {
-      game_id: game.id,
+      game_id: game,
     });
 
-    const thisPlayerCards = cards.find(({ user_id }) =>
-      user_id.equals(game.currentPlayer!.id)
+    const thisPlayerCards = cards.find(
+      ({ user_id }) => user_id.id === game.currentPlayer!.id
     );
 
     await Promise.all([

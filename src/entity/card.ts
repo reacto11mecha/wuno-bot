@@ -1,20 +1,23 @@
 import { Entity, ObjectID, ObjectIdColumn, Column, ManyToOne } from "typeorm";
-import type { allCard } from "../config/cards";
+import { cards, type allCard } from "../config/cards";
 
 import { User } from "./user";
 import { Game } from "./game";
 
 @Entity()
 export class Card {
-  @ObjectIdColumn()
+  @ObjectIdColumn({ primary: true })
   id: ObjectID;
 
   @ManyToOne(() => User, (user) => user.id)
-  user_id: ObjectID;
+  user_id: User;
 
-  @ManyToOne(() => Game, (game) => game.id)
-  game_id: ObjectID;
+  @ManyToOne(() => Game, (game) => game.id, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
+  game_id: Game;
 
-  @Column()
+  @Column({ type: "enum", enum: cards })
   cards: allCard[];
 }

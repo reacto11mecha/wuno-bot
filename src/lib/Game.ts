@@ -29,8 +29,8 @@ export class Game {
 
     this.game.status = "PLAYING";
     this.game.startTime = new Date();
-    this.game.playersOrder = shuffledPlayer.map(({ id }) => id);
-    this.game.currentPosition = currentPlayer.id;
+    this.game.playersOrder = shuffledPlayer;
+    this.game.currentPosition = currentPlayer;
 
     await databaseSource.manager.save(this.game);
   }
@@ -93,7 +93,7 @@ export class Game {
     await Promise.all(
       this.players
         .filter((user) => user.phoneNumber !== this.chat.message.userNumber)
-        .filter(({ id }) => !id.equals(this.game.currentPosition))
+        .filter(({ id }) => id !== this.game.currentPosition.id)
         .map(
           async (user) =>
             await this.chat.sendToOtherPerson(user.phoneNumber, message)
@@ -151,6 +151,10 @@ export class Game {
   //   return this._isPlayerTurn(this.chat.user!);
   // }
 
+  get gameInstance() {
+    return this.game;
+  }
+
   get state() {
     return {
       WAITING: this.game.status === "WAITING",
@@ -193,18 +197,18 @@ export class Game {
   }
 
   get creator() {
-    return this.players.find(({ id }) => this.game.gameCreatorID.equals(id));
+    return this.players.find(({ id }) => this.game.gameCreatorID.id === id);
   }
 
   get isGameCreator() {
-    return this.game.gameCreatorID === this.chat.user!.id;
+    return this.game.gameCreatorID.id === this.chat.user!.id;
   }
 
   get currentPlayer() {
-    return this.players.find(({ id }) => this.game.currentPosition.equals(id));
+    return this.players.find(({ id }) => this.game.currentPosition.id === id);
   }
 
   get currentPlayerIsAuthor() {
-    return this.creator?.id.equals(this.game.currentPosition);
+    return this.creator?.id === this.game.currentPosition.id;
   }
 }

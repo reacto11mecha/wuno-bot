@@ -28,25 +28,25 @@ export class Game {
   status: statusType;
 
   @ManyToOne(() => User, (user) => user.id)
-  gameCreatorID: ObjectID;
+  gameCreatorID: User;
 
   @Column()
   startTime: Date;
 
   @Column()
-  endTIme: Date;
+  endTime: Date;
 
   @Column({ type: "enum", enum: cards })
   currentCard: allCard;
 
   @ManyToOne(() => User, (user) => user.id)
-  playersOrder: ObjectID[];
+  playersOrder: User[];
 
-  @ManyToOne(() => User, (user) => user.id, { eager: true })
+  @ManyToOne(() => User, (user) => user, { eager: true })
   players: User[];
 
   @ManyToOne(() => User, (user) => user.id)
-  currentPosition: ObjectID;
+  currentPosition: User;
 
   @CreateDateColumn()
   created_at: Date;
