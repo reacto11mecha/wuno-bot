@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 
 import { Chat } from "../lib";
-import { Game, GameProperty } from "../entity";
+import { Game, User, GameProperty } from "../entity";
 
 import { cards } from "../config/cards";
 
@@ -25,29 +25,31 @@ export default async function creategame(chat: Chat) {
     newGame.gameID = nanoid(11);
     newGame.gameCreatorID = chat.user!;
     newGame.currentCard = getIntialCard();
+    newGame.players = [chat.user!];
 
-    const actualGame = await databaseSource.manager.save(newGame);
+    await databaseSource.manager.save(newGame);
 
-    chat.user!.gameProperty = new GameProperty(true, actualGame);
-    actualGame.players = [chat.user!];
+    const gameProperty = new GameProperty();
+    gameProperty.isJoiningGame = true;
+    gameProperty.gameID = newGame.gameID;
+    gameProperty.gameUID = newGame.id;
 
-    console.log(chat.user!);
     await Promise.all([
-      databaseSource.manager.save(actualGame),
-      databaseSource.manager.save(chat.user!),
+      databaseSource.manager.save(newGame),
+      databaseSource.manager.update(User, chat.user!.id, { gameProperty }),
     ]);
 
     chat.logger.info(
-      `[DB] Berhasil membuat sesi game baru | ${actualGame.gameID}`
+      `[DB] Berhasil membuat sesi game baru | ${newGame.gameID}`
     );
 
     await chat.replyToCurrentPerson({
       text: `Game berhasil dibuat.\nAjak teman kamu untuk bermain.\n\nPemain yang sudah tergabung\n- ${
         chat.user!.userName
-      }\n\nKode: ${actualGame.gameID}`,
+      }\n\nKode: ${newGame.gameID}`,
     });
     await chat.replyToCurrentPerson({
-      text: `${process.env.PREFIX || "U#"}j ${actualGame.gameID}`,
+      text: `${process.env.PREFIX || "U#"}j ${newGame.gameID}`,
     });
   } else {
     await chat.replyToCurrentPerson({

@@ -7,13 +7,15 @@ type TypeReqJGS = (cb: { chat: Chat; game: Game; card: Card }) => Promise<void>;
 export const requiredJoinGameSession =
   (cb: TypeReqJGS) => async (chat: Chat) => {
     try {
-      console.log(chat.user);
       if (chat.isJoiningGame) {
-        console.log("Joined");
-        const gameData = await databaseSource.manager.findOneBy(GameModel, {
-          id: chat.gameProperty!.gameUID.id,
-          gameID: chat.gameProperty!.gameID.gameID,
-        });
+        const gameData = await databaseSource.manager.findOneBy(
+          GameModel,
+          {
+            id: chat.gameProperty!.gameUID,
+            gameID: chat.gameProperty!.gameID,
+          },
+          { relations: { user: true } }
+        );
         const game = new Game(gameData!, chat);
 
         const cardData = await databaseSource.manager.findOneBy(CardModel, {
@@ -22,6 +24,7 @@ export const requiredJoinGameSession =
         });
         const card = new Card(cardData!, chat, game);
 
+        console.log("Before callback");
         return await cb({ chat, game, card });
       }
 

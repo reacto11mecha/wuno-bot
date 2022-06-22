@@ -4,33 +4,18 @@ import {
   ObjectID,
   Column,
   CreateDateColumn,
-  ManyToOne,
 } from "typeorm";
-
-import { Game } from "./game";
 
 @Entity()
 export class GameProperty {
   @Column()
   isJoiningGame: boolean;
 
-  @ManyToOne(() => Game, (game) => game.id, {
-    cascade: true,
-    onDelete: "SET NULL",
-  })
-  gameUID: Game;
+  @ObjectIdColumn({ primary: false })
+  gameUID: ObjectID;
 
-  @ManyToOne(() => Game, (game) => game.gameID, {
-    cascade: true,
-    onDelete: "SET NULL",
-  })
-  gameID: Game;
-
-  constructor(isJoiningGame = false, gameInstance: Game) {
-    this.isJoiningGame = isJoiningGame;
-    this.gameUID = gameInstance;
-    this.gameID = gameInstance;
-  }
+  @Column()
+  gameID: string;
 }
 
 @Entity()

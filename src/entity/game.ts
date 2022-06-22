@@ -39,7 +39,7 @@ export class Game {
   @Column({ type: "enum", enum: cards })
   currentCard: allCard;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, { eager: true, cascade: true })
   playersOrder: User[];
 
   @ManyToOne(() => User, (user) => user, { eager: true })

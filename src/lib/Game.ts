@@ -201,7 +201,11 @@ export class Game {
   }
 
   get isGameCreator() {
-    return this.game.gameCreatorID.id === this.chat.user!.id;
+    console.log(this.chat.user!.id);
+    console.log(this.game);
+
+    return false;
+    // return this.game.gameCreatorID.id === this.chat.user!.id;
   }
 
   get currentPlayer() {

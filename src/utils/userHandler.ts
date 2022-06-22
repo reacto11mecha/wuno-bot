@@ -33,12 +33,10 @@ export const findOrCreateUser =
         }
       } else {
         if (user.userName !== chat.message.userName) {
-          user.userName = chat.message.userName;
-
-          await databaseSource.manager.save(user);
+          await databaseSource.manager.update(User, user.id, {
+            userName: chat.message.userName,
+          });
         }
-
-        console.log(user);
 
         chat.setUser(user);
         await callback(chat);
