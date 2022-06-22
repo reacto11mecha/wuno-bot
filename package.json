@@ -38,9 +38,11 @@
   "dependencies": {
     "@adiwajshing/baileys": "^4.2.0",
     "@hapi/boom": "^10.0.0",
+    "@typegoose/typegoose": "^9.9.0",
     "dotenv": "^16.0.1",
     "libphonenumber-js": "^1.10.6",
     "mongodb": "^3.6.0",
+    "mongoose": "6.3.5",
     "nanoid": "3.x.x",
     "p-queue": "6.x.x",
     "pino": "^8.0.0",
