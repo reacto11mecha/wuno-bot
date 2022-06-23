@@ -1,30 +1,24 @@
-import { databaseSource } from "../handler/database";
 import { Chat, Game, Card } from "../lib";
 
-import { Game as GameModel, Card as CardModel } from "../entity";
+import { GameModel, CardModel, User } from "../models";
 
 type TypeReqJGS = (cb: { chat: Chat; game: Game; card: Card }) => Promise<void>;
 export const requiredJoinGameSession =
   (cb: TypeReqJGS) => async (chat: Chat) => {
     try {
       if (chat.isJoiningGame) {
-        const gameData = await databaseSource.manager.findOneBy(
-          GameModel,
-          {
-            id: chat.gameProperty!.gameUID,
-            gameID: chat.gameProperty!.gameID,
-          },
-          { relations: { user: true } }
-        );
+        const gameData = await GameModel.findOne({
+          id: chat.gameProperty!.gameUID,
+          gameID: chat.gameProperty!.gameID,
+        });
         const game = new Game(gameData!, chat);
 
-        const cardData = await databaseSource.manager.findOneBy(CardModel, {
-          game_id: gameData!,
-          user_id: chat.user!,
+        const cardData = await CardModel.findOne({
+          game: gameData!._id,
+          user: chat.user!._id,
         });
         const card = new Card(cardData!, chat, game);
 
-        console.log("Before callback");
         return await cb({ chat, game, card });
       }
 
@@ -33,5 +27,55 @@ export const requiredJoinGameSession =
       });
     } catch (error) {
       chat.logger.error(error);
+    }
+  };
+
+export type commonCb = (cb: { chat: Chat; game: Game }) => Promise<void>;
+export const atLeastGameID =
+  (cbNotJoiningGame: commonCb, cbJoiningGame: commonCb) =>
+  async (chat: Chat) => {
+    try {
+      const gameID = chat.args[0];
+
+      if (!chat.isJoiningGame) {
+        if (!gameID || gameID === "") {
+          return await chat.replyToCurrentPerson({
+            text: "Diperlukan parameter game id!",
+          });
+        } else if (gameID.length < 11) {
+          return await chat.replyToCurrentPerson({
+            text: "Minimal panjang game id adalah 11 karakter!",
+          });
+        }
+
+        const searchedGame = await GameModel.findOne({
+          gameID,
+        });
+
+        if (!searchedGame)
+          return await chat.replyToCurrentPerson({
+            text: "Game tidak ditemukan.",
+          });
+
+        const game = new Game(searchedGame!, chat);
+
+        return await cbNotJoiningGame({
+          chat,
+          game,
+        });
+      }
+
+      const gameData = await GameModel.findOne({
+        _id: chat.gameProperty!.gameUID,
+        gameID: chat.gameProperty!.gameID,
+      });
+      const game = new Game(gameData!, chat);
+
+      return await cbJoiningGame({
+        chat,
+        game,
+      });
+    } catch (error) {
+      chat.logger.error({ error });
     }
   };

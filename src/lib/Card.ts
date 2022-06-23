@@ -1,10 +1,11 @@
+import { DocumentType } from "@typegoose/typegoose";
 import { Chat } from "./Chat";
 import { Game } from "./Game";
 import { cards, type allCard } from "../config/cards";
 import { random } from "../utils";
 
 // import { databaseSource } from "../handler/database";
-import { Card as CardModel } from "../entity";
+import { Card as CardType } from "../models";
 
 // const COLOURS = ["red", "green", "blue", "yellow"];
 // const SPECIAL = ["draw2", "reverse", "skip"];
@@ -24,12 +25,12 @@ const reducedByNumbers = [...new Array(14)].map((_, idx) => idx);
 //   .filter((card) => !regexValidWildColorPlus4Only.test(card));
 
 export class Card {
-  card: CardModel;
+  card: DocumentType<CardType>;
   chat: Chat;
   game: Game;
 
-  constructor(cardData: CardModel, chat: Chat, game: Game) {
-    this.card = cardData;
+  constructor(cardData: DocumentType<CardType>, chat: Chat, game: Game) {
+    // this.card = cardData;
     this.chat = chat;
     this.game = game;
   }

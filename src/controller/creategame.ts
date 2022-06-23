@@ -1,12 +1,10 @@
 import { nanoid } from "nanoid";
 
 import { Chat } from "../lib";
-import { Game, User, GameProperty } from "../entity";
+import { GameModel, Game } from "../models";
 
 import { cards } from "../config/cards";
-
 import { random } from "../utils";
-import { databaseSource } from "../handler/database";
 
 const appropriateInitialCards = cards
   .filter((e) => !e.startsWith("wild"))
@@ -21,23 +19,17 @@ const getIntialCard = () => {
 
 export default async function creategame(chat: Chat) {
   if (!chat.isJoiningGame) {
-    const newGame = new Game();
-    newGame.gameID = nanoid(11);
-    newGame.gameCreatorID = chat.user!;
-    newGame.currentCard = getIntialCard();
-    newGame.players = [chat.user!];
+    const newGame = await GameModel.create({
+      gameCreatorID: chat.user!._id,
+      players: [chat.user!._id],
+    } as Game);
 
-    await databaseSource.manager.save(newGame);
-
-    const gameProperty = new GameProperty();
-    gameProperty.isJoiningGame = true;
-    gameProperty.gameID = newGame.gameID;
-    gameProperty.gameUID = newGame.id;
-
-    await Promise.all([
-      databaseSource.manager.save(newGame),
-      databaseSource.manager.update(User, chat.user!.id, { gameProperty }),
-    ]);
+    chat.user!.gameProperty = {
+      isJoiningGame: true,
+      gameUID: newGame._id,
+      gameID: newGame.gameID,
+    };
+    await chat.user!.save();
 
     chat.logger.info(
       `[DB] Berhasil membuat sesi game baru | ${newGame.gameID}`
@@ -54,7 +46,7 @@ export default async function creategame(chat: Chat) {
   } else {
     await chat.replyToCurrentPerson({
       text: `Kamu sudah masuk ke sesi game: ${
-        chat.isGroupChat ? "[REDACTED]" : chat.user!.gameProperty.gameID
+        chat.isGroupChat ? "[REDACTED]" : chat.user!.gameProperty?.gameID
       }`,
     });
   }

@@ -1,7 +1,8 @@
 import type { proto, WASocket, AnyMessageContent } from "@adiwajshing/baileys";
+import { DocumentType } from "@typegoose/typegoose";
 import { Logger } from "pino";
 
-import { User } from "../entity";
+import { UserModel, User } from "../models";
 
 interface IMessage {
   userNumber: string;
@@ -10,12 +11,15 @@ interface IMessage {
   id: string;
 }
 
+const PREFIX = process.env.PREFIX || "U#";
+
 export class Chat {
   sock: WASocket;
   logger: Logger;
   message: IMessage;
   private WebMessage: proto.IWebMessageInfo;
-  user?: User;
+  user?: DocumentType<User>;
+  args: string[];
 
   constructor(
     sock: WASocket,
@@ -36,6 +40,11 @@ export class Chat {
       remoteJid: WebMessage.key.remoteJid!,
       id: WebMessage.key.id!,
     };
+
+    this.args = WebMessage.message!.conversation!.slice(PREFIX.length)
+      .trim()
+      .split(/ +/)
+      .slice(1);
   }
 
   private async _simulateTyping(
@@ -77,7 +86,7 @@ export class Chat {
     await this._sendTo(remoteJid, message);
   }
 
-  setUser(user: User) {
+  setUser(user: DocumentType<User>) {
     this.user = user;
   }
 
