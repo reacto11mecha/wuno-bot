@@ -129,6 +129,10 @@ export class Game {
     return this.game.gameID;
   }
 
+  get created_at() {
+    return this.game.created_at;
+  }
+
   get state() {
     return {
       WAITING: this.game.status === "WAITING",

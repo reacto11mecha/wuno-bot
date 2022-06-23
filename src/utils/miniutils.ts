@@ -10,3 +10,8 @@ export const random = () => {
     2 ** 32
   );
 };
+
+export const df = (date: Date) =>
+  new Intl.DateTimeFormat("id-ID", { dateStyle: "full", timeStyle: "long" })
+    .format(date)
+    .replace(/\./g, ":");
