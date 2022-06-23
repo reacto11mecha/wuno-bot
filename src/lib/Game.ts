@@ -11,8 +11,8 @@ import {
   GameModel,
   Game as GameType,
   GameStatus,
-  // User as UserModel,
-  // Card as CardModel,
+  UserModel,
+  CardModel,
 } from "../models";
 
 import type { allCard } from "../config/cards";
@@ -52,34 +52,35 @@ export class Game {
     await Promise.all([this.chat.user!.save(), this.game.save()]);
   }
 
-  // async endGame() {
-  //   const copyPlayer = [...this.players];
-  //
-  //   this.game.endTime = new Date();
-  //   this.game.status = "ENDED";
-  //   this.game.playersOrder = [];
-  //   this.game.players = [];
-  //
-  //   await Promise.all(
-  //     [...copyPlayer].map(async ({ __id }) => await this.leaveGameForUser(__id))
-  //   );
-  //
-  //   await Promise.all([
-  //     this.game.save(),
-  //     CardModel.deleteMany({ game_id: this._id }),
-  //   ]);
-  // }
-  //
-  // async leaveGameForUser(__id: Types.Object_id) {
-  //   await UserModel.findOneAndUpdate(
-  //     { __id },
-  //     {
-  //       gameProperty: {
-  //         isJoiningGame: false,
-  //       },
-  //     }
-  //   );
-  // }
+  async endGame() {
+    const pojo: { players: Types.ObjectId[]; _id: Types.ObjectId } =
+      await GameModel.findOne({
+        _id: this.game._id,
+        gameID: this.game.gameID,
+      }).lean();
+
+    this.game.endTime = new Date();
+    this.game.status = GameStatus.ENDED;
+    this.game.playersOrder = [];
+    this.game.players = [];
+
+    await Promise.all([
+      this.game.save(),
+      CardModel.deleteMany({ game: pojo._id }),
+      [...pojo.players].map(async (id) => await this.leaveGameForUser(id)),
+    ]);
+  }
+
+  async leaveGameForUser(_id: Types.ObjectId) {
+    await UserModel.findOneAndUpdate(
+      { _id },
+      {
+        gameProperty: {
+          isJoiningGame: false,
+        },
+      }
+    );
+  }
 
   async updatePosition(position: Types.ObjectId) {
     this.game.currentPosition = position;
