@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@adiwajshing/baileys': ^4.2.0
+  '@adiwajshing/keyed-db': ^0.2.4
   '@commitlint/cli': ^17.0.2
   '@commitlint/config-conventional': ^17.0.2
   '@hapi/boom': ^10.0.0
@@ -27,7 +28,8 @@ specifiers:
   typescript: ^4.7.3
 
 dependencies:
-  '@adiwajshing/baileys': 4.2.0_qrcode-terminal@0.12.0
+  '@adiwajshing/baileys': 4.2.0_vhbfltkpprzprsxobjzdvgab2y
+  '@adiwajshing/keyed-db': 0.2.4
   '@hapi/boom': 10.0.0
   '@typegoose/typegoose': 9.9.0_mongoose@6.3.5
   dotenv: 16.0.1
@@ -56,7 +58,7 @@ devDependencies:
 
 packages:
 
-  /@adiwajshing/baileys/4.2.0_qrcode-terminal@0.12.0:
+  /@adiwajshing/baileys/4.2.0_vhbfltkpprzprsxobjzdvgab2y:
     resolution: {integrity: sha512-lNS6V8uDn8PrbH3YZM+4531v8/RVXGzVSJztp5GyKyjI8h1LHD2ZVq7NahK6jBBGR/zXz+OyDG+jJJhTHgJdlA==}
     peerDependencies:
       '@adiwajshing/keyed-db': ^0.2.4
@@ -76,6 +78,7 @@ packages:
       sharp:
         optional: true
     dependencies:
+      '@adiwajshing/keyed-db': 0.2.4
       '@hapi/boom': 9.1.4
       axios: 0.24.0
       futoin-hkdf: 1.5.1
@@ -91,6 +94,10 @@ packages:
       - debug
       - supports-color
       - utf-8-validate
+    dev: false
+
+  /@adiwajshing/keyed-db/0.2.4:
+    resolution: {integrity: sha512-yprSnAtj80/VKuDqRcFFLDYltoNV8tChNwFfIgcf6PGD4sjzWIBgs08pRuTqGH5mk5wgL6PBRSsMCZqtZwzFEw==}
     dev: false
 
   /@babel/code-frame/7.16.7:

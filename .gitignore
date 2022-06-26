@@ -104,5 +104,6 @@ dist
 # TernJS port file
 .tern-port
 
-# baileys authenticated user
+# baileys stuff
 auth_info_baileys/
+baileys_store_multi.json

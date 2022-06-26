@@ -11,7 +11,9 @@ export const messageHandler = async (sock: WASocket, logger: Logger) => {
 
   return async (WebMessage: proto.IWebMessageInfo) => {
     const PREFIX = process.env.PREFIX || "U#";
-    const text = WebMessage!.message!.conversation;
+    const text =
+      WebMessage!.message!.conversation ||
+      WebMessage!.message!.extendedTextMessage!.text;
 
     const command = text!
       .slice(PREFIX.length)!
@@ -20,7 +22,7 @@ export const messageHandler = async (sock: WASocket, logger: Logger) => {
       .shift()!
       .toLowerCase();
 
-    const chat = new Chat(sock, WebMessage, logger);
+    const chat = new Chat(sock, WebMessage, logger, text!);
 
     switch (command) {
       case "c":

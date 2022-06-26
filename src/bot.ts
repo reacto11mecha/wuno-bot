@@ -1,6 +1,9 @@
 import makeWASocket, {
+  makeInMemoryStore,
+  MessageRetryMap,
   DisconnectReason,
   useMultiFileAuthState,
+  fetchLatestBaileysVersion,
 } from "@adiwajshing/baileys";
 import { Boom } from "@hapi/boom";
 import PQueue from "p-queue";
@@ -41,9 +44,18 @@ export default class Bot {
     concurrency: 4,
     autoStart: false,
   });
+  private msgRetryCounterMap: MessageRetryMap = {};
+  private store = makeInMemoryStore({ logger });
 
   constructor() {
     this.queue.start();
+
+    const path = "./baileys_store_multi.json";
+
+    this.store.readFromFile(path);
+    setInterval(() => {
+      this.store.writeToFile(path);
+    }, 10_000);
   }
 
   private isMessageValid(message: string | null | undefined) {
@@ -57,11 +69,18 @@ export default class Bot {
       "auth_info_baileys"
     );
 
+    const { version, isLatest } = await fetchLatestBaileysVersion();
+    logger.info(`using WA v${version.join(".")}, isLatest: ${isLatest}`);
+
     const sock = makeWASocket({
       logger,
+      version,
       auth: state,
       printQRInTerminal: true,
+      msgRetryCounterMap: this.msgRetryCounterMap,
     });
+
+    this.store.bind(sock.ev);
 
     const onMessageQueue = await messageHandler(sock, logger);
 
@@ -105,7 +124,10 @@ export default class Bot {
         WebMessage?.message?.extendedTextMessage?.contextInfo?.remoteJid !==
           "status@broadcast"
       ) {
-        if (this.isMessageValid(WebMessage?.message?.conversation)) {
+        if (
+          this.isMessageValid(WebMessage?.message?.conversation) ||
+          this.isMessageValid(WebMessage?.message?.extendedTextMessage?.text)
+        ) {
           logger.info(`[Pesan] Ada pesan dari: ${WebMessage?.pushName}`);
           this.queue.add(() => onMessageQueue(WebMessage));
         }

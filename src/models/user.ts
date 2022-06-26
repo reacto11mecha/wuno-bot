@@ -3,7 +3,7 @@ import { prop, Ref } from "@typegoose/typegoose";
 import { Game } from "./game";
 import { Card } from "./card";
 
-class GameProperty {
+export class GameProperty {
   @prop({ default: false })
   public isJoiningGame?: boolean;
 

@@ -2,7 +2,7 @@ import type { proto, WASocket, AnyMessageContent } from "@adiwajshing/baileys";
 import { DocumentType } from "@typegoose/typegoose";
 import { Logger } from "pino";
 
-import { UserModel, User } from "../models";
+import { User } from "../models";
 
 interface IMessage {
   userNumber: string;
@@ -24,7 +24,8 @@ export class Chat {
   constructor(
     sock: WASocket,
     WebMessage: proto.IWebMessageInfo,
-    logger: Logger
+    logger: Logger,
+    text: string
   ) {
     this.sock = sock;
     this.logger = logger;
@@ -41,10 +42,7 @@ export class Chat {
       id: WebMessage.key.id!,
     };
 
-    this.args = WebMessage.message!.conversation!.slice(PREFIX.length)
-      .trim()
-      .split(/ +/)
-      .slice(1);
+    this.args = text.slice(PREFIX.length).trim().split(/ +/).slice(1);
   }
 
   private async _simulateTyping(
@@ -91,7 +89,7 @@ export class Chat {
   }
 
   get isDMChat() {
-    return this.message.remoteJid.endsWith("@c.us");
+    return this.message.remoteJid.endsWith("@s.whatsapp.net");
   }
   get isGroupChat() {
     return this.message.remoteJid.endsWith("@g.us");
@@ -102,5 +100,9 @@ export class Chat {
   }
   get gameProperty() {
     return this.user?.gameProperty;
+  }
+
+  get messageKey() {
+    return this.WebMessage.key!;
   }
 }

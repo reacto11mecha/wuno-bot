@@ -1,4 +1,5 @@
 import {
+  Ref,
   DocumentType,
   isDocument,
   isDocumentArray,
@@ -10,6 +11,7 @@ import { random } from "../utils";
 import {
   GameModel,
   Game as GameType,
+  User as UserType,
   GameStatus,
   UserModel,
   CardModel,
@@ -27,11 +29,23 @@ export class Game {
     this.chat = chat;
   }
 
+  private async getPojoSelf() {
+    const pojo: {
+      players: Types.ObjectId[];
+      playersOrder: Types.ObjectId[];
+      _id: Types.ObjectId;
+    } = await GameModel.findOne({
+      _id: this.game._id,
+      gameID: this.game.gameID,
+    }).lean();
+
+    return pojo;
+  }
+
   async startGame() {
     const shuffledPlayer = this.game
-      .players!.map((value) => ({ value, sort: random() }))
-      .sort((a, b) => a.sort - b.sort)
-      .map(({ value }) => value);
+      .players!.sort(() => random() - 0.5)
+      .map((player) => isDocument(player) && player._id);
     const currentPlayer = shuffledPlayer[0];
 
     this.game.status = GameStatus.PLAYING;
@@ -43,21 +57,23 @@ export class Game {
   }
 
   async joinGame() {
-    this.game.players!.push(this.chat.user!._id);
+    this.chat.user!.gameProperty = {};
 
-    this.chat.user!.gameProperty!.isJoiningGame = true;
-    this.chat.user!.gameProperty!.gameUID = this.game._id;
-    this.chat.user!.gameProperty!.gameID = this.game.gameID;
+    this.chat.user!.gameProperty.isJoiningGame = true;
+    this.chat.user!.gameProperty.gameUID = this.game._id;
+    this.chat.user!.gameProperty.gameID = this.game.gameID;
 
-    await Promise.all([this.chat.user!.save(), this.game.save()]);
+    await Promise.all([
+      this.chat.user!.save(),
+      GameModel.findOneAndUpdate(
+        { _id: this.game._id },
+        { $push: { players: this.chat.user!._id } }
+      ),
+    ]);
   }
 
   async endGame() {
-    const pojo: { players: Types.ObjectId[]; _id: Types.ObjectId } =
-      await GameModel.findOne({
-        _id: this.game._id,
-        gameID: this.game.gameID,
-      }).lean();
+    const pojo = await this.getPojoSelf();
 
     this.game.endTime = new Date();
     this.game.status = GameStatus.ENDED;
@@ -80,6 +96,26 @@ export class Game {
         },
       }
     );
+  }
+
+  async removeUserFromArray(_id: Types.ObjectId) {
+    const pojo = await this.getPojoSelf();
+
+    const removedFromPlayersOrder = [...pojo.playersOrder].filter(
+      (id) => !id.equals(_id)
+    );
+    const removedFromPlayers = [...pojo.players].filter(
+      (id) => !id.equals(_id)
+    );
+
+    this.game.playersOrder = removedFromPlayersOrder;
+    this.game.players = removedFromPlayers;
+
+    await Promise.all([
+      this.game.save(),
+      this.leaveGameForUser(_id),
+      CardModel.deleteOne({ user: _id, game_id: this.game._id }),
+    ]);
   }
 
   async updatePosition(position: Types.ObjectId) {
@@ -111,8 +147,20 @@ export class Game {
     }
   }
 
-  async sendToOtherPlayersWithoutCurrentPerson(message: AnyMessageContent) {
-    if (isDocumentArray(this.game.players)) {
+  async sendToOtherPlayersWithoutCurrentPerson(
+    message: AnyMessageContent,
+    players?: Ref<UserType>[]
+  ) {
+    if (players && isDocumentArray(players)) {
+      await Promise.all(
+        players
+          .filter((user) => user.phoneNumber !== this.chat.message.userNumber)
+          .map(
+            async (user) =>
+              await this.chat.sendToOtherPerson(user.phoneNumber, message)
+          )
+      );
+    } else if (isDocumentArray(this.game.players)) {
       await Promise.all(
         this.game
           .players!.filter(
@@ -126,8 +174,37 @@ export class Game {
     }
   }
 
+  async save() {
+    await this.game.save();
+  }
+
+  getNextPosition(increment = 1) {
+    if (isNaN(increment) || increment < 1) throw new Error("Invalid increment");
+
+    if (isDocument(this.currentPlayer) && isDocumentArray(this.players)) {
+      const playersOrder = [...(this.game.playersOrder as Types.ObjectId[])];
+      const currentPlayer = this.currentPlayer;
+
+      const currentIndex = playersOrder.findIndex((player) =>
+        player._id.equals(currentPlayer._id)
+      );
+      const nextPlayerID =
+        playersOrder[(currentIndex + increment) % playersOrder.length];
+
+      return this.players.find((player) => player._id.equals(nextPlayerID));
+    }
+  }
+
+  get uid() {
+    return this.game._id;
+  }
+
   get gameID() {
     return this.game.gameID;
+  }
+
+  get currentPositionId() {
+    return <Types.ObjectId>(<unknown>this.game.currentPosition);
   }
 
   get created_at() {
@@ -179,7 +256,7 @@ export class Game {
   }
 
   get currentPlayer() {
-    return this.players?.find(
+    return this.players!.find(
       (player) =>
         isDocument(player) && player._id.equals(this.game.currentPosition)
     );
@@ -190,5 +267,9 @@ export class Game {
       isDocument(this.creator) &&
       this.creator?._id.equals(this.game.currentPosition)
     );
+  }
+
+  set gameCreatorID(id: Types.ObjectId) {
+    this.game.gameCreatorID = id;
   }
 }

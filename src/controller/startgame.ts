@@ -1,6 +1,8 @@
+import { Types } from "mongoose";
+import { DocumentType, isDocument } from "@typegoose/typegoose";
 import { requiredJoinGameSession } from "../utils";
 
-// import { CardModel } from "../models";
+import { Card, CardModel } from "../models";
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.NotFound) {
@@ -18,73 +20,80 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       });
     }
 
-    // await Promise.all(
-    //   game.players.map(async (player) => {
-    //     const card = new Card();
-    //     card.user_id = player;
-    //     card.game_id = game.gameInstance;
-    //
-    //     await databaseSource.manager.save(card);
-    //   })
-    // );
-    //
-    // await game.startGame();
-    //
-    // const cards = await databaseSource.manager.findBy(Card, {
-    //   game_id: game,
-    // });
-    //
-    // const thisPlayerCards = cards.find(
-    //   ({ user_id }) => user_id.id === game.currentPlayer!.id
-    // );
-    //
-    // await Promise.all([
-    //   (async () => {
-    //     await chat.replyToCurrentPerson({
-    //       text: `Game berhasil dimulai! Sekarang giliran ${
-    //         game.currentPlayerIsAuthor ? "kamu" : game.currentPlayer!.userName
-    //       } untuk bermain`,
-    //     });
-    //
-    //     if (game.currentPlayerIsAuthor) {
-    //       await chat.sendToCurrentPerson({
-    //         text: `Kartu saat ini: ${game.currentCard}`,
-    //       });
-    //       await chat.sendToCurrentPerson({
-    //         text: `Kartu kamu: ${thisPlayerCards!.cards.join(", ")}.`,
-    //       });
-    //     }
-    //
-    //     return true;
-    //   })(),
-    //   (async () => {
-    //     if (!game.currentPlayerIsAuthor) {
-    //       const toSender = `${game.currentPlayer!.phoneNumber.replace(
-    //         "+",
-    //         ""
-    //       )}@s.whatsapp.net`;
-    //
-    //       await chat.sendToOtherPerson(toSender, {
-    //         text: `${chat.message.userName} telah memulai permainan! Sekarang giliran kamu untuk bermain`,
-    //       });
-    //       await chat.sendToOtherPerson(toSender, {
-    //         text: `Kartu saat ini: ${game.currentCard}`,
-    //       });
-    //       await chat.sendToOtherPerson(toSender, {
-    //         text: `Kartu kamu: ${thisPlayerCards?.cards.join(", ")}.`,
-    //       });
-    //     }
-    //   })(),
-    //   game.sendToOtherPlayersWithoutCurrentPlayer({
-    //     text: `${
-    //       chat.message.userName
-    //     } telah memulai permainan! Sekarang giliran ${
-    //       game.currentPlayer!.userName
-    //     } untuk bermain`,
-    //   }),
-    // ]);
-    //
-    // chat.logger.info(`[DB] Game ${game.gameID} dimulai`);
+    const usersCard = await Promise.all(
+      game.players!.map(async (player) => {
+        if (isDocument(player)) {
+          const card = await CardModel.create({
+            user: player._id,
+            game: game.uid,
+          });
+          player.gameProperty!.card = card._id;
+
+          await player.save();
+          return card;
+        }
+      })
+    );
+
+    await game.startGame();
+
+    const currentPlayerCard = <DocumentType<Card>>(
+      usersCard.find(
+        (card) =>
+          isDocument(card) &&
+          game.currentPositionId!.equals(card.user as Types.ObjectId)
+      )
+    );
+
+    await Promise.all([
+      (async () => {
+        if (isDocument(game.currentPlayer)) {
+          await chat.replyToCurrentPerson({
+            text: `Game berhasil dimulai! Sekarang giliran ${
+              game.currentPlayerIsAuthor ? "kamu" : game.currentPlayer.userName
+            } untuk bermain`,
+          });
+        }
+
+        if (game.currentPlayerIsAuthor) {
+          await chat.sendToCurrentPerson({
+            text: `Kartu saat ini: ${game.currentCard}`,
+          });
+
+          await chat.sendToCurrentPerson({
+            text: `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
+          });
+        }
+      })(),
+      (async () => {
+        if (
+          !game.currentPlayerIsAuthor &&
+          isDocument(game.currentPlayer) &&
+          isDocument(currentPlayerCard)
+        ) {
+          const toPerson = game.currentPlayer!.phoneNumber;
+
+          await chat.sendToOtherPerson(toPerson, {
+            text: `${chat.message.userName} telah memulai permainan! Sekarang giliran kamu untuk bermain`,
+          });
+          await chat.sendToOtherPerson(toPerson, {
+            text: `Kartu saat ini: ${game.currentCard}`,
+          });
+          await chat.sendToOtherPerson(toPerson, {
+            text: `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
+          });
+        }
+      })(),
+      (async () => {
+        if (isDocument(game.currentPlayer)) {
+          await game.sendToOtherPlayersWithoutCurrentPlayer({
+            text: `${chat.message.userName} telah memulai permainan! Sekarang giliran ${game.currentPlayer.userName} untuk bermain`,
+          });
+        }
+      })(),
+    ]);
+
+    chat.logger.info(`[DB] Game ${game.gameID} dimulai`);
   } else {
     await chat.replyToCurrentPerson({
       text: "Kamu bukanlah orang yang membuat sesi permainannya!",

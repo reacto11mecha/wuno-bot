@@ -30,7 +30,7 @@ export class Card {
   game: Game;
 
   constructor(cardData: DocumentType<CardType>, chat: Chat, game: Game) {
-    // this.card = cardData;
+    this.card = cardData;
     this.chat = chat;
     this.game = game;
   }

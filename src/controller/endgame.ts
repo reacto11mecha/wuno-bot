@@ -1,20 +1,26 @@
 import { requiredJoinGameSession } from "../utils";
 import { isDocument } from "@typegoose/typegoose";
 
+import { UserModel, GameModel } from "../models";
+
 export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.NotFound) {
     await chat.replyToCurrentPerson({ text: "Game tidak ditemukan." });
   } else if (game.isGameCreator) {
     if (!game.state.ENDED) {
+      const gameClone = await GameModel.findOne({ gameID: game.gameID });
       const creatorUsername =
         isDocument(game.creator) && game.creator.userName.slice();
 
       await game.endGame();
 
       await Promise.all([
-        game.sendToOtherPlayersWithoutCurrentPerson({
-          text: `${creatorUsername} telah menghentikan permainan. Terimakasih sudah bermain!`,
-        }),
+        game.sendToOtherPlayersWithoutCurrentPerson(
+          {
+            text: `${creatorUsername} telah menghentikan permainan. Terimakasih sudah bermain!`,
+          },
+          gameClone!.players
+        ),
         chat.replyToCurrentPerson({
           text: "Game berhasil dihentikan. Terimakasih sudah bermain!",
         }),

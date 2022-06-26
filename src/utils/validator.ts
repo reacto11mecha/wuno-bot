@@ -1,6 +1,6 @@
 import { Chat, Game, Card } from "../lib";
 
-import { GameModel, CardModel, User } from "../models";
+import { GameModel, CardModel } from "../models";
 
 type TypeReqJGS = (cb: { chat: Chat; game: Game; card: Card }) => Promise<void>;
 export const requiredJoinGameSession =
@@ -79,3 +79,12 @@ export const atLeastGameID =
       chat.logger.error({ error });
     }
   };
+
+export type isDMChatCb = (cb: Chat) => Promise<void>;
+export const isDMChat = (cb: isDMChatCb) => async (chat: Chat) => {
+  if (chat.isDMChat) return await cb(chat);
+
+  await chat.replyToCurrentPerson({
+    text: "Kirim pesan ini lewat DM WhatsApp!",
+  });
+};

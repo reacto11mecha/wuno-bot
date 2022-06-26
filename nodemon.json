@@ -2,5 +2,5 @@
     "execMap": {
         "ts": "ts-node"
     },
-    "ignore": ["auth_info_baileys", "dist"]
+    "ignore": ["auth_info_baileys", "baileys_store_multi.json", "dist"]
 }
