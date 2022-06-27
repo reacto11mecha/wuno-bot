@@ -18,7 +18,7 @@ specifiers:
   mongoose: 6.3.5
   mongoose-autopopulate: ^0.16.1
   nanoid: 3.x.x
-  nodemon: ^2.0.16
+  nodemon: ^2.0.18
   p-queue: 6.x.x
   pino: ^8.0.0
   pino-pretty: ^8.0.0
@@ -51,7 +51,7 @@ devDependencies:
   eslint: 8.17.0
   eslint-config-prettier: 8.5.0_eslint@8.17.0
   husky: 8.0.1
-  nodemon: 2.0.16
+  nodemon: 2.0.18
   prettier: 2.7.1
   ts-node: 10.8.1_w7x2tbnlqsjlyiccdck6zsdv74
   typescript: 4.7.3
@@ -2134,8 +2134,8 @@ packages:
       clone: 2.1.2
     dev: false
 
-  /nodemon/2.0.16:
-    resolution: {integrity: sha512-zsrcaOfTWRuUzBn3P44RDliLlp263Z/76FPoHFr3cFFkOz0lTPAcIw8dCzfdVIx/t3AtDYCZRCDkoCojJqaG3w==}
+  /nodemon/2.0.18:
+    resolution: {integrity: sha512-uAvrKipi2zAz8E7nkSz4qW4F4zd5fs2wNGsTx+xXlP8KXqd9ucE0vY9wankOsPboeDyuUGN9vsXGV1pLn80l/A==}
     engines: {node: '>=8.10.0'}
     hasBin: true
     requiresBuild: true
