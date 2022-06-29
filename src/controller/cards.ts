@@ -7,7 +7,7 @@ export default requiredJoinGameSession(async ({ chat, game, card }) => {
     });
   } else if (game.state.ENDED) {
     await chat.replyToCurrentPerson({ text: "Game sudah selesai!" });
-  } else if (game.isCurrentChatTurn) {
+  } else {
     const cards = card.cards!.join(", ");
 
     await chat.replyToCurrentPerson({ text: `Kartu kamu: ${cards}.` });
