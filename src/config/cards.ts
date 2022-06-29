@@ -1,5 +1,5 @@
-type color = "red" | "green" | "blue" | "yellow";
-type possibleNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+export type color = "red" | "green" | "blue" | "yellow";
+export type possibleNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 export type allCard =
   | `${color}${possibleNumber}`
   | `wild${color}`

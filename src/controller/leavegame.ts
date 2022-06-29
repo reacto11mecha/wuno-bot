@@ -43,6 +43,22 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.state.PLAYING) {
     const currentPlayer = game.currentPlayer;
 
+    // Check if players is less than two person
+    if (game.players!.length < 2) {
+      await game.endGame();
+
+      await Promise.all([
+        chat.replyToCurrentPerson({
+          text: "Anda berhasil keluar dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!",
+        }),
+        game.sendToOtherPlayersWithoutCurrentPlayer({
+          text: `Pemain ${chat.message.userName} sudah keluar dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!`,
+        }),
+      ]);
+
+      return;
+    }
+
     // Typeguard playing state start
     if (isDocument(currentPlayer) && isDocument(nextPlayer)) {
       if (game.currentPlayerIsAuthor) {
@@ -84,7 +100,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       } else if (game.isGameCreator) {
         // Is current chatter the author and not it's turn
         await removeGameAuthorAndSetToNextPlayer(chat, game);
-      } else if (currentPlayer._id.equals(chat.user!._id)) {
+      } else if (game.isCurrentChatTurn) {
         // Is current chatter not the author and it's turn
       } else {
         // Is current chatter not the author and not it's turn

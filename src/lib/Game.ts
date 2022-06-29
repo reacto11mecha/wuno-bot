@@ -1,6 +1,7 @@
 import {
   Ref,
   DocumentType,
+  isRefType,
   isDocument,
   isDocumentArray,
 } from "@typegoose/typegoose";
@@ -40,6 +41,13 @@ export class Game {
     }).lean();
 
     return pojo;
+  }
+
+  private _isPlayerTurn(user: DocumentType<UserType>) {
+    return (
+      isRefType(this.game.currentPosition, Types.ObjectId) &&
+      this.game.currentPosition!.equals(user._id)
+    );
   }
 
   async startGame() {
@@ -267,6 +275,10 @@ export class Game {
       isDocument(this.creator) &&
       this.creator?._id.equals(this.game.currentPosition)
     );
+  }
+
+  get isCurrentChatTurn() {
+    return this._isPlayerTurn(this.chat.user!);
   }
 
   set gameCreatorID(id: Types.ObjectId) {
