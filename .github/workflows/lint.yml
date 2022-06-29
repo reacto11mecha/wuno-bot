@@ -26,4 +26,5 @@ jobs:
           run_install: true
 
       - name: Test Code Linting
-        run: pnpm lint 
+        run: pnpm Lint
+        continue-on-error: false
