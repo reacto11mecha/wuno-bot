@@ -2,10 +2,15 @@
   "name": "wuno-bot",
   "version": "1.0.0",
   "description": "Whatsapp uno bot",
-  "type": "module",
+  "main": "dist/index.js",
   "scripts": {
+    "dev": "nodemon src/index.ts",
     "start": "node .",
-    "lint": "eslint ."
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ./src",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -17,20 +22,37 @@
     "url": "https://github.com/reacto11mecha/wuno-bot/issues"
   },
   "homepage": "https://github.com/reacto11mecha/wuno-bot#readme",
-  "dependencies": {
-    "@open-wa/wa-automate": "^4.25.1",
-    "dotenv": "^10.0.0",
-    "libphonenumber-js": "^1.9.44",
-    "mongoose": "^6.0.14",
-    "nanoid": "^3.1.30",
-    "p-queue": "^7.1.0",
-    "pino": "^7.5.1",
-    "pino-pretty": "^7.2.0",
-    "sharp": "^0.29.3"
-  },
   "devDependencies": {
-    "eslint": "^8.3.0",
-    "eslint-config-prettier": "^8.3.0",
-    "prettier": "^2.5.0"
+    "@commitlint/cli": "^17.0.2",
+    "@commitlint/config-conventional": "^17.0.2",
+    "@types/node": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "husky": "^8.0.1",
+    "nodemon": "^2.0.18",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.3"
+  },
+  "dependencies": {
+    "@adiwajshing/baileys": "^4.2.0",
+    "@adiwajshing/keyed-db": "^0.2.4",
+    "@hapi/boom": "^10.0.0",
+    "@typegoose/typegoose": "^9.9.0",
+    "dotenv": "^16.0.1",
+    "libphonenumber-js": "^1.10.6",
+    "mongoose": "6.3.5",
+    "mongoose-autopopulate": "^0.16.1",
+    "nanoid": "3.x.x",
+    "p-queue": "6.x.x",
+    "pino": "^8.0.0",
+    "pino-pretty": "^8.0.0",
+    "qrcode-terminal": "^0.12.0"
+  },
+  "lint-staged": {
+    "*.{ts,js}": "eslint --cache --fix",
+    "*.{ts,js,css,md}": "prettier --write"
   }
 }
