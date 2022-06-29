@@ -26,4 +26,4 @@ jobs:
           run_install: true
 
       - name: Test Type Checking
-        run: pnpm typecheking
+        run: pnpm typecheck
