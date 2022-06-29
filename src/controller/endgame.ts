@@ -1,7 +1,7 @@
 import { requiredJoinGameSession } from "../utils";
 import { isDocument } from "@typegoose/typegoose";
 
-import { UserModel, GameModel } from "../models";
+import { GameModel } from "../models";
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.NotFound) {

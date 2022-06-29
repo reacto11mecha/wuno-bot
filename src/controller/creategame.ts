@@ -1,21 +1,5 @@
-import { nanoid } from "nanoid";
-
 import { Chat } from "../lib";
 import { GameModel, Game } from "../models";
-
-import { cards } from "../config/cards";
-import { random } from "../utils";
-
-const appropriateInitialCards = cards
-  .filter((e) => !e.startsWith("wild"))
-  .filter((e) => !e.endsWith("skip"))
-  .filter((e) => !e.endsWith("draw2"))
-  .filter((e) => !e.endsWith("reverse"));
-
-const getIntialCard = () => {
-  const idx = Math.floor(random() * appropriateInitialCards.length);
-  return appropriateInitialCards[idx];
-};
 
 export default async function creategame(chat: Chat) {
   if (!chat.isJoiningGame) {

@@ -1,6 +1,6 @@
 import { prop, Ref } from "@typegoose/typegoose";
 
-import { cards, type allCard } from "../config/cards";
+import { cards } from "../config/cards";
 import { Card as CardLib } from "../lib";
 import { User } from "./user";
 import { Game } from "./game";

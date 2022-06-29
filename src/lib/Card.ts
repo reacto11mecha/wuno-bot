@@ -26,7 +26,7 @@ export interface IGetCardState {
 }
 
 const COLOURS = ["red", "green", "blue", "yellow"];
-const SPECIAL = ["draw2", "reverse", "skip"];
+// const SPECIAL = ["draw2", "reverse", "skip"];
 
 const regexValidNormal = /^(red|green|blue|yellow)[0-9]$/;
 const regexValidSpecial = /^(red|green|blue|yellow)(draw2|reverse|skip)$/;
@@ -34,9 +34,9 @@ const regexValidWildColorOnly = /^(wild)(red|green|blue|yellow)$/;
 const regexValidWildColorPlus4Only = /^(wilddraw4)(red|green|blue|yellow)$/;
 
 const reducedByNumbers = [...new Array(14)].map((_, idx) => idx);
-const filteredWildColor = cards
-  .filter((card) => !regexValidWildColorOnly.test(card))
-  .filter((card) => !regexValidWildColorPlus4Only.test(card));
+// const filteredWildColor = cards
+//   .filter((card) => !regexValidWildColorOnly.test(card))
+//   .filter((card) => !regexValidWildColorPlus4Only.test(card));
 
 export class Card {
   private card: DocumentType<CardType>;
