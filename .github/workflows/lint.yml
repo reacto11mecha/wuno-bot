@@ -27,4 +27,3 @@ jobs:
 
       - name: Test Code Linting
         run: pnpm lint
-        continue-on-error: false
