@@ -8,6 +8,7 @@
     "start": "node .",
     "build": "tsc",
     "build:watch": "tsc --watch",
+    "typechecking": "tsc --noEmit",
     "lint": "eslint ./src",
     "prepare": "husky install"
   },
