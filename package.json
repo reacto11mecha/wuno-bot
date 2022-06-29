@@ -26,7 +26,7 @@
     "p-queue": "^7.1.0",
     "pino": "^7.5.1",
     "pino-pretty": "^7.2.0",
-    "sharp": "^0.29.3"
+    "sharp": "^0.30.5"
   },
   "devDependencies": {
     "eslint": "^8.3.0",
