@@ -1,6 +1,7 @@
 import {
   Ref,
   DocumentType,
+  isRefTypeArray,
   isRefType,
   isDocument,
   isDocumentArray,
@@ -139,6 +140,13 @@ export class Game {
     await this.game.save();
   }
 
+  async reversePlayersOrder() {
+    if (isRefTypeArray(this.game.playersOrder, Types.ObjectId)) {
+      this.game.playersOrder = [...this.game.playersOrder].reverse();
+      await this.game.save();
+    }
+  }
+
   async sendToOtherPlayersWithoutCurrentPlayer(message: AnyMessageContent) {
     if (isDocumentArray(this.game.players)) {
       await Promise.all(
@@ -201,6 +209,10 @@ export class Game {
 
       return this.players.find((player) => player._id.equals(nextPlayerID));
     }
+  }
+
+  get playersOrderIds() {
+    return this.game.playersOrder;
   }
 
   get uid() {
