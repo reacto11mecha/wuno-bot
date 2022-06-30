@@ -5,6 +5,8 @@ import { Chat } from "../lib/Chat";
 import { emitHandler } from "./emitter";
 import { getController } from "./controller";
 
+import { botInfo } from "../config/messages";
+
 export const messageHandler = async (sock: WASocket, logger: Logger) => {
   const controller = await getController();
   const emitter = emitHandler(controller);
@@ -78,13 +80,17 @@ export const messageHandler = async (sock: WASocket, logger: Logger) => {
       case "draw":
         emitter.emit("draw", chat);
         break;
+      case "h":
+      case "help":
+        emitter.emit("help", chat);
+        break;
 
       default: {
         await chat.sendToCurrentPerson({
           text:
             command.length > 0
               ? `Tidak ada perintah yang bernama "${command}"`
-              : "Under development",
+              : botInfo,
         });
         break;
       }
