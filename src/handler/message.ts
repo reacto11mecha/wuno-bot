@@ -27,13 +27,11 @@ export const messageHandler = async (sock: WASocket, logger: Logger) => {
     const chat = new Chat(sock, WebMessage, logger, text!);
 
     switch (command) {
-      case "c":
       case "cg":
       case "create":
       case "creategame":
         emitter.emit("creategame", chat);
         break;
-      case "s":
       case "sg":
       case "start":
       case "startgame":
@@ -68,9 +66,11 @@ export const messageHandler = async (sock: WASocket, logger: Logger) => {
       case "play":
         emitter.emit("play", chat);
         break;
+      case "s":
       case "say":
         emitter.emit("say", chat);
         break;
+      case "c":
       case "cards":
         emitter.emit("cards", chat);
         break;
