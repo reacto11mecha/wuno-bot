@@ -9,7 +9,7 @@ import {
 import { Types } from "mongoose";
 import { Chat } from "./Chat";
 
-import { random } from "../utils";
+import { calcElapsedTime, random } from "../utils";
 import {
   GameModel,
   Game as GameType,
@@ -31,7 +31,7 @@ export class Game {
     this.chat = chat;
   }
 
-  private async getPojoSelf() {
+  async getPojoSelf() {
     const pojo: {
       players: Types.ObjectId[];
       playersOrder: Types.ObjectId[];
@@ -94,6 +94,8 @@ export class Game {
       CardModel.deleteMany({ game: pojo._id }),
       [...pojo.players].map(async (id) => await this.leaveGameForUser(id)),
     ]);
+
+    this.chat.logger.info(`[DB] Game ${this.game.gameID} dimulai`);
   }
 
   async leaveGameForUser(_id: Types.ObjectId) {
@@ -209,6 +211,10 @@ export class Game {
 
       return this.players.find((player) => player._id.equals(nextPlayerID));
     }
+  }
+
+  getElapsedTime() {
+    return calcElapsedTime(this.game.startTime!, this.game.endTime!);
   }
 
   get playersOrderIds() {

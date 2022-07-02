@@ -7,6 +7,7 @@ specifiers:
   '@commitlint/config-conventional': ^17.0.2
   '@hapi/boom': ^10.0.0
   '@typegoose/typegoose': ^9.9.0
+  '@types/luxon': ^2.3.2
   '@types/node': ^18.0.0
   '@types/sharp': ^0.30.4
   '@typescript-eslint/eslint-plugin': ^5.28.0
@@ -16,6 +17,7 @@ specifiers:
   eslint-config-prettier: ^8.5.0
   husky: ^8.0.1
   libphonenumber-js: ^1.10.6
+  luxon: ^2.4.0
   mongoose: 6.3.5
   mongoose-autopopulate: ^0.16.1
   nanoid: 3.x.x
@@ -36,6 +38,7 @@ dependencies:
   '@typegoose/typegoose': 9.9.0_mongoose@6.3.5
   dotenv: 16.0.1
   libphonenumber-js: 1.10.6
+  luxon: 2.4.0
   mongoose: 6.3.5
   mongoose-autopopulate: 0.16.1_mongoose@6.3.5
   nanoid: 3.3.4
@@ -48,6 +51,7 @@ dependencies:
 devDependencies:
   '@commitlint/cli': 17.0.2
   '@commitlint/config-conventional': 17.0.2
+  '@types/luxon': 2.3.2
   '@types/node': 18.0.0
   '@types/sharp': 0.30.4
   '@typescript-eslint/eslint-plugin': 5.28.0_7yumg2qjgbp7maccqlfhx2vudu
@@ -484,6 +488,10 @@ packages:
   /@types/long/4.0.2:
     resolution: {integrity: sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==}
     dev: false
+
+  /@types/luxon/2.3.2:
+    resolution: {integrity: sha512-WOehptuhKIXukSUUkRgGbj2c997Uv/iUgYgII8U7XLJqq9W2oF0kQ6frEznRQbdurioz+L/cdaIm4GutTQfgmA==}
+    dev: true
 
   /@types/minimist/1.2.2:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
@@ -1998,6 +2006,11 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
+
+  /luxon/2.4.0:
+    resolution: {integrity: sha512-w+NAwWOUL5hO0SgwOHsMBAmZ15SoknmQXhSO0hIbJCAmPKSsGeK8MlmhYh2w6Iib38IxN2M+/ooXWLbeis7GuA==}
+    engines: {node: '>=12'}
+    dev: false
 
   /make-dir/3.1.0:
     resolution: {integrity: sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw==}

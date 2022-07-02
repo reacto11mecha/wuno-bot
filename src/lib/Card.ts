@@ -8,6 +8,7 @@ import { Types } from "mongoose";
 import { Chat } from "./Chat";
 import { Game } from "./Game";
 import { cards } from "../config/cards";
+import { getRandom, randomWithBias } from "../utils";
 
 import { Card as CardType, CardModel } from "../models";
 import type {
@@ -30,13 +31,11 @@ export interface IGetCardState {
   type?: "draw2" | "reverse" | "skip";
 }
 
-// const COLOURS = ["red", "green", "blue", "yellow"];
-// const SPECIAL = ["draw2", "reverse", "skip"];
-
 const regexValidNormal = /^(red|green|blue|yellow)[0-9]$/;
 const regexValidSpecial = /^(red|green|blue|yellow)(draw2|reverse|skip)$/;
-const regexValidWildColorOnly = /^(wild)(red|green|blue|yellow)$/;
-const regexValidWildColorPlus4Only = /^(wilddraw4)(red|green|blue|yellow)$/;
+export const regexValidWildColorOnly = /^(wild)(red|green|blue|yellow)$/;
+export const regexValidWildColorPlus4Only =
+  /^(wilddraw4)(red|green|blue|yellow)$/;
 
 const reducedByNumbers = [...new Array(14)].map((_, idx) => idx);
 const filteredWildColor = cards
@@ -55,15 +54,15 @@ export class Card {
   }
 
   static pickRandomCard(): allCard {
-    const idxReduced = Math.floor(Math.random() * reducedByNumbers.length);
+    const idxReduced = Math.floor(getRandom() * reducedByNumbers.length);
     const reducedNumber = reducedByNumbers[idxReduced];
 
-    const idxCard = Math.floor(Math.random() * (cards.length - reducedNumber));
+    const idxCard = Math.floor(getRandom() * (cards.length - reducedNumber));
     const card = filteredWildColor[idxCard];
 
-    // Prevent null card value
     if (!card) return Card.pickRandomCard();
-    return card;
+
+    return randomWithBias([card, "wild"], [16, 1], 2) as allCard;
   }
 
   static isValidCard(card: string) {
@@ -126,6 +125,35 @@ export class Card {
     }
   }
 
+  private async checkIsWinner(notAWinnerCallback: () => Promise<void>) {
+    if (this.cards!.length > 0) return await notAWinnerCallback();
+
+    const playerList = this.game.players;
+    await this.game.endGame();
+
+    const gameDuration = this.game.getElapsedTime();
+
+    await Promise.all([
+      this.chat.sendToCurrentPerson({
+        text: `Selamat! Kamu memenangkan kesempatan permainan kali ini.
+
+Kamu telah memanangkan permainan ini dengan durasi ${gameDuration}.
+
+Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
+      }),
+      this.game.sendToOtherPlayersWithoutCurrentPerson(
+        {
+          text: `${this.chat.message.userName} memenangkan kesempatan permainan kali ini.
+
+Dia telah memanangkan permainan ini dengan durasi ${gameDuration}.
+
+Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
+        },
+        playerList
+      ),
+    ]);
+  }
+
   async solve(givenCard: allCard) {
     const status = this.compareTwoCard(
       this.game.currentCard as allCard,
@@ -148,37 +176,37 @@ export class Card {
           nextPlayer!._id
         );
 
-        if (
-          isDocument(nextPlayer) &&
-          isDocument(nextUserCard) &&
-          isDocumentArray(playerList)
-        ) {
-          await Promise.all([
-            this.chat.sendToCurrentPerson({
-              text: `Berhasil mengeluarkan kartu *${givenCard}*, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
-            }),
-            this.game.sendToOtherPlayersWithoutCurrentPerson(
-              {
-                text: `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
-              },
-              playerList
-            ),
-            (async () => {
-              const phoneNumber = nextPlayer.phoneNumber;
+        await this.checkIsWinner(async () => {
+          if (
+            isDocument(nextPlayer) &&
+            isDocument(nextUserCard) &&
+            isDocumentArray(playerList)
+          ) {
+            await Promise.all([
+              this.chat.sendToCurrentPerson({
+                text: `Berhasil mengeluarkan kartu *${givenCard}*, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
+              }),
+              this.game.sendToOtherPlayersWithoutCurrentPerson(
+                {
+                  text: `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
+                },
+                playerList
+              ),
+            ]);
+            const phoneNumber = nextPlayer.phoneNumber;
 
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, Sekarang giliran kamu untuk bermain`,
-              });
+            await this.chat.sendToOtherPerson(phoneNumber, {
+              text: `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, Sekarang giliran kamu untuk bermain`,
+            });
 
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `Kartu saat ini: ${this.game.currentCard}`,
-              });
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `Kartu kamu: ${nextUserCard.cards?.join(", ")}.`,
-              });
-            })(),
-          ]);
-        }
+            await this.chat.sendToOtherPerson(phoneNumber, {
+              text: `Kartu saat ini: ${this.game.currentCard}`,
+            });
+            await this.chat.sendToOtherPerson(phoneNumber, {
+              text: `Kartu kamu: ${nextUserCard.cards?.join(", ")}.`,
+            });
+          }
+        });
 
         break;
       }
@@ -195,58 +223,65 @@ export class Card {
               isDocument(player) && player._id !== actualNextPlayer!._id
           );
 
-        const newCards = [Card.pickRandomCard(), Card.pickRandomCard()];
+        const newCards = Array.from(new Array(2)).map(() =>
+          Card.pickRandomCard()
+        );
 
         await Promise.all([
           this.game.updateCardAndPosition(givenCard, actualNextPlayer!._id),
-          this.removeCardFromPlayer(givenCard),
-          newCards.map((card) => this.addNewCard(card)),
+          (async () => {
+            await this.removeCardFromPlayer(givenCard);
+
+            await this.addNewCard(newCards[0]);
+            await this.addNewCard(newCards[1]);
+          })(),
         ]);
 
         const nextUserCard = await this.getCardByUserAndThisGame(
           actualNextPlayer!._id
         );
 
-        if (
-          isDocument(nextPlayer) &&
-          isDocument(actualNextPlayer) &&
-          isDocument(nextUserCard) &&
-          isDocumentArray(playerList)
-        ) {
-          await Promise.all([
-            this.chat.sendToOtherPerson(nextPlayer.phoneNumber, {
-              text: `Anda ditambahkan dua kartu oleh ${
-                this.chat.message.userName
-              } dengan kartu ${givenCard}. Anda mendapatkan kartu ${newCards
-                .map((card) => `*${card}*`)
-                .join(" dan ")}. Sekarang giliran ${
-                actualNextPlayer.userName
-              } untuk bermain.`,
-            }),
-            this.game.sendToOtherPlayersWithoutCurrentPerson(
-              {
-                text: `${nextPlayer.userName} telah ditambahkan dua kartu oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.userName} untuk bermain.`,
-              },
-              playerList
-            ),
-            (async () => {
-              const phoneNumber = actualNextPlayer.phoneNumber;
+        await this.checkIsWinner(async () => {
+          if (
+            isDocument(nextPlayer) &&
+            isDocument(actualNextPlayer) &&
+            isDocument(nextUserCard) &&
+            isDocumentArray(playerList)
+          ) {
+            await Promise.all([
+              this.chat.sendToOtherPerson(nextPlayer.phoneNumber, {
+                text: `Anda ditambahkan dua kartu oleh ${
+                  this.chat.message.userName
+                } dengan kartu ${givenCard}. Anda mendapatkan kartu ${newCards
+                  .map((card) => `*${card}*`)
+                  .join(" dan ")}. Sekarang giliran ${
+                  actualNextPlayer.userName
+                } untuk bermain.`,
+              }),
+              this.game.sendToOtherPlayersWithoutCurrentPerson(
+                {
+                  text: `${nextPlayer.userName} telah ditambahkan dua kartu oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.userName} untuk bermain.`,
+                },
+                playerList
+              ),
+              (async () => {
+                const phoneNumber = actualNextPlayer.phoneNumber;
 
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `${nextPlayer.userName} telah ditambahkan dua skip oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran kamu untuk bermain.`,
-              });
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `Kartu saat ini: ${this.game.currentCard}`,
-              });
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `Kartu saat ini: ${this.game.currentCard}`,
-              });
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `Kartu kamu: ${nextUserCard!.cards?.join(", ")}.`,
-              });
-            })(),
-          ]);
-        }
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `${nextPlayer.userName} telah ditambahkan dua kartu oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran kamu untuk bermain.`,
+                });
+
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `Kartu saat ini: ${this.game.currentCard}`,
+                });
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `Kartu kamu: ${nextUserCard!.cards?.join(", ")}.`,
+                });
+              })(),
+            ]);
+          }
+        });
+
         break;
       }
 
@@ -267,37 +302,40 @@ export class Card {
           nextPlayer!._id
         );
 
-        if (
-          isDocument(nextPlayer) &&
-          isDocument(nextUserCard) &&
-          isDocumentArray(playerList)
-        ) {
-          await Promise.all([
-            this.chat.sendToCurrentPerson({
-              text: `Berhasil mengeluarkan kartu *${givenCard}* dan me-reverse permainan, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
-            }),
-            this.game.sendToOtherPlayersWithoutCurrentPerson(
-              {
-                text: `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}* dan me-reverse permainan, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
-              },
-              playerList
-            ),
-            (async () => {
-              const phoneNumber = nextPlayer.phoneNumber;
+        await this.checkIsWinner(async () => {
+          if (
+            isDocument(nextPlayer) &&
+            isDocument(nextUserCard) &&
+            isDocumentArray(playerList)
+          ) {
+            await Promise.all([
+              this.chat.sendToCurrentPerson({
+                text: `Berhasil mengeluarkan kartu *${givenCard}* dan me-reverse permainan, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
+              }),
+              this.game.sendToOtherPlayersWithoutCurrentPerson(
+                {
+                  text: `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}* dan me-reverse permainan, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
+                },
+                playerList
+              ),
+              (async () => {
+                const phoneNumber = nextPlayer.phoneNumber;
 
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, Sekarang giliran kamu untuk bermain`,
-              });
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}* dan me-reverse permainan, Sekarang giliran kamu untuk bermain`,
+                });
 
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `Kartu saat ini: ${this.game.currentCard}`,
-              });
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `Kartu kamu: ${nextUserCard.cards?.join(", ")}.`,
-              });
-            })(),
-          ]);
-        }
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `Kartu saat ini: ${this.game.currentCard}`,
+                });
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `Kartu kamu: ${nextUserCard.cards?.join(", ")}.`,
+                });
+              })(),
+            ]);
+          }
+        });
+
         break;
       }
 
@@ -322,40 +360,168 @@ export class Card {
           actualNextPlayer!._id
         );
 
-        if (
-          isDocument(nextPlayer) &&
-          isDocument(actualNextPlayer) &&
-          isDocument(nextUserCard) &&
-          isDocumentArray(playerList)
-        ) {
-          await Promise.all([
-            this.chat.sendToOtherPerson(nextPlayer.phoneNumber, {
-              text: `Anda telah di skip oleh ${this.chat.message.userName} dengan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.userName} untuk bermain.`,
-            }),
-            this.game.sendToOtherPlayersWithoutCurrentPerson(
-              {
-                text: `${nextPlayer.userName} telah di skip oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.userName} untuk bermain.`,
-              },
-              playerList
-            ),
-            (async () => {
-              const phoneNumber = actualNextPlayer.phoneNumber;
+        await this.checkIsWinner(async () => {
+          if (
+            isDocument(nextPlayer) &&
+            isDocument(actualNextPlayer) &&
+            isDocument(nextUserCard) &&
+            isDocumentArray(playerList)
+          ) {
+            await Promise.all([
+              this.chat.sendToOtherPerson(nextPlayer.phoneNumber, {
+                text: `Anda telah di skip oleh ${this.chat.message.userName} dengan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.userName} untuk bermain.`,
+              }),
+              this.game.sendToOtherPlayersWithoutCurrentPerson(
+                {
+                  text: `${nextPlayer.userName} telah di skip oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.userName} untuk bermain.`,
+                },
+                playerList
+              ),
+              (async () => {
+                const phoneNumber = actualNextPlayer.phoneNumber;
 
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `${nextPlayer.userName} telah di skip oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran kamu untuk bermain.`,
-              });
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `Kartu saat ini: ${this.game.currentCard}`,
-              });
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `Kartu saat ini: ${this.game.currentCard}`,
-              });
-              await this.chat.sendToOtherPerson(phoneNumber, {
-                text: `Kartu kamu: ${nextUserCard!.cards?.join(", ")}.`,
-              });
-            })(),
-          ]);
-        }
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `${nextPlayer.userName} telah di skip oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran kamu untuk bermain.`,
+                });
+
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `Kartu saat ini: ${this.game.currentCard}`,
+                });
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `Kartu kamu: ${nextUserCard!.cards?.join(", ")}.`,
+                });
+              })(),
+            ]);
+          }
+        });
+
+        break;
+      }
+
+      case "STACK_PLUS_4": {
+        const nextPlayer = this.game.getNextPosition();
+        const actualNextPlayer = this.game.getNextPosition(2);
+        const playerList = this.game
+          .players!.filter(
+            (player) => isDocument(player) && player._id !== nextPlayer!._id
+          )
+          .filter(
+            (player) =>
+              isDocument(player) && player._id !== actualNextPlayer!._id
+          );
+
+        const newCards = Array.from(new Array(4)).map(() =>
+          Card.pickRandomCard()
+        );
+
+        await Promise.all([
+          this.game.updateCardAndPosition(givenCard, actualNextPlayer!._id),
+          (async () => {
+            await this.removeCardFromPlayer("wilddraw4");
+
+            await this.addNewCard(newCards[0]);
+            await this.addNewCard(newCards[1]);
+            await this.addNewCard(newCards[2]);
+            await this.addNewCard(newCards[3]);
+          })(),
+        ]);
+
+        const nextUserCard = await this.getCardByUserAndThisGame(
+          actualNextPlayer!._id
+        );
+
+        await this.checkIsWinner(async () => {
+          if (
+            isDocument(nextPlayer) &&
+            isDocument(actualNextPlayer) &&
+            isDocument(nextUserCard) &&
+            isDocumentArray(playerList)
+          ) {
+            await Promise.all([
+              this.chat.sendToOtherPerson(nextPlayer.phoneNumber, {
+                text: `Anda ditambahkan empat kartu oleh ${
+                  this.chat.message.userName
+                } dengan kartu ${givenCard}. Anda mendapatkan kartu ${newCards
+                  .map((card, idx) => `${idx === 3 ? " dan " : ""}*${card}*`)
+                  .join(", ")}. Sekarang giliran ${
+                  actualNextPlayer.userName
+                } untuk bermain.`,
+              }),
+              this.game.sendToOtherPlayersWithoutCurrentPerson(
+                {
+                  text: `${nextPlayer.userName} telah ditambahkan empat kartu oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.userName} untuk bermain.`,
+                },
+                playerList
+              ),
+              (async () => {
+                const phoneNumber = actualNextPlayer.phoneNumber;
+
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `${nextPlayer.userName} telah ditambahkan empat kartu oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran kamu untuk bermain.`,
+                });
+
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `Kartu saat ini: ${this.game.currentCard}`,
+                });
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `Kartu kamu: ${nextUserCard!.cards?.join(", ")}.`,
+                });
+              })(),
+            ]);
+          }
+        });
+
+        break;
+      }
+
+      case "STACK_WILD": {
+        const nextPlayer = this.game.getNextPosition();
+        const playerList = this.game.players!.filter(
+          (player) => isDocument(player) && player._id !== nextPlayer!._id
+        );
+
+        await Promise.all([
+          this.game.updateCardAndPosition(givenCard, nextPlayer!._id),
+          await this.removeCardFromPlayer("wild"),
+        ]);
+
+        const nextUserCard = await this.getCardByUserAndThisGame(
+          nextPlayer!._id
+        );
+
+        await this.checkIsWinner(async () => {
+          if (
+            isDocument(nextPlayer) &&
+            isDocument(nextUserCard) &&
+            isDocumentArray(playerList)
+          ) {
+            await Promise.all([
+              this.chat.sendToCurrentPerson({
+                text: `Berhasil mengeluarkan kartu pilih warna dengan kartu *${givenCard}*, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
+              }),
+              this.game.sendToOtherPlayersWithoutCurrentPerson(
+                {
+                  text: `${this.chat.message.userName} telah mengeluarkan kartu pilih warna dengan kartu *${givenCard}*, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
+                },
+                playerList
+              ),
+              (async () => {
+                const phoneNumber = nextPlayer.phoneNumber;
+
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `${this.chat.message.userName} telah mengeluarkan kartu pilih warna dengan kartu *${givenCard}*, Sekarang giliran kamu untuk bermain`,
+                });
+
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `Kartu saat ini: ${this.game.currentCard}`,
+                });
+                await this.chat.sendToOtherPerson(phoneNumber, {
+                  text: `Kartu kamu: ${nextUserCard.cards?.join(", ")}.`,
+                });
+              })(),
+            ]);
+          }
+        });
 
         break;
       }
@@ -369,10 +535,14 @@ export class Card {
   }
 
   isIncluded(card: string) {
-    return this.card.cards?.includes(card);
+    if (card.match(regexValidWildColorOnly))
+      return this.card.cards?.includes("wild");
+    else if (card.match(regexValidWildColorPlus4Only))
+      return this.card.cards?.includes("wilddraw4");
+    else return this.card.cards?.includes(card);
   }
 
-  compareTwoCard(firstCard: allCard, secCard: allCard) {
+  private compareTwoCard(firstCard: allCard, secCard: allCard) {
     const firstState = this.getCardState(firstCard);
     const secState = this.getCardState(secCard);
 
@@ -387,6 +557,10 @@ export class Card {
     switch (true) {
       /* eslint-disable no-fallthrough */
 
+      // Valid wild color only from player
+      case switchState.SECONDCARD_IS_WILD:
+        return "STACK_WILD";
+
       case switchState.FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME:
 
       // Wild color only, stack with specific color
@@ -397,10 +571,6 @@ export class Card {
       case switchState.SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD:
         return `VALID_SPECIAL_${secState.type!.toUpperCase()}`;
 
-      // Valid wild color only from player
-      case switchState.SECONDCARD_IS_WILD:
-        return "STACK_WILD";
-
       // Valid wilddraw4 from player
       case switchState.SECONDCARD_IS_WILD4:
         return "STACK_PLUS_4";
@@ -409,7 +579,7 @@ export class Card {
     return "UNMATCH";
   }
 
-  getSwitchState(firstState: IGetCardState, secState: IGetCardState) {
+  private getSwitchState(firstState: IGetCardState, secState: IGetCardState) {
     /**
      * If the color or number is the same, but it's not special or plus4 card
      */
@@ -469,7 +639,7 @@ export class Card {
    * @param card Valid given card
    * @returns Object of the card state
    */
-  getCardState(card: allCard): IGetCardState {
+  private getCardState(card: allCard): IGetCardState {
     const normalizeCard = card.trim().toLowerCase();
 
     switch (true) {
