@@ -5,6 +5,8 @@ import { Chat } from "../lib/Chat";
 import { emitHandler } from "./emitter";
 import { getController } from "./controller";
 
+import { botInfo } from "../config/messages";
+
 export const messageHandler = async (sock: WASocket, logger: Logger) => {
   const controller = await getController();
   const emitter = emitHandler(controller);
@@ -25,13 +27,11 @@ export const messageHandler = async (sock: WASocket, logger: Logger) => {
     const chat = new Chat(sock, WebMessage, logger, text!);
 
     switch (command) {
-      case "c":
       case "cg":
       case "create":
       case "creategame":
         emitter.emit("creategame", chat);
         break;
-      case "s":
       case "sg":
       case "start":
       case "startgame":
@@ -66,9 +66,11 @@ export const messageHandler = async (sock: WASocket, logger: Logger) => {
       case "play":
         emitter.emit("play", chat);
         break;
+      case "s":
       case "say":
         emitter.emit("say", chat);
         break;
+      case "c":
       case "cards":
         emitter.emit("cards", chat);
         break;
@@ -78,13 +80,17 @@ export const messageHandler = async (sock: WASocket, logger: Logger) => {
       case "draw":
         emitter.emit("draw", chat);
         break;
+      case "h":
+      case "help":
+        emitter.emit("help", chat);
+        break;
 
       default: {
         await chat.sendToCurrentPerson({
           text:
             command.length > 0
               ? `Tidak ada perintah yang bernama "${command}"`
-              : "Under development",
+              : botInfo,
         });
         break;
       }

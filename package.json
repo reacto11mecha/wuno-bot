@@ -25,7 +25,9 @@
   "devDependencies": {
     "@commitlint/cli": "^17.0.2",
     "@commitlint/config-conventional": "^17.0.2",
+    "@types/luxon": "^2.3.2",
     "@types/node": "^18.0.0",
+    "@types/sharp": "^0.30.4",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "eslint": "^8.17.0",
@@ -43,13 +45,15 @@
     "@typegoose/typegoose": "^9.9.0",
     "dotenv": "^16.0.1",
     "libphonenumber-js": "^1.10.6",
+    "luxon": "^2.4.0",
     "mongoose": "6.3.5",
     "mongoose-autopopulate": "^0.16.1",
     "nanoid": "3.x.x",
     "p-queue": "6.x.x",
     "pino": "^8.0.0",
     "pino-pretty": "^8.0.0",
-    "qrcode-terminal": "^0.12.0"
+    "qrcode-terminal": "^0.12.0",
+    "sharp": "^0.30.7"
   },
   "lint-staged": {
     "*.{ts,js}": "eslint --cache --fix",

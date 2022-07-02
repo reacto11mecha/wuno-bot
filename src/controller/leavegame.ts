@@ -102,8 +102,44 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
         await removeGameAuthorAndSetToNextPlayer(chat, game);
       } else if (game.isCurrentChatTurn) {
         // Is current chatter not the author and it's turn
+        await game.updatePosition(nextPlayer._id);
+
+        const card = await CardModel.findOne({
+          game: game.uid,
+          user: nextPlayer._id,
+        });
+
+        await Promise.all([
+          (async () => {
+            const otherPlayer = nextPlayer.phoneNumber;
+
+            await chat.sendToOtherPerson(otherPlayer, {
+              text: `${chat.message.userName} telah keluar dari game, selanjutnya adalah giliran kamu untuk bermain`,
+            });
+            await chat.sendToOtherPerson(otherPlayer, {
+              text: `Kartu saat ini: ${game.currentCard}`,
+            });
+            await chat.sendToOtherPerson(otherPlayer, {
+              text: `Kartu kamu: ${card?.cards?.join(", ")}.`,
+            });
+          })(),
+          chat.replyToCurrentPerson({
+            text: `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${nextPlayer.userName}`,
+          }),
+          game.sendToOtherPlayersWithoutCurrentPlayer({
+            text: `${chat.message.userName} telah keluar dari game, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
+          }),
+        ]);
       } else {
         // Is current chatter not the author and not it's turn
+        await Promise.all([
+          chat.replyToCurrentPerson({
+            text: "Anda berhasil keluar dari game. Terimakasih telah bermain!",
+          }),
+          game.sendToOtherPlayersWithoutCurrentPlayer({
+            text: `${chat.message.userName} telah keluar dari game`,
+          }),
+        ]);
       }
     }
     // Typeguard playing state end

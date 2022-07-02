@@ -2,6 +2,7 @@ import EventEmitter from "events";
 import { getController } from "./controller";
 
 import { findOrCreateUser, isDMChat } from "../utils";
+import { handleHelpCommand } from "./help";
 
 export const emitHandler = (
   controller: Awaited<ReturnType<typeof getController>>
@@ -22,6 +23,8 @@ export const emitHandler = (
   messageHandler.on("say", isDMChat(findOrCreateUser(controller.say)));
   messageHandler.on("cards", isDMChat(findOrCreateUser(controller.cards)));
   messageHandler.on("draw", isDMChat(findOrCreateUser(controller.draw)));
+
+  messageHandler.on("help", handleHelpCommand(controller));
 
   return messageHandler;
 };

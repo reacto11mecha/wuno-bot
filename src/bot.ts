@@ -50,6 +50,27 @@ export default class Bot {
   constructor() {
     this.queue.start();
 
+    this.queue.on("add", () =>
+      logger.info(
+        `[P-QUEUE] Task is added.  Size: ${this.queue.size}  Pending: ${this.queue.pending}`
+      )
+    );
+    this.queue.on("active", () =>
+      logger.info(
+        `[P-QUEUE] Active Queue. Size: ${this.queue.size}  Pending: ${this.queue.pending}`
+      )
+    );
+    this.queue.on("next", () =>
+      logger.info(
+        `[P-QUEUE] Task is completed.  Size: ${this.queue.size}  Pending: ${this.queue.pending}`
+      )
+    );
+    this.queue.on("idle", () =>
+      logger.info(
+        `[P-QUEUE] Queue is idle.  Size: ${this.queue.size}  Pending: ${this.queue.pending}`
+      )
+    );
+
     const path = "./baileys_store_multi.json";
 
     this.store.readFromFile(path);
@@ -139,7 +160,7 @@ export default class Bot {
 
   init() {
     if (!process.env.MONGO_URI)
-      throw new Error("[DB] Diperlukan sebuah koneksi URI MongDB | MONGO_URI");
+      throw new Error("[DB] Diperlukan sebuah URI MongDB | MONGO_URI");
 
     connectDatabase(process.env.MONGO_URI, logger).then(() =>
       this.connectToWhatsApp()
