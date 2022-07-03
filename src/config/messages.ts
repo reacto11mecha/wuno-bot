@@ -1,10 +1,11 @@
 import fs from "fs";
 import path from "path";
 
+import { PREFIX } from "./prefix";
+
 const packageInfo = JSON.parse(
   fs.readFileSync(path.resolve("package.json"), "utf-8")
 );
-const PREFIX = process.env.PREFIX || "U#";
 
 export const GITHUB_URL = packageInfo.repository.url
   .replace("git+", "")

@@ -49,6 +49,7 @@
     "mongoose": "6.3.5",
     "mongoose-autopopulate": "^0.16.1",
     "nanoid": "3.x.x",
+    "p-limit": "3.1.0",
     "p-queue": "6.x.x",
     "pino": "^8.0.0",
     "pino-pretty": "^8.0.0",

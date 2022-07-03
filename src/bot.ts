@@ -7,12 +7,14 @@ import makeWASocket, {
 } from "@adiwajshing/baileys";
 import { Boom } from "@hapi/boom";
 import PQueue from "p-queue";
+import pLimit from "p-limit";
 import dotenv from "dotenv";
 import path from "path";
 import P from "pino";
 
 import { messageHandler } from "./handler/message";
 import { connectDatabase } from "./handler/database";
+import { PREFIX } from "./config/prefix";
 
 dotenv.config();
 
@@ -46,6 +48,7 @@ export default class Bot {
   });
   private msgRetryCounterMap: MessageRetryMap = {};
   private store = makeInMemoryStore({ logger });
+  private messageLimitter = pLimit(4);
 
   constructor() {
     this.queue.start();
@@ -80,7 +83,7 @@ export default class Bot {
   }
 
   private isMessageValid(message: string | null | undefined) {
-    if (message) return message.startsWith(process.env.PREFIX || "U#");
+    if (message) return message.startsWith(PREFIX);
 
     return false;
   }
@@ -103,7 +106,11 @@ export default class Bot {
 
     this.store.bind(sock.ev);
 
-    const onMessageQueue = await messageHandler(sock, logger);
+    const onMessageQueue = await messageHandler(
+      sock,
+      logger,
+      this.messageLimitter
+    );
 
     sock.ev.on("connection.update", (update) => {
       const { connection, lastDisconnect } = update;

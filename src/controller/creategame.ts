@@ -1,6 +1,8 @@
 import { Chat } from "../lib";
 import { GameModel, Game } from "../models";
 
+import { PREFIX } from "../config/prefix";
+
 export default async function creategame(chat: Chat) {
   if (!chat.isJoiningGame) {
     const newGame = await GameModel.create({
@@ -25,7 +27,7 @@ export default async function creategame(chat: Chat) {
       }\n\nKode: ${newGame.gameID}`,
     });
     await chat.replyToCurrentPerson({
-      text: `${process.env.PREFIX || "U#"}j ${newGame.gameID}`,
+      text: `${PREFIX}j ${newGame.gameID}`,
     });
   } else {
     await chat.replyToCurrentPerson({

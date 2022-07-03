@@ -1,5 +1,6 @@
 import {
   DocumentType,
+  isRefType,
   isDocument,
   isDocumentArray,
 } from "@typegoose/typegoose";
@@ -8,6 +9,7 @@ import { Types } from "mongoose";
 import { Chat } from "./Chat";
 import { Game } from "./Game";
 import { cards } from "../config/cards";
+import { PREFIX } from "../config/prefix";
 import { getRandom, randomWithBias } from "../utils";
 
 import { Card as CardType, CardModel } from "../models";
@@ -71,9 +73,9 @@ export class Card {
     );
   }
 
-  async addNewCard(card: string) {
+  async addNewCard(card: string, cardId?: Types.ObjectId) {
     await CardModel.findOneAndUpdate(
-      { _id: this.card._id },
+      { _id: !cardId ? this.card._id : cardId },
       { $push: { cards: card } }
     );
   }
@@ -232,8 +234,13 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           (async () => {
             await this.removeCardFromPlayer(givenCard);
 
-            await this.addNewCard(newCards[0]);
-            await this.addNewCard(newCards[1]);
+            if (
+              isDocument(nextPlayer) &&
+              isRefType(nextPlayer.gameProperty!.card, Types.ObjectId)
+            ) {
+              await this.addNewCard(newCards[0], nextPlayer.gameProperty!.card);
+              await this.addNewCard(newCards[1], nextPlayer.gameProperty!.card);
+            }
           })(),
         ]);
 
@@ -419,10 +426,31 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           (async () => {
             await this.removeCardFromPlayer("wilddraw4");
 
-            await this.addNewCard(newCards[0]);
-            await this.addNewCard(newCards[1]);
-            await this.addNewCard(newCards[2]);
-            await this.addNewCard(newCards[3]);
+            if (isDocument(nextPlayer)) {
+              console.log(nextPlayer.gameProperty!.card);
+
+              if (
+                isDocument(nextPlayer) &&
+                isRefType(nextPlayer.gameProperty!.card, Types.ObjectId)
+              ) {
+                await this.addNewCard(
+                  newCards[0],
+                  nextPlayer.gameProperty!.card
+                );
+                await this.addNewCard(
+                  newCards[1],
+                  nextPlayer.gameProperty!.card
+                );
+                await this.addNewCard(
+                  newCards[2],
+                  nextPlayer.gameProperty!.card
+                );
+                await this.addNewCard(
+                  newCards[3],
+                  nextPlayer.gameProperty!.card
+                );
+              }
+            }
           })(),
         ]);
 
@@ -528,7 +556,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
 
       case "UNMATCH": {
         await this.chat.sendToCurrentPerson({
-          text: `Kartu *${givenCard}*, tidak valid jika disandingkan dengan kartu *${this.game.currentCard}*! Jika tidak memiliki kartu lagi, ambil dengan '${process.env.PREFIX}d' untuk mengambil kartu baru.`,
+          text: `Kartu *${givenCard}*, tidak valid jika disandingkan dengan kartu *${this.game.currentCard}*! Jika tidak memiliki kartu lagi, ambil dengan '${PREFIX}d' untuk mengambil kartu baru.`,
         });
       }
     }

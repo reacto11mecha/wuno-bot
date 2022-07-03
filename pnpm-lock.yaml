@@ -22,6 +22,7 @@ specifiers:
   mongoose-autopopulate: ^0.16.1
   nanoid: 3.x.x
   nodemon: ^2.0.18
+  p-limit: 3.1.0
   p-queue: 6.x.x
   pino: ^8.0.0
   pino-pretty: ^8.0.0
@@ -42,6 +43,7 @@ dependencies:
   mongoose: 6.3.5
   mongoose-autopopulate: 0.16.1_mongoose@6.3.5
   nanoid: 3.3.4
+  p-limit: 3.1.0
   p-queue: 6.6.2
   pino: 8.0.0
   pino-pretty: 8.0.0
@@ -2348,7 +2350,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yocto-queue: 0.1.0
-    dev: true
 
   /p-locate/4.1.0:
     resolution: {integrity: sha512-R79ZZ/0wAxKGu3oYMlz8jy/kbhsNrS7SKZ7PxEHBgJ5+F2mtFW2fK2cOtBh1cHYkQsbzFV7I+EoRKe6Yt0oK7A==}
@@ -3387,7 +3388,6 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
-    dev: true
 
   github.com/adiwajshing/libsignal-node/11dbd962ea108187c79a7c46fe4d6f790e23da97:
     resolution: {tarball: https://codeload.github.com/adiwajshing/libsignal-node/tar.gz/11dbd962ea108187c79a7c46fe4d6f790e23da97}

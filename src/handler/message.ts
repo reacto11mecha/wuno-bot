@@ -1,18 +1,23 @@
 import type { proto, WASocket } from "@adiwajshing/baileys";
+import pLimit from "p-limit";
 import { Logger } from "pino";
 
 import { Chat } from "../lib/Chat";
 import { emitHandler } from "./emitter";
+import { PREFIX } from "../config/prefix";
 import { getController } from "./controller";
 
 import { botInfo } from "../config/messages";
 
-export const messageHandler = async (sock: WASocket, logger: Logger) => {
+export const messageHandler = async (
+  sock: WASocket,
+  logger: Logger,
+  limitter: ReturnType<typeof pLimit>
+) => {
   const controller = await getController();
   const emitter = emitHandler(controller);
 
   return async (WebMessage: proto.IWebMessageInfo) => {
-    const PREFIX = process.env.PREFIX || "U#";
     const text =
       WebMessage!.message!.conversation ||
       WebMessage!.message!.extendedTextMessage!.text;
@@ -24,7 +29,7 @@ export const messageHandler = async (sock: WASocket, logger: Logger) => {
       .shift()!
       .toLowerCase();
 
-    const chat = new Chat(sock, WebMessage, logger, text!);
+    const chat = new Chat(sock, WebMessage, logger, text!, limitter);
 
     switch (command) {
       case "cg":

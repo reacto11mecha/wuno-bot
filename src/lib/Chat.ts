@@ -1,7 +1,9 @@
 import type { proto, WASocket, AnyMessageContent } from "@adiwajshing/baileys";
 import { DocumentType } from "@typegoose/typegoose";
 import { Logger } from "pino";
+import pLimit from "p-limit";
 
+import { PREFIX } from "../config/prefix";
 import { User } from "../models";
 
 interface IMessage {
@@ -11,13 +13,12 @@ interface IMessage {
   id: string;
 }
 
-const PREFIX = process.env.PREFIX || "U#";
-
 export class Chat {
   sock: WASocket;
   logger: Logger;
   message: IMessage;
   private WebMessage: proto.IWebMessageInfo;
+  private limitter: ReturnType<typeof pLimit>;
   user?: DocumentType<User>;
   args: string[];
 
@@ -25,11 +26,13 @@ export class Chat {
     sock: WASocket,
     WebMessage: proto.IWebMessageInfo,
     logger: Logger,
-    text: string
+    text: string,
+    limitter: ReturnType<typeof pLimit>
   ) {
     this.sock = sock;
     this.logger = logger;
     this.WebMessage = WebMessage;
+    this.limitter = limitter;
 
     this.message = {
       userNumber: `${
@@ -58,7 +61,7 @@ export class Chat {
   }
 
   private async _sendTo(remoteJid: string, message: AnyMessageContent) {
-    await this.sock.sendMessage(remoteJid, message);
+    await this.limitter(() => this.sock.sendMessage(remoteJid, message));
   }
 
   async simulateTypingToCurrentPerson(callback: () => Promise<void>) {
@@ -74,9 +77,11 @@ export class Chat {
 
   async replyToCurrentPerson(message: AnyMessageContent) {
     await this._simulateTyping(this.message.remoteJid, async () => {
-      await this.sock.sendMessage(this.message.remoteJid, message, {
-        quoted: this.WebMessage,
-      });
+      await this.limitter(() =>
+        this.sock.sendMessage(this.message.remoteJid, message, {
+          quoted: this.WebMessage,
+        })
+      );
     });
   }
 

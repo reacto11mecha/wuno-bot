@@ -1,5 +1,7 @@
 import { atLeastGameID } from "../utils";
 
+import { PREFIX } from "../config/prefix";
+
 export default atLeastGameID(
   async ({ chat, game }) => {
     if (game.state.PLAYING) {
@@ -19,11 +21,7 @@ export default atLeastGameID(
         text: `Berhasil join ke game "${game.gameID}", tunggu pembuat ruang game ini memulai permainannya!`,
       }),
       await game.sendToOtherPlayersWithoutCurrentPerson({
-        text: `Pemain dengan username "${
-          chat.message.userName
-        }" memasuki ruang permainan! Sapa dia dengan menggunakan "${
-          process.env.PREFIX || "U#"
-        }say Halo ${chat.message.userName}!"`,
+        text: `Pemain dengan username "${chat.message.userName}" memasuki ruang permainan! Sapa dia dengan menggunakan "${PREFIX}say Halo ${chat.message.userName}!"`,
       }),
     ]);
   },

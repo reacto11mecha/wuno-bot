@@ -5,6 +5,7 @@ import {
   regexValidWildColorPlus4Only,
 } from "../lib";
 
+import { PREFIX } from "../config/prefix";
 import type { allCard } from "../config/cards";
 
 const isValidWildOrPlus4 = (card: string) => {
@@ -42,9 +43,7 @@ export default requiredJoinGameSession(async ({ chat, game, card }) => {
 
 Coba tetapkan warna di antara warna \`\`\`red\`\`\` (merah), \`\`\`green\`\`\` (hijau), \`\`\`blue\`\`\` (biru), atau \`\`\`yellow\`\`\` (kuning) dengan menggunakan perintah
 
-  \`\`\`${
-    process.env.PREFIX || "U#"
-  }p ${choosenCard} <warna yang di inginkan>\`\`\``,
+  \`\`\`${PREFIX}p ${choosenCard} <warna yang di inginkan>\`\`\``,
       });
     } else if (!Card.isValidCard(choosenCard)) {
       await chat.replyToCurrentPerson({
