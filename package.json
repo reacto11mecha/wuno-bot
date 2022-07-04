@@ -1,7 +1,7 @@
 {
   "name": "wuno-bot",
   "version": "1.0.0",
-  "description": "Whatsapp uno bot",
+  "description": "Bot whatsapp yang berguna untuk bermain UNO",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
@@ -18,6 +18,12 @@
   },
   "author": "Ezra Khairan Permana",
   "license": "MIT",
+  "keywords": [
+    "typescript",
+    "uno",
+    "whatsapp-bot",
+    "baileys"
+  ],
   "bugs": {
     "url": "https://github.com/reacto11mecha/wuno-bot/issues"
   },
@@ -49,6 +55,7 @@
     "mongoose": "6.3.5",
     "mongoose-autopopulate": "^0.16.1",
     "nanoid": "3.x.x",
+    "node-cache": "^5.1.2",
     "p-limit": "3.1.0",
     "p-queue": "6.x.x",
     "pino": "^8.0.0",
