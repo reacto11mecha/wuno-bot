@@ -5,13 +5,22 @@ import { isDocument } from "@typegoose/typegoose";
 
 const commonCallback: commonCb = async ({ chat, game }) =>
   await chat.replyToCurrentPerson({
-    text: `Game ID: ${game.gameID}\nGame Status: ${
-      game.translatedStatus
-    }\nTanggal Dibuat: ${df(
-      game.created_at!
-    )}\n\nPemain yang sudah tergabung:\n${game
-      .players!.map((player) => isDocument(player) && `- ${player.userName}`)
-      .join("\n")}`,
+    text: `GAME ID: ${game.gameID}
+Game Status: ${game.translatedStatus}
+Tanggal Dibuat: ${df(game.created_at!)}
+
+Pemain yang sudah tergabung:
+${game
+  .players!.map((player) => isDocument(player) && `- ${player.userName}`)
+  .join("\n")}${
+      !game.state.PLAYING
+        ? ""
+        : `
+Kartu Saat Ini: ${game.currentCard}
+Giliran Pemain Saat Ini: ${
+            isDocument(game.currentPlayer) ? game.currentPlayer.userName : ""
+          }`
+    }`,
   });
 
 export default atLeastGameID(commonCallback, commonCallback);

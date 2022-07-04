@@ -95,7 +95,7 @@ export class Game {
       [...pojo.players].map(async (id) => await this.leaveGameForUser(id)),
     ]);
 
-    this.chat.logger.info(`[DB] Game ${this.game.gameID} dimulai`);
+    this.chat.logger.info(`[DB] Game ${this.game.gameID} selesai`);
   }
 
   async leaveGameForUser(_id: Types.ObjectId) {

@@ -1,4 +1,6 @@
-import { requiredJoinGameSession } from "../utils";
+import { requiredJoinGameSession, createCardsImageFront } from "../utils";
+
+import type { allCard } from "../config/cards";
 
 export default requiredJoinGameSession(async ({ chat, game, card }) => {
   if (game.state.WAITING) {
@@ -8,8 +10,12 @@ export default requiredJoinGameSession(async ({ chat, game, card }) => {
   } else if (game.state.ENDED) {
     await chat.replyToCurrentPerson({ text: "Game sudah selesai!" });
   } else {
+    const image = await createCardsImageFront(card.cards! as allCard[]);
     const cards = card.cards!.join(", ");
 
-    await chat.replyToCurrentPerson({ text: `Kartu kamu: ${cards}.` });
+    await chat.replyToCurrentPerson({
+      image,
+      caption: `Kartu kamu: ${cards}.`,
+    });
   }
 });

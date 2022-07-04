@@ -1,8 +1,9 @@
 import { Types } from "mongoose";
 import { DocumentType, isDocument } from "@typegoose/typegoose";
-import { requiredJoinGameSession } from "../utils";
+import { requiredJoinGameSession, createAllCardImage } from "../utils";
 
 import { Card, CardModel } from "../models";
+import type { allCard } from "../config/cards";
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.NotFound) {
@@ -45,6 +46,12 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       )
     );
 
+    const [currentCardImage, frontCardsImage, backCardsImage] =
+      await createAllCardImage(
+        game.currentCard as allCard,
+        currentPlayerCard.cards as allCard[]
+      );
+
     await Promise.all([
       (async () => {
         if (isDocument(game.currentPlayer)) {
@@ -57,11 +64,13 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
         if (game.currentPlayerIsAuthor) {
           await chat.sendToCurrentPerson({
-            text: `Kartu saat ini: ${game.currentCard}`,
+            image: currentCardImage,
+            caption: `Kartu saat ini: ${game.currentCard}`,
           });
 
           await chat.sendToCurrentPerson({
-            text: `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
+            image: frontCardsImage,
+            caption: `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
           });
         }
       })(),
@@ -77,10 +86,12 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             text: `${chat.message.userName} telah memulai permainan! Sekarang giliran kamu untuk bermain`,
           });
           await chat.sendToOtherPerson(toPerson, {
-            text: `Kartu saat ini: ${game.currentCard}`,
+            image: currentCardImage,
+            caption: `Kartu saat ini: ${game.currentCard}`,
           });
           await chat.sendToOtherPerson(toPerson, {
-            text: `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
+            image: frontCardsImage,
+            caption: `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
           });
         }
       })(),
@@ -88,6 +99,15 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
         if (isDocument(game.currentPlayer)) {
           await game.sendToOtherPlayersWithoutCurrentPlayer({
             text: `${chat.message.userName} telah memulai permainan! Sekarang giliran ${game.currentPlayer.userName} untuk bermain`,
+          });
+
+          await game.sendToOtherPlayersWithoutCurrentPlayer({
+            image: currentCardImage,
+            caption: `Kartu saat ini: ${game.currentCard}`,
+          });
+          await game.sendToOtherPlayersWithoutCurrentPlayer({
+            image: backCardsImage,
+            caption: `Kartu yang ${game.currentPlayer.userName} miliki`,
           });
         }
       })(),
