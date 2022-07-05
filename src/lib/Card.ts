@@ -736,26 +736,27 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     switch (true) {
       /* eslint-disable no-fallthrough */
 
+      // Valid wilddraw4 from player
+      case switchState.SECONDCARD_IS_WILD4:
+        return "STACK_PLUS_4";
+
       // Valid wild color only from player
       case switchState.SECONDCARD_IS_WILD:
         return "STACK_WILD";
 
       case switchState.FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME:
 
-      // Wild color only, stack with specific color
-      case switchState.FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR:
-        return "STACK";
-
       case switchState.FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO:
       case switchState.SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD:
         return `VALID_SPECIAL_${secState.type!.toUpperCase()}`;
 
-      // Valid wilddraw4 from player
-      case switchState.SECONDCARD_IS_WILD4:
-        return "STACK_PLUS_4";
-    }
+      // Wild color only, stack with specific color
+      case switchState.FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR:
+        return "STACK";
 
-    return "UNMATCH";
+      default:
+        return "UNMATCH";
+    }
   }
 
   private getSwitchState(firstState: IGetCardState, secState: IGetCardState) {
