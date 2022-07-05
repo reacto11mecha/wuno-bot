@@ -9,9 +9,16 @@ import { Types } from "mongoose";
 
 import { Chat } from "./Chat";
 import { Game } from "./Game";
-import { cards } from "../config/cards";
 import { PREFIX } from "../config/prefix";
-import { getRandom, randomWithBias, createAllCardImage } from "../utils";
+import { createAllCardImage } from "../utils";
+
+import {
+  cards,
+  regexValidNormal,
+  regexValidSpecial,
+  regexValidWildColorOnly,
+  regexValidWildColorPlus4Only,
+} from "../config/cards";
 
 import { Card as CardType, CardModel, User } from "../models";
 import type {
@@ -34,16 +41,7 @@ export interface IGetCardState {
   type?: "draw2" | "reverse" | "skip";
 }
 
-const regexValidNormal = /^(red|green|blue|yellow)[0-9]$/;
-const regexValidSpecial = /^(red|green|blue|yellow)(draw2|reverse|skip)$/;
-export const regexValidWildColorOnly = /^(wild)(red|green|blue|yellow)$/;
-export const regexValidWildColorPlus4Only =
-  /^(wilddraw4)(red|green|blue|yellow)$/;
-
-const reducedByNumbers = [...new Array(14)].map((_, idx) => idx);
-const filteredWildColor = cards
-  .filter((card) => !regexValidWildColorOnly.test(card))
-  .filter((card) => !regexValidWildColorPlus4Only.test(card));
+import { CardPicker } from "../config/cards";
 
 export class Card {
   private card: DocumentType<CardType>;
@@ -54,18 +52,6 @@ export class Card {
     this.card = cardData;
     this.chat = chat;
     this.game = game;
-  }
-
-  static pickRandomCard(): allCard {
-    const idxReduced = Math.floor(getRandom() * reducedByNumbers.length);
-    const reducedNumber = reducedByNumbers[idxReduced];
-
-    const idxCard = Math.floor(getRandom() * (cards.length - reducedNumber));
-    const card = filteredWildColor[idxCard];
-
-    if (!card) return Card.pickRandomCard();
-
-    return randomWithBias([card, "wild"], [16, 1], 2) as allCard;
   }
 
   static isValidCard(card: string) {
@@ -101,7 +87,7 @@ export class Card {
       (player) => isDocument(player) && player._id !== nextPlayer!._id
     );
 
-    const newCard = Card.pickRandomCard();
+    const newCard = CardPicker.pickRandomCard();
 
     if (isDocument(nextPlayer) && isDocumentArray(playerList)) {
       await this.addNewCard(newCard);
@@ -356,7 +342,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           );
 
         const newCards = Array.from(new Array(2)).map(() =>
-          Card.pickRandomCard()
+          CardPicker.pickRandomCard()
         );
 
         await Promise.all([
@@ -572,7 +558,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           );
 
         const newCards = Array.from(new Array(4)).map(() =>
-          Card.pickRandomCard()
+          CardPicker.pickRandomCard()
         );
 
         await Promise.all([

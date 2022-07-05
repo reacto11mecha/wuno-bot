@@ -1,3 +1,5 @@
+import { getRandom, randomWithBias } from "../utils";
+
 export type color = "red" | "green" | "blue" | "yellow";
 export type possibleNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 export type allCard =
@@ -84,3 +86,29 @@ export const cards: allCard[] = [
 
   "wilddraw4",
 ];
+
+export const regexValidNormal = /^(red|green|blue|yellow)[0-9]$/;
+export const regexValidSpecial =
+  /^(red|green|blue|yellow)(draw2|reverse|skip)$/;
+export const regexValidWildColorOnly = /^(wild)(red|green|blue|yellow)$/;
+export const regexValidWildColorPlus4Only =
+  /^(wilddraw4)(red|green|blue|yellow)$/;
+
+const reducedByNumbers = [...new Array(14)].map((_, idx) => idx);
+const filteredWildColor = cards
+  .filter((card) => !regexValidWildColorOnly.test(card))
+  .filter((card) => !regexValidWildColorPlus4Only.test(card));
+
+export class CardPicker {
+  static pickRandomCard(): allCard {
+    const idxReduced = Math.floor(getRandom() * reducedByNumbers.length);
+    const reducedNumber = reducedByNumbers[idxReduced];
+
+    const idxCard = Math.floor(getRandom() * (cards.length - reducedNumber));
+    const card = filteredWildColor[idxCard];
+
+    if (!card) return CardPicker.pickRandomCard();
+
+    return randomWithBias([card, "wild"], [16, 1], 2) as allCard;
+  }
+}

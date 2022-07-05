@@ -1,7 +1,6 @@
 import { prop, Ref } from "@typegoose/typegoose";
 
-import { cards } from "../config/cards";
-import { Card as CardLib } from "../lib";
+import { cards, CardPicker } from "../config/cards";
 import { User } from "./user";
 import { Game } from "./game";
 
@@ -16,7 +15,7 @@ export class Card {
     type: () => [String],
     validate: (cardsInput: string[]) =>
       cardsInput.every((card) => (cards as string[]).includes(card)),
-    default: () => [...new Array(6)].map(() => CardLib.pickRandomCard()),
+    default: () => [...new Array(6)].map(() => CardPicker.pickRandomCard()),
   })
   public cards?: string[];
 }

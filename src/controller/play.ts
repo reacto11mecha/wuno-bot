@@ -1,10 +1,10 @@
 import { requiredJoinGameSession } from "../utils";
+import { Card } from "../lib";
+
 import {
-  Card,
   regexValidWildColorOnly,
   regexValidWildColorPlus4Only,
-} from "../lib";
-
+} from "../config/cards";
 import { PREFIX } from "../config/prefix";
 import type { allCard } from "../config/cards";
 
