@@ -87,7 +87,9 @@ export class Card {
       (player) => isDocument(player) && player._id !== nextPlayer!._id
     );
 
-    const newCard = CardPicker.pickRandomCard();
+    const newCard = CardPicker.pickCardByGivenCard(
+      this.game.currentCard as allCard
+    );
 
     if (isDocument(nextPlayer) && isDocumentArray(playerList)) {
       await this.addNewCard(newCard);

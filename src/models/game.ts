@@ -3,19 +3,8 @@ import autopopulate from "mongoose-autopopulate";
 import { nanoid } from "nanoid";
 
 import { User } from "./user";
-import { random } from "../utils";
 
-import { cards } from "../config/cards";
-const appropriateInitialCards = cards
-  .filter((e) => !e.startsWith("wild"))
-  .filter((e) => !e.endsWith("skip"))
-  .filter((e) => !e.endsWith("draw2"))
-  .filter((e) => !e.endsWith("reverse"));
-
-const getInitialCard = () =>
-  appropriateInitialCards[
-    Math.floor(random() * appropriateInitialCards.length)
-  ];
+import { CardPicker } from "../config/cards";
 
 export enum GameStatus {
   WAITING = "WAITING",
@@ -40,7 +29,7 @@ export class Game {
   @prop()
   public endTime?: Date;
 
-  @prop({ default: () => getInitialCard() })
+  @prop({ default: () => CardPicker.getInitialCard() })
   public currentCard?: string;
 
   @prop({ ref: () => User })

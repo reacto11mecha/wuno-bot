@@ -1,4 +1,4 @@
-import { getRandom, randomWithBias } from "../utils";
+import { random, getRandom, randomWithBias } from "../utils";
 
 export type color = "red" | "green" | "blue" | "yellow";
 export type possibleNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -98,17 +98,79 @@ const reducedByNumbers = [...new Array(14)].map((_, idx) => idx);
 const filteredWildColor = cards
   .filter((card) => !regexValidWildColorOnly.test(card))
   .filter((card) => !regexValidWildColorPlus4Only.test(card));
+const appropriateInitialCards = cards
+  .filter((e) => !e.startsWith("wild"))
+  .filter((e) => !e.endsWith("skip"))
+  .filter((e) => !e.endsWith("draw2"))
+  .filter((e) => !e.endsWith("reverse"));
+
+enum randomCardCondition {
+  randomCard,
+  wild,
+}
+
+enum givenCardCondition {
+  ByGivenCard,
+  ByRandomPick,
+  ByInitialCard,
+}
 
 export class CardPicker {
   static pickRandomCard(): allCard {
-    const idxReduced = Math.floor(getRandom() * reducedByNumbers.length);
-    const reducedNumber = reducedByNumbers[idxReduced];
+    const status: randomCardCondition = randomWithBias(
+      [randomCardCondition.randomCard, randomCardCondition.wild],
+      [16, 1],
+      2
+    );
 
-    const idxCard = Math.floor(getRandom() * (cards.length - reducedNumber));
-    const card = filteredWildColor[idxCard];
+    switch (status) {
+      case randomCardCondition.randomCard: {
+        const idxReduced = Math.floor(getRandom() * reducedByNumbers.length);
+        const reducedNumber = reducedByNumbers[idxReduced];
 
-    if (!card) return CardPicker.pickRandomCard();
+        const idxCard = Math.floor(
+          getRandom() * (cards.length - reducedNumber)
+        );
+        const card = filteredWildColor[idxCard];
 
-    return randomWithBias([card, "wild"], [16, 1], 2) as allCard;
+        if (!card) return CardPicker.pickRandomCard();
+
+        return card;
+      }
+
+      case randomCardCondition.wild:
+        return "wild";
+    }
+  }
+
+  static getInitialCard() {
+    return appropriateInitialCards[
+      Math.floor(random() * appropriateInitialCards.length)
+    ];
+  }
+
+  static pickCardByGivenCard(card: allCard): allCard {
+    const status: givenCardCondition = randomWithBias(
+      [
+        givenCardCondition.ByGivenCard,
+        givenCardCondition.ByRandomPick,
+        givenCardCondition.ByInitialCard,
+      ],
+      [12, 5, 1],
+      3
+    );
+
+    switch (status) {
+      case givenCardCondition.ByGivenCard:
+        // TODO: Buat algoritma nyangkul tapi bedasarkan kartu yang dikasih
+        console.log(card);
+        return "greenreverse";
+
+      case givenCardCondition.ByRandomPick:
+        return CardPicker.pickRandomCard();
+
+      case givenCardCondition.ByInitialCard:
+        return CardPicker.getInitialCard() as allCard;
+    }
   }
 }
