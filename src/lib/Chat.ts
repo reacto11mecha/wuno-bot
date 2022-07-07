@@ -6,7 +6,7 @@ import pLimit from "p-limit";
 import { PREFIX } from "../config/prefix";
 import { User } from "../models";
 
-interface IMessage {
+export interface IMessage {
   userNumber: string;
   userName: string;
   remoteJid: string;

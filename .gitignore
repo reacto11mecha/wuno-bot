@@ -107,3 +107,6 @@ dist
 # baileys stuff
 auth_info_baileys/
 baileys_store_multi.json
+
+# typedoc
+docs/

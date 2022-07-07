@@ -2,7 +2,11 @@ import { Chat, Game, Card } from "../lib";
 
 import { GameModel, CardModel } from "../models";
 
-type TypeReqJGS = (cb: { chat: Chat; game: Game; card: Card }) => Promise<void>;
+export type TypeReqJGS = (cb: {
+  chat: Chat;
+  game: Game;
+  card: Card;
+}) => Promise<void>;
 export const requiredJoinGameSession =
   (cb: TypeReqJGS) => async (chat: Chat) => {
     try {
