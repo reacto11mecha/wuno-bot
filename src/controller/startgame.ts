@@ -3,6 +3,7 @@ import { DocumentType, isDocument } from "@typegoose/typegoose";
 import { requiredJoinGameSession, createAllCardImage } from "../utils";
 
 import { Card, CardModel } from "../models";
+import { CardPicker } from "../config/cards";
 import type { allCard } from "../config/cards";
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
@@ -27,6 +28,9 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           const card = await CardModel.create({
             user: player._id,
             game: game.uid,
+            cards: [...new Array(6)].map(() =>
+              CardPicker.pickCardByGivenCard(game.currentCard as allCard)
+            ),
           });
           player.gameProperty!.card = card._id;
 
