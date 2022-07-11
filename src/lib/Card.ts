@@ -14,34 +14,14 @@ import { createAllCardImage } from "../utils";
 
 import {
   cards,
-  regexValidNormal,
-  regexValidSpecial,
   regexValidWildColorOnly,
   regexValidWildColorPlus4Only,
 } from "../config/cards";
 
 import { Card as CardType, CardModel, User } from "../models";
-import type {
-  allCard,
-  color as colorType,
-  possibleNumber,
-} from "../config/cards";
+import type { allCard, IGetCardState } from "../config/cards";
 
-export interface IGetCardState {
-  state:
-    | "VALID_NORMAL"
-    | "VALID_WILD_PLUS4"
-    | "VALID_WILD"
-    | "VALID_SPECIAL"
-    | "REQUIRED_ADDITIONAL_COLOR"
-    | "INVALID_ADDITIONAL_COLOR"
-    | "INVALID";
-  color?: colorType;
-  number?: possibleNumber;
-  type?: "draw2" | "reverse" | "skip";
-}
-
-import { CardPicker } from "../config/cards";
+import { EGetCardState, CardPicker } from "../config/cards";
 
 export class Card {
   private card: DocumentType<CardType>;
@@ -344,7 +324,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           );
 
         const newCards = Array.from(new Array(2)).map(() =>
-          CardPicker.pickRandomCard()
+          CardPicker.pickCardByGivenCard(this.game.currentCard as allCard)
         );
 
         await Promise.all([
@@ -560,7 +540,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           );
 
         const newCards = Array.from(new Array(4)).map(() =>
-          CardPicker.pickRandomCard()
+          CardPicker.pickCardByGivenCard(this.game.currentCard as allCard)
         );
 
         await Promise.all([
@@ -710,14 +690,8 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
   }
 
   private compareTwoCard(firstCard: allCard, secCard: allCard) {
-    const firstState = this.getCardState(firstCard);
-    const secState = this.getCardState(secCard);
-
-    if (
-      secState.state === "REQUIRED_ADDITIONAL_COLOR" ||
-      secState.state === "INVALID_ADDITIONAL_COLOR"
-    )
-      return secState.state;
+    const firstState = CardPicker.getCardState(firstCard);
+    const secState = CardPicker.getCardState(secCard);
 
     const switchState = this.getSwitchState(firstState, secState);
 
@@ -733,14 +707,12 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
         return "STACK_WILD";
 
       case switchState.FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME:
+      case switchState.FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR:
+        return "STACK";
 
       case switchState.FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO:
       case switchState.SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD:
         return `VALID_SPECIAL_${secState.type!.toUpperCase()}`;
-
-      // Wild color only, stack with specific color
-      case switchState.FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR:
-        return "STACK";
 
       default:
         return "UNMATCH";
@@ -754,16 +726,16 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     const FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME =
       (firstState?.color === secState?.color ||
         firstState?.number === secState?.number) &&
-      secState.state !== "VALID_SPECIAL";
+      secState.state !== EGetCardState.VALID_SPECIAL;
 
     /**
      * If the first card is the wild and the color of second card is the same
      * or the first card is the plus4 and the color of second card is the same
      */
     const FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR =
-      (firstState.state === "VALID_WILD" &&
+      (firstState.state === EGetCardState.VALID_WILD &&
         firstState.color === secState.color) ||
-      (firstState.state === "VALID_WILD_PLUS4" &&
+      (firstState.state === EGetCardState.VALID_WILD_PLUS4 &&
         firstState.color === secState.color);
 
     /**
@@ -771,26 +743,28 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
      * of the second card is the same as the first card color
      */
     const SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD =
-      secState.state === "VALID_SPECIAL" && secState.color === firstState.color;
+      secState.state === EGetCardState.VALID_SPECIAL &&
+      secState.color === firstState.color;
 
     /**
      * If the first card is special card and the type of
      * the second card is the same as the first card type
      */
     const FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO =
-      firstState.state === "VALID_SPECIAL" &&
-      secState.state === "VALID_SPECIAL" &&
+      firstState.state === EGetCardState.VALID_SPECIAL &&
+      secState.state === EGetCardState.VALID_SPECIAL &&
       firstState.type === secState.type;
 
     /**
      * If the second card is wild card or in the other word is color only
      */
-    const SECONDCARD_IS_WILD = secState.state === "VALID_WILD";
+    const SECONDCARD_IS_WILD = secState.state === EGetCardState.VALID_WILD;
 
     /**
      * If the second card is plus4 card
      */
-    const SECONDCARD_IS_WILD4 = secState.state === "VALID_WILD_PLUS4";
+    const SECONDCARD_IS_WILD4 =
+      secState.state === EGetCardState.VALID_WILD_PLUS4;
 
     return {
       FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME,
@@ -800,66 +774,6 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
       SECONDCARD_IS_WILD,
       SECONDCARD_IS_WILD4,
     };
-  }
-
-  /**
-   * Get the state of the current card (normal card, wild card, etc.)
-   * @param card Valid given card
-   * @returns Object of the card state
-   */
-  private getCardState(card: allCard): IGetCardState {
-    const normalizeCard = card.trim().toLowerCase();
-
-    switch (true) {
-      case regexValidNormal.test(normalizeCard): {
-        const color = normalizeCard.match(
-          regexValidNormal
-        )![1] as IGetCardState["color"];
-        const number = Number(
-          normalizeCard.slice(color!.length)
-        )! as IGetCardState["number"];
-
-        return { state: "VALID_NORMAL", color, number };
-      }
-
-      case regexValidWildColorPlus4Only.test(normalizeCard): {
-        const color = normalizeCard.match(
-          regexValidWildColorPlus4Only
-        )![2] as IGetCardState["color"];
-
-        return { state: "VALID_WILD_PLUS4", color };
-      }
-
-      case regexValidWildColorOnly.test(normalizeCard): {
-        const color = normalizeCard.match(
-          regexValidWildColorOnly
-        )![2] as IGetCardState["color"];
-
-        return {
-          state: "VALID_WILD",
-          color,
-        };
-      }
-
-      case regexValidSpecial.test(normalizeCard): {
-        const color = normalizeCard.match(
-          regexValidSpecial
-        )![1]! as IGetCardState["color"];
-        const type = normalizeCard.match(
-          regexValidSpecial
-        )![2]! as IGetCardState["type"];
-
-        return {
-          state: "VALID_SPECIAL",
-          color,
-          type,
-        };
-      }
-
-      default: {
-        return { state: "INVALID" };
-      }
-    }
   }
 
   get cards() {

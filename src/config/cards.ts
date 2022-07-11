@@ -12,6 +12,21 @@ export type allCard =
   | "wild"
   | "wilddraw4";
 
+export enum EGetCardState {
+  VALID_NORMAL,
+  VALID_WILD_PLUS4,
+  VALID_WILD,
+  VALID_SPECIAL,
+  INVALID,
+}
+
+export interface IGetCardState {
+  state: EGetCardState;
+  color?: color;
+  number?: possibleNumber;
+  type?: "draw2" | "reverse" | "skip";
+}
+
 export const cards: allCard[] = [
   "red0",
   "red1",
@@ -104,6 +119,37 @@ const appropriateInitialCards = cards
   .filter((e) => !e.endsWith("draw2"))
   .filter((e) => !e.endsWith("reverse"));
 
+const filterCardByGivenCard = {
+  ValidNormal(
+    actualCard: allCard,
+    color: color,
+    number: possibleNumber
+  ): allCard[] {
+    const sameByColor = [...filteredWildColor].filter((card) =>
+      card.includes(color)
+    );
+    const sameByNumber = [...filteredWildColor].filter((card) =>
+      card.includes(number as unknown as string)
+    );
+
+    return [...new Set([...sameByColor, ...sameByNumber])].filter(
+      (card) => !card.includes(actualCard)
+    );
+  },
+  GetCardByColor(color: color): allCard[] {
+    return [...filteredWildColor].filter((card) => card.includes(color));
+  },
+};
+
+const reusableGetCardByColor = (color: color) => {
+  const filteredCard = filterCardByGivenCard.GetCardByColor(color);
+
+  const idxCard = Math.floor(getRandom() * filteredCard.length);
+  const choosenCard = filteredCard[idxCard];
+
+  return choosenCard;
+};
+
 enum randomCardCondition {
   randomCard,
   wild,
@@ -156,21 +202,102 @@ export class CardPicker {
         givenCardCondition.ByRandomPick,
         givenCardCondition.ByInitialCard,
       ],
-      [12, 5, 1],
+      [13, 5, 1],
       3
     );
 
     switch (status) {
-      case givenCardCondition.ByGivenCard:
-        // TODO: Buat algoritma nyangkul tapi bedasarkan kartu yang dikasih
-        console.log(card);
-        return "greenreverse";
+      case givenCardCondition.ByGivenCard: {
+        const state = CardPicker.getCardState(card);
+
+        switch (state.state) {
+          case EGetCardState.VALID_NORMAL: {
+            const filteredCard = filterCardByGivenCard.ValidNormal(
+              card,
+              state.color!,
+              state.number!
+            );
+
+            const idxCard = Math.floor(getRandom() * filteredCard.length);
+            const choosenCard = filteredCard[idxCard];
+
+            return choosenCard;
+          }
+
+          /* eslint-disable no-fallthrough */
+
+          case EGetCardState.VALID_WILD:
+          case EGetCardState.VALID_SPECIAL:
+          case EGetCardState.VALID_WILD_PLUS4:
+            return reusableGetCardByColor(state.color!);
+        }
+      }
 
       case givenCardCondition.ByRandomPick:
         return CardPicker.pickRandomCard();
 
       case givenCardCondition.ByInitialCard:
         return CardPicker.getInitialCard() as allCard;
+    }
+  }
+
+  /**
+   * Get the state of the current card (normal card, wild card, etc.)
+   * @param card Valid given card
+   * @returns Object of the card state
+   */
+  static getCardState(card: allCard): IGetCardState {
+    const normalizeCard = card.trim().toLowerCase();
+
+    switch (true) {
+      case regexValidNormal.test(normalizeCard): {
+        const color = normalizeCard.match(
+          regexValidNormal
+        )![1] as IGetCardState["color"];
+        const number = Number(
+          normalizeCard.slice(color!.length)
+        )! as IGetCardState["number"];
+
+        return { state: EGetCardState.VALID_NORMAL, color, number };
+      }
+
+      case regexValidWildColorPlus4Only.test(normalizeCard): {
+        const color = normalizeCard.match(
+          regexValidWildColorPlus4Only
+        )![2] as IGetCardState["color"];
+
+        return { state: EGetCardState.VALID_WILD_PLUS4, color };
+      }
+
+      case regexValidWildColorOnly.test(normalizeCard): {
+        const color = normalizeCard.match(
+          regexValidWildColorOnly
+        )![2] as IGetCardState["color"];
+
+        return {
+          state: EGetCardState.VALID_WILD,
+          color,
+        };
+      }
+
+      case regexValidSpecial.test(normalizeCard): {
+        const color = normalizeCard.match(
+          regexValidSpecial
+        )![1]! as IGetCardState["color"];
+        const type = normalizeCard.match(
+          regexValidSpecial
+        )![2]! as IGetCardState["type"];
+
+        return {
+          state: EGetCardState.VALID_SPECIAL,
+          color,
+          type,
+        };
+      }
+
+      default: {
+        return { state: EGetCardState.INVALID };
+      }
     }
   }
 }
