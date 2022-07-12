@@ -19,9 +19,9 @@ import {
 } from "../config/cards";
 
 import { Card as CardType, CardModel, User } from "../models";
-import type { allCard, IGetCardState } from "../config/cards";
+import type { allCard } from "../config/cards";
 
-import { EGetCardState, CardPicker } from "../config/cards";
+import { CardPicker, compareTwoCard } from "../config/cards";
 
 export class Card {
   private card: DocumentType<CardType>;
@@ -250,10 +250,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
   }
 
   async solve(givenCard: allCard) {
-    const status = this.compareTwoCard(
-      this.game.currentCard as allCard,
-      givenCard
-    );
+    const status = compareTwoCard(this.game.currentCard as allCard, givenCard);
 
     switch (status) {
       case "STACK": {
@@ -687,93 +684,6 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     else if (card.match(regexValidWildColorPlus4Only))
       return this.card.cards?.includes("wilddraw4");
     else return this.card.cards?.includes(card);
-  }
-
-  private compareTwoCard(firstCard: allCard, secCard: allCard) {
-    const firstState = CardPicker.getCardState(firstCard);
-    const secState = CardPicker.getCardState(secCard);
-
-    const switchState = this.getSwitchState(firstState, secState);
-
-    switch (true) {
-      /* eslint-disable no-fallthrough */
-
-      // Valid wilddraw4 from player
-      case switchState.SECONDCARD_IS_WILD4:
-        return "STACK_PLUS_4";
-
-      // Valid wild color only from player
-      case switchState.SECONDCARD_IS_WILD:
-        return "STACK_WILD";
-
-      case switchState.FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME:
-      case switchState.FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR:
-        return "STACK";
-
-      case switchState.FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO:
-      case switchState.SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD:
-        return `VALID_SPECIAL_${secState.type!.toUpperCase()}`;
-
-      default:
-        return "UNMATCH";
-    }
-  }
-
-  private getSwitchState(firstState: IGetCardState, secState: IGetCardState) {
-    /**
-     * If the color or number is the same, but it's not special or plus4 card
-     */
-    const FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME =
-      (firstState?.color === secState?.color ||
-        firstState?.number === secState?.number) &&
-      secState.state !== EGetCardState.VALID_SPECIAL;
-
-    /**
-     * If the first card is the wild and the color of second card is the same
-     * or the first card is the plus4 and the color of second card is the same
-     */
-    const FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR =
-      (firstState.state === EGetCardState.VALID_WILD &&
-        firstState.color === secState.color) ||
-      (firstState.state === EGetCardState.VALID_WILD_PLUS4 &&
-        firstState.color === secState.color);
-
-    /**
-     * If the second card is special card and the color
-     * of the second card is the same as the first card color
-     */
-    const SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD =
-      secState.state === EGetCardState.VALID_SPECIAL &&
-      secState.color === firstState.color;
-
-    /**
-     * If the first card is special card and the type of
-     * the second card is the same as the first card type
-     */
-    const FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO =
-      firstState.state === EGetCardState.VALID_SPECIAL &&
-      secState.state === EGetCardState.VALID_SPECIAL &&
-      firstState.type === secState.type;
-
-    /**
-     * If the second card is wild card or in the other word is color only
-     */
-    const SECONDCARD_IS_WILD = secState.state === EGetCardState.VALID_WILD;
-
-    /**
-     * If the second card is plus4 card
-     */
-    const SECONDCARD_IS_WILD4 =
-      secState.state === EGetCardState.VALID_WILD_PLUS4;
-
-    return {
-      FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME,
-      FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR,
-      SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD,
-      FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO,
-      SECONDCARD_IS_WILD,
-      SECONDCARD_IS_WILD4,
-    };
   }
 
   get cards() {

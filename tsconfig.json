@@ -108,10 +108,9 @@
       "./src/bot.ts",
       "./src/lib",
       "./src/utils",
-      "./src/config",
+      "./src/config/*.ts",
       "./src/models",
-      "./src/controller",
-      "./src/handler"
+      "./src/handler/*.ts"
     ],
     "out": "docs",
     "excludeExternals": true
