@@ -4,6 +4,7 @@
   "description": "Bot whatsapp yang berguna untuk bermain UNO",
   "main": "dist/index.js",
   "scripts": {
+    "test": "jest",
     "dev": "nodemon src/index.ts",
     "start": "node .",
     "build": "tsc",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.0.2",
     "@commitlint/config-conventional": "^17.0.2",
+    "@types/jest": "^28.1.4",
     "@types/luxon": "^2.3.2",
     "@types/node": "^18.0.0",
     "@types/sharp": "^0.30.4",
@@ -41,8 +43,10 @@
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "husky": "^8.0.1",
+    "jest": "^28.1.2",
     "nodemon": "^2.0.19",
     "prettier": "^2.7.1",
+    "ts-jest": "^28.0.5",
     "ts-node": "^10.8.1",
     "typedoc": "^0.23.5",
     "typedoc-plugin-missing-exports": "^0.23.0",
