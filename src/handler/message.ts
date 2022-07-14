@@ -85,6 +85,10 @@ export const messageHandler = async (
       case "draw":
         emitter.emit("draw", chat);
         break;
+      case "k":
+      case "kick":
+        emitter.emit("kick", chat);
+        break;
       case "h":
       case "help":
         emitter.emit("help", chat);
