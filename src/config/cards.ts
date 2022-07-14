@@ -316,69 +316,53 @@ export class CardPicker {
   }
 }
 
+export enum switchState {
+  FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME,
+  FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR,
+  SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD,
+  FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO,
+  SECONDCARD_IS_WILD,
+  SECONDCARD_IS_WILD4,
+}
+
 /**
  * A function that used to defining the state for switch case comparer
  * @param firstState Card state from the deck
  * @param secState Card state from the user given card
- * @returns An objects that indicate a certain valid condition
+ * @returns An enum that indicate a certain valid condition
  */
 export const getSwitchState = (
   firstState: IGetCardState,
   secState: IGetCardState
 ) => {
-  /**
-   * If the color or number is the same, but it's not special or plus4 card
-   */
-  const FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME =
+  if (secState.state === EGetCardState.VALID_WILD)
+    return switchState.SECONDCARD_IS_WILD;
+  else if (secState.state === EGetCardState.VALID_WILD_PLUS4)
+    return switchState.SECONDCARD_IS_WILD4;
+  else if (
     (firstState?.color === secState?.color ||
       firstState?.number === secState?.number) &&
-    secState.state !== EGetCardState.VALID_SPECIAL;
-
-  /**
-   * If the first card is the wild and the color of second card is the same
-   * or the first card is the plus4 and the color of second card is the same
-   */
-  const FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR =
+    secState.state !== EGetCardState.VALID_SPECIAL
+  )
+    return switchState.FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME;
+  else if (
     (firstState.state === EGetCardState.VALID_WILD &&
       firstState.color === secState.color) ||
     (firstState.state === EGetCardState.VALID_WILD_PLUS4 &&
-      firstState.color === secState.color);
-
-  /**
-   * If the second card is special card and the color
-   * of the second card is the same as the first card color
-   */
-  const SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD =
+      firstState.color === secState.color)
+  )
+    return switchState.FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR;
+  else if (
     secState.state === EGetCardState.VALID_SPECIAL &&
-    secState.color === firstState.color;
-
-  /**
-   * If the first card is special card and the type of
-   * the second card is the same as the first card type
-   */
-  const FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO =
+    secState.color === firstState.color
+  )
+    return switchState.SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD;
+  else if (
     firstState.state === EGetCardState.VALID_SPECIAL &&
     secState.state === EGetCardState.VALID_SPECIAL &&
-    firstState.type === secState.type;
-
-  /**
-   * If the second card is wild card or in the other word is color only
-   */
-  const SECONDCARD_IS_WILD = secState.state === EGetCardState.VALID_WILD;
-
-  /**
-   * If the second card is plus4 card
-   */
-  const SECONDCARD_IS_WILD4 = secState.state === EGetCardState.VALID_WILD_PLUS4;
-
-  return {
-    FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME,
-    FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR,
-    SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD,
-    FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO,
-    SECONDCARD_IS_WILD,
-    SECONDCARD_IS_WILD4,
-  };
+    firstState.type === secState.type
+  )
+    return switchState.FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO;
 };
 
 /**
@@ -391,9 +375,9 @@ export const compareTwoCard = (firstCard: allCard, secCard: allCard) => {
   const firstState = CardPicker.getCardState(firstCard);
   const secState = CardPicker.getCardState(secCard);
 
-  const switchState = getSwitchState(firstState, secState);
+  const switchStateCard = getSwitchState(firstState, secState);
 
-  switch (true) {
+  switch (switchStateCard) {
     /* eslint-disable no-fallthrough */
 
     // Valid wilddraw4 from player
