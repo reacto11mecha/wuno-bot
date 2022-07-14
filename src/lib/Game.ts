@@ -125,7 +125,7 @@ export class Game {
     await Promise.all([
       this.game.save(),
       this.leaveGameForUser(_id),
-      CardModel.deleteOne({ user: _id, game_id: this.game._id }),
+      CardModel.deleteOne({ user: _id, game: this.game._id }),
     ]);
   }
 
