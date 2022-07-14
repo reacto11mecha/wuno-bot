@@ -119,8 +119,8 @@ const appropriateInitialCards = cards
   .filter((e) => !e.endsWith("draw2"))
   .filter((e) => !e.endsWith("reverse"));
 
-const filterCardByGivenCard = {
-  ValidNormal(
+export class filterCardByGivenCard {
+  static ValidNormal(
     actualCard: allCard,
     color: color,
     number: possibleNumber
@@ -135,11 +135,12 @@ const filterCardByGivenCard = {
     return [...new Set([...sameByColor, ...sameByNumber])].filter(
       (card) => !card.includes(actualCard)
     );
-  },
-  GetCardByColor(color: color): allCard[] {
+  }
+
+  static GetCardByColor(color: color): allCard[] {
     return [...filteredWildColor].filter((card) => card.includes(color));
-  },
-};
+  }
+}
 
 const reusableGetCardByColor = (color: color) => {
   const filteredCard = filterCardByGivenCard.GetCardByColor(color);
