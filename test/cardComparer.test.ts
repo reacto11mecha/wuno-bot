@@ -2,8 +2,9 @@ import { compareTwoCard } from "../src/config/cards";
 import type { allCard } from "../src/config/cards";
 
 const allColor = ["red", "green", "blue", "yellow"];
+const allSpecialCard = ["reverse", "skip", "draw2"];
 
-describe("Card comparer unit test", () => {
+describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
   it("Stack the card if it's the same color", () => {
     const shouldBeSuccessRed = compareTwoCard("red2", "red5");
     const shouldBeSuccessGreen = compareTwoCard("green0", "green7");
@@ -50,7 +51,7 @@ describe("Card comparer unit test", () => {
     ).toBe(true);
   });
 
-  it("Stack plus 4 whatever the color is", () => {
+  it("Stack plus 4 whatever the normal color is", () => {
     const colorWNumber = allColor.map((color) => `${color}5` as allCard);
     const plus4WColor = allColor.map((color) => `wilddraw4${color}` as allCard);
 
@@ -68,7 +69,7 @@ describe("Card comparer unit test", () => {
     ).toBe(true);
   });
 
-  it("Stack wild whatever the color is", () => {
+  it("Stack wild whatever the normal color is", () => {
     const colorWNumber = allColor.map((color) => `${color}1` as allCard);
     const WildWithColor = allColor.map((color) => `wild${color}` as allCard);
 
@@ -87,8 +88,6 @@ describe("Card comparer unit test", () => {
   });
 
   it("Stack special card if the card is the same color as the deck card color", () => {
-    const allSpecialCard = ["reverse", "skip", "draw2"];
-
     const allPossibleCombination = allSpecialCard
       .map((type) =>
         allColor.map((card) => {
@@ -101,6 +100,34 @@ describe("Card comparer unit test", () => {
       .reduce((curr, acc) => curr.concat(acc));
 
     expect(allPossibleCombination.length).toEqual(12);
+    expect(
+      allSpecialCard
+        .map((special) => `VALID_SPECIAL_${special.toUpperCase()}`)
+        .map((type) =>
+          allPossibleCombination.some((combination) => combination === type)
+        )
+        .every((combinationType) => combinationType === true)
+    ).toBe(true);
+  });
+
+  it("Stack special color with the same special type but different color", () => {
+    const allPossibleCombination = allColor
+      .map((color) =>
+        allColor
+          .filter((type) => type !== color)
+          .map((opposite) =>
+            allSpecialCard.map((special) => {
+              const deckCard = `${opposite}${special}` as allCard;
+              const givenCard = `${color}${special}` as allCard;
+
+              return compareTwoCard(deckCard, givenCard);
+            })
+          )
+      )
+      .map((data) => data.reduce((curr, acc) => curr.concat(acc)))
+      .reduce((curr, acc) => curr.concat(acc));
+
+    expect(allPossibleCombination.length).toEqual(36);
     expect(
       allSpecialCard
         .map((special) => `VALID_SPECIAL_${special.toUpperCase()}`)
@@ -142,7 +169,9 @@ describe("Card comparer unit test", () => {
       allPossibleCombination.every((combination) => combination === "STACK")
     ).toBe(true);
   });
+});
 
+describe("Card comparer unit test [UNMATCH]", () => {
   it("Normal card compared to normal card but all card are unmatch", () => {
     const allPossibleCombination = allColor
       .map((type) =>
@@ -198,6 +227,34 @@ describe("Card comparer unit test", () => {
       .reduce((curr, acc) => curr.concat(acc));
 
     expect(allPossibleCombination.length).toEqual(12);
+    expect(
+      allPossibleCombination.every((combination) => combination === "UNMATCH")
+    ).toBe(true);
+  });
+
+  it("Stack special compared to special card but all card are unmatch", () => {
+    const allPossibleCombination = allSpecialCard
+      .map((special) =>
+        allSpecialCard
+          .filter((type) => type !== special)
+          .map((oppositeType) =>
+            allColor.map((color) =>
+              allColor
+                .filter((type) => type !== color)
+                .map((oppositeColor) => {
+                  const deckCard = `${oppositeColor}${oppositeType}` as allCard;
+                  const givenCard = `${color}${special}` as allCard;
+
+                  return compareTwoCard(deckCard, givenCard);
+                })
+            )
+          )
+      )
+      .map((data) => data.reduce((curr, acc) => curr.concat(acc)))
+      .map((data) => data.reduce((curr, acc) => curr.concat(acc)))
+      .reduce((curr, acc) => curr.concat(acc));
+
+    expect(allPossibleCombination.length).toEqual(72);
     expect(
       allPossibleCombination.every((combination) => combination === "UNMATCH")
     ).toBe(true);
