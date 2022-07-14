@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
+    "test:watch": "jest --watch",
     "dev": "nodemon src/index.ts",
     "start": "node .",
     "build": "tsc",
@@ -12,7 +13,8 @@
     "build:all": "tsc && typedoc",
     "build:watch": "tsc --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ./src",
+    "format": "prettier -w ./src ./test",
+    "lint": "eslint ./src ./test",
     "prepare": "husky install"
   },
   "repository": {
