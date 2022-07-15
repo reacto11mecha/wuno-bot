@@ -43,12 +43,12 @@ const logger = P({
 
 export default class Bot {
   private queue = new PQueue({
-    concurrency: 4,
+    concurrency: 2,
     autoStart: false,
   });
   private msgRetryCounterMap: MessageRetryMap = {};
   private store = makeInMemoryStore({ logger });
-  private messageLimitter = pLimit(4);
+  private messageLimitter = pLimit(2);
 
   constructor() {
     this.queue.start();
