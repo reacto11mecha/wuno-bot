@@ -1,5 +1,5 @@
-import { compareTwoCard } from "../src/config/cards";
-import type { allCard } from "../src/config/cards";
+import { compareTwoCard } from "../../src/config/cards";
+import type { allCard } from "../../src/config/cards";
 
 const allColor = ["red", "green", "blue", "yellow"];
 const allSpecialCard = ["reverse", "skip", "draw2"];
