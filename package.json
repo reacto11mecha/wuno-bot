@@ -55,9 +55,6 @@
     "typescript": "^4.7.3"
   },
   "dependencies": {
-    "@adiwajshing/baileys": "^4.2.0",
-    "@adiwajshing/keyed-db": "^0.2.4",
-    "@hapi/boom": "^10.0.0",
     "@open-wa/wa-automate": "^4.42.5",
     "@typegoose/typegoose": "^9.9.0",
     "dotenv": "^16.0.1",
