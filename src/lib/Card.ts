@@ -19,6 +19,7 @@ import {
 } from "../config/cards";
 
 import { Card as CardType, CardModel, User } from "../models";
+import type { DataURL } from "@open-wa/wa-automate";
 import type { allCard } from "../config/cards";
 
 import { CardPicker, compareTwoCard } from "../config/cards";
@@ -88,62 +89,59 @@ export class Card {
       await Promise.all([
         (async () => {
           await this.game.sendToOtherPlayersWithoutCurrentPerson(
-            {
-              text: `${this.chat.message.userName} telah mengambil kartu, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
-            },
+            `${this.chat.message.userName} telah mengambil kartu, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
             playerList
           );
 
           await this.game.sendToOtherPlayersWithoutCurrentPerson(
-            {
-              image: currentCardImage,
-              caption: `Kartu saat ini: ${this.game.currentCard}`,
-            },
-            playerList
+            `Kartu saat ini: ${this.game.currentCard}`,
+            playerList,
+            currentCardImage
           );
           await this.game.sendToOtherPlayersWithoutCurrentPerson(
-            {
-              image: backCardsImage,
-              caption: `Kartu yang ${
-                isDocument(this.game.currentPlayer)
-                  ? this.game.currentPlayer.userName
-                  : ""
-              } miliki`,
-            },
-            playerList
-          );
-        })(),
-        (async () => {
-          await this.chat.sendToCurrentPerson({
-            text: `Berhasil mengambil kartu baru, *${newCard}*. selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
-          });
-
-          await this.chat.sendToCurrentPerson({
-            image: currentCardImage,
-            caption: `Kartu saat ini: ${this.game.currentCard}`,
-          });
-          await this.chat.sendToCurrentPerson({
-            image: backCardsImage,
-            caption: `Kartu yang ${
+            `Kartu yang ${
               isDocument(this.game.currentPlayer)
                 ? this.game.currentPlayer.userName
                 : ""
             } miliki`,
-          });
+            playerList,
+            backCardsImage
+          );
         })(),
         (async () => {
-          await this.chat.sendToOtherPerson(otherPlayer, {
-            text: `${this.chat.message.userName} telah mengambil kartu baru, Sekarang giliran kamu untuk bermain`,
-          });
+          await this.chat.sendToCurrentPerson(
+            `Berhasil mengambil kartu baru, *${newCard}*. selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`
+          );
 
-          await this.chat.sendToOtherPerson(otherPlayer, {
-            image: currentCardImage,
-            caption: `Kartu saat ini: ${this.game.currentCard}`,
-          });
-          await this.chat.sendToOtherPerson(otherPlayer, {
-            image: frontCardsImage,
-            caption: `Kartu kamu: ${nextUserCard?.cards?.join(", ")}.`,
-          });
+          await this.chat.sendToCurrentPerson(
+            `Kartu saat ini: ${this.game.currentCard}`,
+            currentCardImage
+          );
+          await this.chat.sendToCurrentPerson(
+            `Kartu yang ${
+              isDocument(this.game.currentPlayer)
+                ? this.game.currentPlayer.userName
+                : ""
+            } miliki`,
+            backCardsImage
+          );
+        })(),
+        (async () => {
+          await this.chat.sendToOtherPerson(
+            otherPlayer,
+            `${this.chat.message.userName} telah mengambil kartu baru, Sekarang giliran kamu untuk bermain`
+          );
+
+          await this.chat.sendToOtherPerson(
+            otherPlayer,
+            `Kartu saat ini: ${this.game.currentCard}`,
+            currentCardImage
+          );
+          await this.chat.sendToOtherPerson(
+            otherPlayer,
+            `Kartu kamu: ${nextUserCard?.cards?.join(", ")}.`,
+            frontCardsImage
+          );
         })(),
       ]);
     }
@@ -158,21 +156,19 @@ export class Card {
     const gameDuration = this.game.getElapsedTime();
 
     await Promise.all([
-      this.chat.sendToCurrentPerson({
-        text: `Selamat! Kamu memenangkan kesempatan permainan kali ini.
+      this.chat
+        .sendToCurrentPerson(`Selamat! Kamu memenangkan kesempatan permainan kali ini.
 
 Kamu telah memanangkan permainan ini dengan durasi ${gameDuration}.
 
-Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
-      }),
+Game otomatis telah dihentikan. Terimakasih sudah bermain!`),
       this.game.sendToOtherPlayersWithoutCurrentPerson(
-        {
-          text: `${this.chat.message.userName} memenangkan kesempatan permainan kali ini.
+        `${this.chat.message.userName} memenangkan kesempatan permainan kali ini.
 
 Dia telah memanangkan permainan ini dengan durasi ${gameDuration}.
 
 Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
-        },
+
         playerList
       ),
     ]);
@@ -180,51 +176,40 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
 
   async sendToCurrentPersonInGame(
     text: string,
-    currentCardImage: Buffer,
-    backCardsImage: Buffer,
+    currentCardImage: DataURL,
+    backCardsImage: DataURL,
     nextPlayerName: string
   ) {
-    await this.chat.sendToCurrentPerson({
-      text,
-    });
+    await this.chat.sendToCurrentPerson(text);
 
-    await this.chat.sendToCurrentPerson({
-      image: currentCardImage,
-      caption: `Kartu saat ini: ${this.game.currentCard}`,
-    });
-    await this.chat.sendToCurrentPerson({
-      image: backCardsImage,
-      caption: `Kartu yang ${nextPlayerName} miliki`,
-    });
+    await this.chat.sendToCurrentPerson(
+      `Kartu saat ini: ${this.game.currentCard}`,
+      currentCardImage
+    );
+    await this.chat.sendToCurrentPerson(
+      `Kartu yang ${nextPlayerName} miliki`,
+      backCardsImage
+    );
   }
 
   async sendToOtherPlayersWithoutCurrentPersonInGame(
     text: string,
     playerList: Ref<User, Types.ObjectId | undefined>[] | undefined,
-    currentCardImage: Buffer,
-    backCardsImage: Buffer,
+    currentCardImage: DataURL,
+    backCardsImage: DataURL,
     nextPlayerName: string
   ) {
-    await this.game.sendToOtherPlayersWithoutCurrentPerson(
-      {
-        text,
-      },
-      playerList
-    );
+    await this.game.sendToOtherPlayersWithoutCurrentPerson(text, playerList);
 
     await this.game.sendToOtherPlayersWithoutCurrentPerson(
-      {
-        image: currentCardImage,
-        caption: `Kartu saat ini: ${this.game.currentCard}`,
-      },
-      playerList
+      `Kartu saat ini: ${this.game.currentCard}`,
+      playerList,
+      currentCardImage
     );
     await this.game.sendToOtherPlayersWithoutCurrentPerson(
-      {
-        image: backCardsImage,
-        caption: `Kartu yang ${nextPlayerName} miliki`,
-      },
-      playerList
+      `Kartu yang ${nextPlayerName} miliki`,
+      playerList,
+      backCardsImage
     );
   }
 
@@ -232,21 +217,21 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     firstText: string,
     lastText: string,
     phoneNumber: string,
-    currentCardImage: Buffer,
-    backOrFrontCardsImage: Buffer
+    currentCardImage: DataURL,
+    backOrFrontCardsImage: DataURL
   ) {
-    await this.chat.sendToOtherPerson(phoneNumber, {
-      text: firstText,
-    });
+    await this.chat.sendToOtherPerson(phoneNumber, firstText);
 
-    await this.chat.sendToOtherPerson(phoneNumber, {
-      image: currentCardImage,
-      caption: `Kartu saat ini: ${this.game.currentCard}`,
-    });
-    await this.chat.sendToOtherPerson(phoneNumber, {
-      image: backOrFrontCardsImage,
-      caption: lastText,
-    });
+    await this.chat.sendToOtherPerson(
+      phoneNumber,
+      `Kartu saat ini: ${this.game.currentCard}`,
+      currentCardImage
+    );
+    await this.chat.sendToOtherPerson(
+      phoneNumber,
+      lastText,
+      backOrFrontCardsImage
+    );
   }
 
   async solve(givenCard: allCard) {
@@ -671,9 +656,9 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
       }
 
       case "UNMATCH": {
-        await this.chat.sendToCurrentPerson({
-          text: `Kartu *${givenCard}*, tidak valid jika disandingkan dengan kartu *${this.game.currentCard}*! Jika tidak memiliki kartu lagi, ambil dengan '${PREFIX}d' untuk mengambil kartu baru.`,
-        });
+        await this.chat.sendToCurrentPerson(
+          `Kartu *${givenCard}*, tidak valid jika disandingkan dengan kartu *${this.game.currentCard}*! Jika tidak memiliki kartu lagi, ambil dengan '${PREFIX}d' untuk mengambil kartu baru.`
+        );
       }
     }
   }

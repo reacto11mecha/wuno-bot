@@ -1,11 +1,4 @@
-import makeWASocket, {
-  makeInMemoryStore,
-  MessageRetryMap,
-  DisconnectReason,
-  useMultiFileAuthState,
-  fetchLatestBaileysVersion,
-} from "@adiwajshing/baileys";
-import { Boom } from "@hapi/boom";
+import { create, Client } from "@open-wa/wa-automate";
 import PQueue from "p-queue";
 import pLimit from "p-limit";
 import dotenv from "dotenv";
@@ -43,12 +36,10 @@ const logger = P({
 
 export default class Bot {
   private queue = new PQueue({
-    concurrency: 2,
+    concurrency: 4,
     autoStart: false,
   });
-  private msgRetryCounterMap: MessageRetryMap = {};
-  private store = makeInMemoryStore({ logger });
-  private messageLimitter = pLimit(2);
+  private messageLimitter = pLimit(8);
 
   constructor() {
     this.queue.start();
@@ -73,96 +64,32 @@ export default class Bot {
         `[P-QUEUE] Queue is idle.  Size: ${this.queue.size}  Pending: ${this.queue.pending}`
       )
     );
-
-    const path = "./baileys_store_multi.json";
-
-    this.store.readFromFile(path);
-    setInterval(() => {
-      this.store.writeToFile(path);
-    }, 10_000);
   }
 
-  private isMessageValid(message: string | null | undefined) {
-    if (message) return message.startsWith(PREFIX);
-
-    return false;
-  }
-
-  private async connectToWhatsApp() {
-    const { state, saveCreds } = await useMultiFileAuthState(
-      "auth_info_baileys"
-    );
-
-    const { version, isLatest } = await fetchLatestBaileysVersion();
-    logger.info(`using WA v${version.join(".")}, isLatest: ${isLatest}`);
-
-    const sock = makeWASocket({
-      logger,
-      version,
-      auth: state,
-      printQRInTerminal: true,
-      msgRetryCounterMap: this.msgRetryCounterMap,
-    });
-
-    this.store.bind(sock.ev);
-
+  private async clientHandler(
+    messageQueue: PQueue,
+    messageLimitter: ReturnType<typeof pLimit>,
+    client: Client
+  ) {
     const onMessageQueue = await messageHandler(
-      sock,
+      client,
       logger,
-      this.messageLimitter
+      messageLimitter
     );
 
-    sock.ev.on("connection.update", (update) => {
-      const { connection, lastDisconnect } = update;
+    client.onStateChanged((state) => {
+      logger.info(`[STATE] Current State: ${state}`);
+      if (state === "CONFLICT" || state === "UNLAUNCHED") client.forceRefocus();
+    });
 
-      switch (connection) {
-        case "close": {
-          const shouldReconnect =
-            (lastDisconnect?.error as Boom)?.output?.statusCode !==
-            DisconnectReason.loggedOut;
-
-          logger.error(
-            `Connection closed due to ${lastDisconnect?.error}, reconnecting ${shouldReconnect}`
-          );
-
-          if (shouldReconnect) {
-            this.connectToWhatsApp();
-          }
-
-          break;
-        }
-
-        case "open": {
-          logger.info("Opened connection");
-          break;
-        }
-
-        default:
-          break;
+    client.onMessage((message) => {
+      if (message.body.startsWith(PREFIX)) {
+        logger.info(`[Pesan] Ada pesan dari: ${message.sender.pushname}`);
+        messageQueue.add(async () => await onMessageQueue(message));
       }
     });
 
-    sock.ev.on("messages.upsert", async (m) => {
-      const WebMessage = m.messages[0];
-
-      if (
-        m.type === "notify" &&
-        !WebMessage.key.fromMe &&
-        WebMessage.key.remoteJid !== "status@broadcast" &&
-        WebMessage?.message?.extendedTextMessage?.contextInfo?.remoteJid !==
-          "status@broadcast"
-      ) {
-        if (
-          this.isMessageValid(WebMessage?.message?.conversation) ||
-          this.isMessageValid(WebMessage?.message?.extendedTextMessage?.text)
-        ) {
-          logger.info(`[Pesan] Ada pesan dari: ${WebMessage?.pushName}`);
-          this.queue.add(() => onMessageQueue(WebMessage));
-        }
-      }
-    });
-
-    sock.ev.on("creds.update", saveCreds);
+    logger.info("[BOT] Bot berhasil dihidupkan | Pesan Pertama");
   }
 
   init() {
@@ -170,7 +97,18 @@ export default class Bot {
       throw new Error("[DB] Diperlukan sebuah URI MongDB | MONGO_URI");
 
     connectDatabase(process.env.MONGO_URI, logger).then(() =>
-      this.connectToWhatsApp()
+      create({
+        sessionId: "WUNO_BOT",
+        authTimeout: 60,
+        blockCrashLogs: true,
+        disableSpins: true,
+        headless: true,
+        logConsole: false,
+        popup: true,
+        qrTimeout: 0,
+      }).then((client) =>
+        this.clientHandler(this.queue, this.messageLimitter, client)
+      )
     );
   }
 }

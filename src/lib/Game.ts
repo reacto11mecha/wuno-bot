@@ -20,7 +20,7 @@ import {
 } from "../models";
 
 import type { allCard } from "../config/cards";
-import type { AnyMessageContent } from "@adiwajshing/baileys";
+import type { Content, DataURL } from "@open-wa/wa-automate";
 
 export class Game {
   private game: DocumentType<GameType>;
@@ -149,7 +149,10 @@ export class Game {
     }
   }
 
-  async sendToOtherPlayersWithoutCurrentPlayer(message: AnyMessageContent) {
+  async sendToOtherPlayersWithoutCurrentPlayer(
+    message: Content,
+    image?: DataURL
+  ) {
     if (isDocumentArray(this.game.players)) {
       await Promise.all(
         this.game
@@ -159,15 +162,20 @@ export class Game {
           .filter((id) => id !== this.game.currentPosition)
           .map(
             async (user) =>
-              await this.chat.sendToOtherPerson(user.phoneNumber, message)
+              await this.chat.sendToOtherPerson(
+                user.phoneNumber,
+                message,
+                image
+              )
           )
       );
     }
   }
 
   async sendToOtherPlayersWithoutCurrentPerson(
-    message: AnyMessageContent,
-    players?: Ref<UserType>[]
+    message: Content,
+    players?: Ref<UserType>[],
+    image?: DataURL
   ) {
     if (players && isDocumentArray(players)) {
       await Promise.all(
@@ -175,7 +183,11 @@ export class Game {
           .filter((user) => user.phoneNumber !== this.chat.message.userNumber)
           .map(
             async (user) =>
-              await this.chat.sendToOtherPerson(user.phoneNumber, message)
+              await this.chat.sendToOtherPerson(
+                user.phoneNumber,
+                message,
+                image
+              )
           )
       );
     } else if (isDocumentArray(this.game.players)) {
@@ -186,7 +198,11 @@ export class Game {
           )
           .map(
             async (user) =>
-              await this.chat.sendToOtherPerson(user.phoneNumber, message)
+              await this.chat.sendToOtherPerson(
+                user.phoneNumber,
+                message,
+                image
+              )
           )
       );
     }

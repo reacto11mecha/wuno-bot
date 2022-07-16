@@ -1,11 +1,10 @@
 import { atLeastGameID, df, type commonCb } from "../utils";
 
 import { isDocument } from "@typegoose/typegoose";
-// import { User } from "../models"
 
 const commonCallback: commonCb = async ({ chat, game }) =>
-  await chat.replyToCurrentPerson({
-    text: `GAME ID: ${game.gameID}
+  await chat.replyToCurrentPerson(
+    `GAME ID: ${game.gameID}
 Game Status: ${game.translatedStatus}
 Tanggal Dibuat: ${df(game.created_at!)}
 
@@ -15,12 +14,12 @@ ${game
   .join("\n")}${
       !game.state.PLAYING
         ? ""
-        : `
+        : `\n
 Kartu Saat Ini: ${game.currentCard}
 Giliran Pemain Saat Ini: ${
             isDocument(game.currentPlayer) ? game.currentPlayer.userName : ""
           }`
-    }`,
-  });
+    }`
+  );
 
 export default atLeastGameID(commonCallback, commonCallback);

@@ -1,4 +1,4 @@
-import type { proto, WASocket } from "@adiwajshing/baileys";
+import type { Client, Message } from "@open-wa/wa-automate";
 import pLimit from "p-limit";
 import { Logger } from "pino";
 
@@ -10,26 +10,22 @@ import { getController } from "./controller";
 import { botInfo } from "../config/messages";
 
 export const messageHandler = async (
-  sock: WASocket,
+  client: Client,
   logger: Logger,
   limitter: ReturnType<typeof pLimit>
 ) => {
   const controller = await getController();
   const emitter = emitHandler(controller);
 
-  return async (WebMessage: proto.IWebMessageInfo) => {
-    const text =
-      WebMessage!.message!.conversation ||
-      WebMessage!.message!.extendedTextMessage!.text;
-
-    const command = text!
+  return async (message: Message) => {
+    const command = message.body
       .slice(PREFIX.length)!
       .trim()!
       .split(/ +/)!
       .shift()!
       .toLowerCase();
 
-    const chat = new Chat(sock, WebMessage, logger, text!, limitter);
+    const chat = new Chat(client, message, logger, limitter);
 
     switch (command) {
       case "cg":
@@ -95,12 +91,11 @@ export const messageHandler = async (
         break;
 
       default: {
-        await chat.sendToCurrentPerson({
-          text:
-            command.length > 0
-              ? `Tidak ada perintah yang bernama "${command}"`
-              : botInfo,
-        });
+        await chat.sendToCurrentPerson(
+          command.length > 0
+            ? `Tidak ada perintah yang bernama "${command}"`
+            : botInfo
+        );
         break;
       }
     }

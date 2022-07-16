@@ -17,12 +17,12 @@ async function removeGameAuthorAndSetToNextPlayer(chat: Chat, game: Game) {
 
     if (isDocument(player)) {
       await Promise.all([
-        chat.replyToCurrentPerson({
-          text: `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${player.userName}`,
-        }),
-        game.sendToOtherPlayersWithoutCurrentPlayer({
-          text: `${chat.message.userName} telah keluar dari game, dan posisi host sekarang berpindah ke ${player.userName}`,
-        }),
+        chat.replyToCurrentPerson(
+          `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${player.userName}`
+        ),
+        game.sendToOtherPlayersWithoutCurrentPlayer(
+          `${chat.message.userName} telah keluar dari game, dan posisi host sekarang berpindah ke ${player.userName}`
+        ),
       ]);
     }
   }
@@ -34,10 +34,6 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
   });
   await game.removeUserFromArray(chat.user!._id);
 
-  if (isDocument(creator) && creator.gameProperty!.card) {
-    await CardModel.deleteOne({ _id: creator.gameProperty!.card });
-  }
-
   const nextPlayer = game.getNextPosition();
 
   if (game.state.PLAYING) {
@@ -48,12 +44,12 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       await game.endGame();
 
       await Promise.all([
-        chat.replyToCurrentPerson({
-          text: "Anda berhasil keluar dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!",
-        }),
-        game.sendToOtherPlayersWithoutCurrentPlayer({
-          text: `Pemain ${chat.message.userName} sudah keluar dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!`,
-        }),
+        chat.replyToCurrentPerson(
+          "Anda berhasil keluar dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!"
+        ),
+        game.sendToOtherPlayersWithoutCurrentPlayer(
+          `Pemain ${chat.message.userName} sudah keluar dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!`
+        ),
       ]);
 
       return;
@@ -63,13 +59,10 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     if (isDocument(currentPlayer) && isDocument(nextPlayer)) {
       if (game.currentPlayerIsAuthor) {
         // Is current chatter the author and it's turn
-        await Promise.all([
-          (async () => {
-            game.gameCreatorID = nextPlayer._id;
-            await game.save();
-          })(),
-          game.updatePosition(nextPlayer._id),
-        ]);
+        game.gameCreatorID = nextPlayer._id;
+        await game.save();
+
+        await game.updatePosition(nextPlayer._id);
 
         const card = await CardModel.findOne({
           game: game.uid,
@@ -80,22 +73,25 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           (async () => {
             const otherPlayer = nextPlayer.phoneNumber;
 
-            await chat.sendToOtherPerson(otherPlayer, {
-              text: "Kamu sekarang adalah host dari game ini, kamu juga yang saat ini dapat giliran main",
-            });
-            await chat.sendToOtherPerson(otherPlayer, {
-              text: `Kartu saat ini: ${game.currentCard}`,
-            });
-            await chat.sendToOtherPerson(otherPlayer, {
-              text: `Kartu kamu: ${card?.cards?.join(", ")}.`,
-            });
+            await chat.sendToOtherPerson(
+              otherPlayer,
+              "Kamu sekarang adalah host dari game ini, kamu juga yang saat ini dapat giliran main"
+            );
+            await chat.sendToOtherPerson(
+              otherPlayer,
+              `Kartu saat ini: ${game.currentCard}`
+            );
+            await chat.sendToOtherPerson(
+              otherPlayer,
+              `Kartu kamu: ${card?.cards?.join(", ")}.`
+            );
           })(),
-          chat.replyToCurrentPerson({
-            text: `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${nextPlayer.userName}`,
-          }),
-          game.sendToOtherPlayersWithoutCurrentPlayer({
-            text: `${chat.message.userName} telah keluar dari game, dan posisi host sekarang berpindah ke ${nextPlayer.userName}, saat ini giliran dia juga untuk bermain`,
-          }),
+          chat.replyToCurrentPerson(
+            `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${nextPlayer.userName}`
+          ),
+          game.sendToOtherPlayersWithoutCurrentPlayer(
+            `${chat.message.userName} telah keluar dari game, dan posisi host sekarang berpindah ke ${nextPlayer.userName}, saat ini giliran dia juga untuk bermain`
+          ),
         ]);
       } else if (game.isGameCreator) {
         // Is current chatter the author and not it's turn
@@ -113,32 +109,35 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           (async () => {
             const otherPlayer = nextPlayer.phoneNumber;
 
-            await chat.sendToOtherPerson(otherPlayer, {
-              text: `${chat.message.userName} telah keluar dari game, selanjutnya adalah giliran kamu untuk bermain`,
-            });
-            await chat.sendToOtherPerson(otherPlayer, {
-              text: `Kartu saat ini: ${game.currentCard}`,
-            });
-            await chat.sendToOtherPerson(otherPlayer, {
-              text: `Kartu kamu: ${card?.cards?.join(", ")}.`,
-            });
+            await chat.sendToOtherPerson(
+              otherPlayer,
+              `${chat.message.userName} telah keluar dari game, selanjutnya adalah giliran kamu untuk bermain`
+            );
+            await chat.sendToOtherPerson(
+              otherPlayer,
+              `Kartu saat ini: ${game.currentCard}`
+            );
+            await chat.sendToOtherPerson(
+              otherPlayer,
+              `Kartu kamu: ${card?.cards?.join(", ")}.`
+            );
           })(),
-          chat.replyToCurrentPerson({
-            text: `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${nextPlayer.userName}`,
-          }),
-          game.sendToOtherPlayersWithoutCurrentPlayer({
-            text: `${chat.message.userName} telah keluar dari game, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
-          }),
+          chat.replyToCurrentPerson(
+            `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${nextPlayer.userName}`
+          ),
+          game.sendToOtherPlayersWithoutCurrentPlayer(
+            `${chat.message.userName} telah keluar dari game, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`
+          ),
         ]);
       } else {
         // Is current chatter not the author and not it's turn
         await Promise.all([
-          chat.replyToCurrentPerson({
-            text: "Anda berhasil keluar dari game. Terimakasih telah bermain!",
-          }),
-          game.sendToOtherPlayersWithoutCurrentPlayer({
-            text: `${chat.message.userName} telah keluar dari game`,
-          }),
+          chat.replyToCurrentPerson(
+            "Anda berhasil keluar dari game. Terimakasih telah bermain!"
+          ),
+          game.sendToOtherPlayersWithoutCurrentPlayer(
+            `${chat.message.userName} telah keluar dari game`
+          ),
         ]);
       }
     }
@@ -158,18 +157,18 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
         // Is current chatter is author and less than two players waiting
         await game.endGame();
 
-        await chat.replyToCurrentPerson({
-          text: "Anda berhasil keluar dari game, tetapi karena hanya anda saja yang berada otomatis game dihentikan. Terimakasih sudah bermain!",
-        });
+        await chat.replyToCurrentPerson(
+          "Anda berhasil keluar dari game, tetapi karena hanya anda saja yang berada otomatis game dihentikan. Terimakasih sudah bermain!"
+        );
       } else {
         // Is current chatter is not the author
         await Promise.all([
-          chat.replyToCurrentPerson({
-            text: "Anda berhasil keluar dari game. Terimakasih telah bermain!",
-          }),
-          game.sendToOtherPlayersWithoutCurrentPlayer({
-            text: `${chat.message.userName} telah keluar dari game`,
-          }),
+          chat.replyToCurrentPerson(
+            "Anda berhasil keluar dari game. Terimakasih telah bermain!"
+          ),
+          game.sendToOtherPlayersWithoutCurrentPlayer(
+            `${chat.message.userName} telah keluar dari game`
+          ),
         ]);
       }
     }

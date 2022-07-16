@@ -1,4 +1,12 @@
-import type { proto, WASocket, AnyMessageContent } from "@adiwajshing/baileys";
+import type {
+  Message,
+  Client,
+  ChatId,
+  ContactId,
+  Content,
+  MessageId,
+  DataURL,
+} from "@open-wa/wa-automate";
 import { DocumentType } from "@typegoose/typegoose";
 import { Logger } from "pino";
 import pLimit from "p-limit";
@@ -7,86 +15,93 @@ import { PREFIX } from "../config/prefix";
 import { User } from "../models";
 
 export interface IMessage {
-  userNumber: string;
+  userNumber: ContactId;
   userName: string;
-  remoteJid: string;
-  id: string;
+  from: ChatId;
+  id: MessageId;
 }
 
 export class Chat {
-  sock: WASocket;
+  client: Client;
   logger: Logger;
   message: IMessage;
-  private WebMessage: proto.IWebMessageInfo;
+  private IncomingMessage: Message;
   private limitter: ReturnType<typeof pLimit>;
   user?: DocumentType<User>;
   args: string[];
 
   constructor(
-    sock: WASocket,
-    WebMessage: proto.IWebMessageInfo,
+    client: Client,
+    IncomingMessage: Message,
     logger: Logger,
-    text: string,
     limitter: ReturnType<typeof pLimit>
   ) {
-    this.sock = sock;
+    this.client = client;
     this.logger = logger;
-    this.WebMessage = WebMessage;
+    this.IncomingMessage = IncomingMessage;
     this.limitter = limitter;
 
     this.message = {
-      userNumber: `${
-        WebMessage.key.remoteJid!.endsWith("@g.us")
-          ? WebMessage.key.participant!
-          : WebMessage.key.remoteJid!
-      }`,
-      userName: WebMessage.pushName!,
-      remoteJid: WebMessage.key.remoteJid!,
-      id: WebMessage.key.id!,
+      userNumber: IncomingMessage.sender.id,
+      userName: IncomingMessage.sender.pushname,
+      from: IncomingMessage.from,
+      id: IncomingMessage.id,
     };
 
-    this.args = text.slice(PREFIX.length).trim().split(/ +/).slice(1);
+    this.args = IncomingMessage.body
+      .slice(PREFIX.length)
+      .trim()
+      .split(/ +/)
+      .slice(1);
   }
 
-  private async _simulateTyping(
-    remoteJid: string,
-    sendCb: () => Promise<void>
-  ) {
-    await this.sock.presenceSubscribe(remoteJid);
-    await this.sock.sendPresenceUpdate("composing", remoteJid);
-
-    await sendCb();
-
-    await this.sock.sendPresenceUpdate("paused", remoteJid);
-  }
-
-  private async _sendTo(remoteJid: string, message: AnyMessageContent) {
-    await this.limitter(() => this.sock.sendMessage(remoteJid, message));
-  }
-
-  async simulateTypingToCurrentPerson(callback: () => Promise<void>) {
-    await this._simulateTyping(this.message.remoteJid, callback);
-  }
-
-  async sendToCurrentPerson(message: AnyMessageContent) {
-    await this._simulateTyping(
-      this.message.remoteJid,
-      async () => await this._sendTo(this.message.remoteJid, message)
-    );
-  }
-
-  async replyToCurrentPerson(message: AnyMessageContent) {
-    await this._simulateTyping(this.message.remoteJid, async () => {
-      await this.limitter(() =>
-        this.sock.sendMessage(this.message.remoteJid, message, {
-          quoted: this.WebMessage,
-        })
-      );
+  private async _sendText(to: ChatId, content: Content) {
+    await this.limitter(async () => {
+      await this.client.simulateTyping(to, true);
+      await this.client.sendText(to, content);
+      await this.client.simulateTyping(to, false);
     });
   }
 
-  async sendToOtherPerson(remoteJid: string, message: AnyMessageContent) {
-    await this._sendTo(remoteJid, message);
+  private async _sendImage(
+    to: ChatId,
+    caption: Content,
+    image: DataURL,
+    quotedMsgId?: MessageId
+  ) {
+    await this.limitter(async () => {
+      await this.client.simulateTyping(to, true);
+      await this.client.sendImage(to, image, "img.png", caption, quotedMsgId);
+      await this.client.simulateTyping(to, false);
+    });
+  }
+
+  async sendToCurrentPerson(content: Content, image?: DataURL) {
+    if (image) {
+      await this._sendImage(this.message.from, content, image);
+    } else {
+      await this._sendText(this.message.from, content);
+    }
+  }
+
+  async replyToCurrentPerson(content: Content, image?: DataURL) {
+    if (image) {
+      await this._sendImage(this.message.from, content, image, this.message.id);
+    } else {
+      await this.limitter(async () => {
+        await this.client.simulateTyping(this.message.from, true);
+        await this.client.reply(this.message.from, content, this.message.id);
+        await this.client.simulateTyping(this.message.from, false);
+      });
+    }
+  }
+
+  async sendToOtherPerson(to: string, content: Content, image?: DataURL) {
+    if (image) {
+      await this._sendImage(<ChatId>to, content, image);
+    } else {
+      await this._sendText(<ChatId>to, content);
+    }
   }
 
   setUser(user: DocumentType<User>) {
@@ -94,10 +109,10 @@ export class Chat {
   }
 
   get isDMChat() {
-    return this.message.remoteJid.endsWith("@s.whatsapp.net");
+    return this.message.from.endsWith("@c.us");
   }
   get isGroupChat() {
-    return this.message.remoteJid.endsWith("@g.us");
+    return this.message.from.endsWith("@g.us");
   }
 
   get isJoiningGame() {
@@ -105,9 +120,5 @@ export class Chat {
   }
   get gameProperty() {
     return this.user?.gameProperty;
-  }
-
-  get messageKey() {
-    return this.WebMessage.key!;
   }
 }

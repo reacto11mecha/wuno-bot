@@ -26,9 +26,7 @@ export const requiredJoinGameSession =
         return await cb({ chat, game, card });
       }
 
-      await chat.replyToCurrentPerson({
-        text: "Kamu belum masuk ke sesi game manapun!",
-      });
+      await chat.replyToCurrentPerson("Kamu belum masuk ke sesi game manapun!");
     } catch (error) {
       chat.logger.error(error);
     }
@@ -43,13 +41,13 @@ export const atLeastGameID =
 
       if (!chat.isJoiningGame) {
         if (!gameID || gameID === "") {
-          return await chat.replyToCurrentPerson({
-            text: "Diperlukan parameter game id!",
-          });
+          return await chat.replyToCurrentPerson(
+            "Diperlukan parameter game id!"
+          );
         } else if (gameID.length < 11) {
-          return await chat.replyToCurrentPerson({
-            text: "Minimal panjang game id adalah 11 karakter!",
-          });
+          return await chat.replyToCurrentPerson(
+            "Minimal panjang game id adalah 11 karakter!"
+          );
         }
 
         const searchedGame = await GameModel.findOne({
@@ -57,9 +55,7 @@ export const atLeastGameID =
         });
 
         if (!searchedGame)
-          return await chat.replyToCurrentPerson({
-            text: "Game tidak ditemukan.",
-          });
+          return await chat.replyToCurrentPerson("Game tidak ditemukan.");
 
         const game = new Game(searchedGame!, chat);
 
@@ -88,7 +84,5 @@ export type isDMChatCb = (cb: Chat) => Promise<void>;
 export const isDMChat = (cb: isDMChatCb) => async (chat: Chat) => {
   if (chat.isDMChat) return await cb(chat);
 
-  await chat.replyToCurrentPerson({
-    text: "Kirim pesan ini lewat DM WhatsApp!",
-  });
+  await chat.replyToCurrentPerson("Kirim pesan ini lewat DM WhatsApp!");
 };

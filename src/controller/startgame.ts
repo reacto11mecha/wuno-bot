@@ -8,18 +8,16 @@ import type { allCard } from "../config/cards";
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.NotFound) {
-    return await chat.replyToCurrentPerson({
-      text: "Sebuah kesalahan, game tidak ditemukan!",
-    });
+    return await chat.replyToCurrentPerson(
+      "Sebuah kesalahan, game tidak ditemukan!"
+    );
   } else if (game.isGameCreator) {
     if (game.players?.length === 1) {
-      return await chat.replyToCurrentPerson({
-        text: "Minimal ada dua pemain yang tergabung!",
-      });
+      return await chat.replyToCurrentPerson(
+        "Minimal ada dua pemain yang tergabung!"
+      );
     } else if (game.state.PLAYING) {
-      return await chat.replyToCurrentPerson({
-        text: "Game ini sedang dimainkan!",
-      });
+      return await chat.replyToCurrentPerson("Game ini sedang dimainkan!");
     }
 
     const usersCard = await Promise.all(
@@ -59,23 +57,23 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     await Promise.all([
       (async () => {
         if (isDocument(game.currentPlayer)) {
-          await chat.replyToCurrentPerson({
-            text: `Game berhasil dimulai! Sekarang giliran ${
+          await chat.replyToCurrentPerson(
+            `Game berhasil dimulai! Sekarang giliran ${
               game.currentPlayerIsAuthor ? "kamu" : game.currentPlayer.userName
-            } untuk bermain`,
-          });
+            } untuk bermain`
+          );
         }
 
         if (game.currentPlayerIsAuthor) {
-          await chat.sendToCurrentPerson({
-            image: currentCardImage,
-            caption: `Kartu saat ini: ${game.currentCard}`,
-          });
+          await chat.sendToCurrentPerson(
+            `Kartu saat ini: ${game.currentCard}`,
+            currentCardImage
+          );
 
-          await chat.sendToCurrentPerson({
-            image: frontCardsImage,
-            caption: `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
-          });
+          await chat.sendToCurrentPerson(
+            `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
+            frontCardsImage
+          );
         }
       })(),
       (async () => {
@@ -86,41 +84,44 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
         ) {
           const toPerson = game.currentPlayer!.phoneNumber;
 
-          await chat.sendToOtherPerson(toPerson, {
-            text: `${chat.message.userName} telah memulai permainan! Sekarang giliran kamu untuk bermain`,
-          });
-          await chat.sendToOtherPerson(toPerson, {
-            image: currentCardImage,
-            caption: `Kartu saat ini: ${game.currentCard}`,
-          });
-          await chat.sendToOtherPerson(toPerson, {
-            image: frontCardsImage,
-            caption: `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
-          });
+          await chat.sendToOtherPerson(
+            toPerson,
+            `${chat.message.userName} telah memulai permainan! Sekarang giliran kamu untuk bermain`
+          );
+          await chat.sendToOtherPerson(
+            toPerson,
+            `Kartu saat ini: ${game.currentCard}`,
+            currentCardImage
+          );
+          await chat.sendToOtherPerson(
+            toPerson,
+            `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
+            frontCardsImage
+          );
         }
       })(),
       (async () => {
         if (isDocument(game.currentPlayer)) {
-          await game.sendToOtherPlayersWithoutCurrentPlayer({
-            text: `${chat.message.userName} telah memulai permainan! Sekarang giliran ${game.currentPlayer.userName} untuk bermain`,
-          });
+          await game.sendToOtherPlayersWithoutCurrentPlayer(
+            `${chat.message.userName} telah memulai permainan! Sekarang giliran ${game.currentPlayer.userName} untuk bermain`
+          );
 
-          await game.sendToOtherPlayersWithoutCurrentPlayer({
-            image: currentCardImage,
-            caption: `Kartu saat ini: ${game.currentCard}`,
-          });
-          await game.sendToOtherPlayersWithoutCurrentPlayer({
-            image: backCardsImage,
-            caption: `Kartu yang ${game.currentPlayer.userName} miliki`,
-          });
+          await game.sendToOtherPlayersWithoutCurrentPlayer(
+            `Kartu saat ini: ${game.currentCard}`,
+            currentCardImage
+          );
+          await game.sendToOtherPlayersWithoutCurrentPlayer(
+            `Kartu yang ${game.currentPlayer.userName} miliki`,
+            backCardsImage
+          );
         }
       })(),
     ]);
 
     chat.logger.info(`[DB] Game ${game.gameID} dimulai`);
   } else {
-    await chat.replyToCurrentPerson({
-      text: "Kamu bukanlah orang yang membuat sesi permainannya!",
-    });
+    await chat.replyToCurrentPerson(
+      "Kamu bukanlah orang yang membuat sesi permainannya!"
+    );
   }
 });
