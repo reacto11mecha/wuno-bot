@@ -3,6 +3,11 @@ import { getController } from "./controller";
 
 import { helpTemplate, replies } from "../config/messages";
 
+/**
+ * Help command handler function
+ * @param controller Array of controllers object
+ * @returns void
+ */
 export const handleHelpCommand =
   (controller: Awaited<ReturnType<typeof getController>>) =>
   async (chat: Chat) => {

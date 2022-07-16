@@ -2,11 +2,20 @@ import { Chat, Game, Card } from "../lib";
 
 import { GameModel, CardModel } from "../models";
 
+/**
+ * "requiredJoinGameSession" util callback controller type
+ */
 export type TypeReqJGS = (cb: {
   chat: Chat;
   game: Game;
   card: Card;
 }) => Promise<void>;
+
+/**
+ * Util for checking user is joining game session before accessing main controller
+ * @param cb Callback controller
+ * @returns void
+ */
 export const requiredJoinGameSession =
   (cb: TypeReqJGS) => async (chat: Chat) => {
     try {
@@ -32,7 +41,17 @@ export const requiredJoinGameSession =
     }
   };
 
+/**
+ * "atLeastGameId" util callback not joining game and joining game
+ */
 export type commonCb = (cb: { chat: Chat; game: Game }) => Promise<void>;
+
+/**
+ * Util for grabbing game id from args and takes care if the game exists or not, either user is joining the game or not
+ * @param cbNotJoiningGame Callback for not joining the game
+ * @param cbJoiningGame Callback for the joining the game
+ * @returns void
+ */
 export const atLeastGameID =
   (cbNotJoiningGame: commonCb, cbJoiningGame: commonCb) =>
   async (chat: Chat) => {
@@ -80,7 +99,16 @@ export const atLeastGameID =
     }
   };
 
+/**
+ * "isDMChat" util callback type
+ */
 export type isDMChatCb = (cb: Chat) => Promise<void>;
+
+/**
+ * Util for checking whether the chat is coming from DM or not
+ * @param cb General callback that can be passed basic chat instance
+ * @returns void
+ */
 export const isDMChat = (cb: isDMChatCb) => async (chat: Chat) => {
   if (chat.isDMChat) return await cb(chat);
 

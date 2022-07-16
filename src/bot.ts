@@ -66,6 +66,12 @@ export default class Bot {
     );
   }
 
+  /**
+   * The second gate for this bot is working
+   * @param messageQueue Message queue from p-queue
+   * @param messageLimitter Message limiter from p-limit
+   * @param client Client instance from "@open-wa/wa-automate"
+   */
   private async clientHandler(
     messageQueue: PQueue,
     messageLimitter: ReturnType<typeof pLimit>,
@@ -92,6 +98,9 @@ export default class Bot {
     logger.info("[BOT] Bot berhasil dihidupkan | Pesan Pertama");
   }
 
+  /**
+   * The main entrance gate for this bot is working
+   */
   init() {
     if (!process.env.MONGO_URI)
       throw new Error("[DB] Diperlukan sebuah URI MongDB | MONGO_URI");

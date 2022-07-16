@@ -4,6 +4,11 @@ import { getController } from "./controller";
 import { findOrCreateUser, isDMChat } from "../utils";
 import { handleHelpCommand } from "./help";
 
+/**
+ * Event emitter constructor that can be used by the "bone"
+ * @param controller List of all controllers object
+ * @returns Event emitter instance that used for handling command to the actual controller
+ */
 export const emitHandler = (
   controller: Awaited<ReturnType<typeof getController>>
 ) => {

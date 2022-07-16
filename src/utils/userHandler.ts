@@ -1,6 +1,11 @@
 import { Chat } from "../lib/Chat";
 import { UserModel } from "../models";
 
+/**
+ * Util for finding or create user if it doesn't exist
+ * @param callback Callback that has basic chat instance parameter
+ * @returns void
+ */
 export const findOrCreateUser =
   (callback: (chat: Chat) => Promise<void>) => async (chat: Chat) => {
     const user = await UserModel.findOne({

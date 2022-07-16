@@ -9,6 +9,13 @@ import { getController } from "./controller";
 
 import { botInfo } from "../config/messages";
 
+/**
+ * A "bone" for this bot handling incoming messages whatsoever
+ * @param client open-wa/wa-automate client instance
+ * @param logger pino logger instance
+ * @param limitter p-limit instance
+ * @returns A function that can be used for queue callback
+ */
 export const messageHandler = async (
   client: Client,
   logger: Logger,
