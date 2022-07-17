@@ -24,23 +24,53 @@ import type { allCard } from "../config/cards";
 
 import { CardPicker, compareTwoCard } from "../config/cards";
 
+/**
+ * Class for handling user card
+ */
 export class Card {
+  /**
+   * Card document by specific user and game
+   */
   private card: DocumentType<CardType>;
+
+  /**
+   * Chat message instance
+   */
   private chat: Chat;
+
+  /**
+   * Game message instance
+   */
   private game: Game;
 
+  /**
+   * Card class constructor
+   * @param cardData Card document by specific user and game
+   * @param chat Chat message instance
+   * @param game Game message instance
+   */
   constructor(cardData: DocumentType<CardType>, chat: Chat, game: Game) {
     this.card = cardData;
     this.chat = chat;
     this.game = game;
   }
 
+  /**
+   * Static function for checking a given card is valid or not
+   * @param card Valid or invalid card string
+   * @returns Boolean that indicate the card is valid or not
+   */
   static isValidCard(card: string) {
     return (cards as string[]).includes(
       card.trim().replace(" ", "").toLocaleLowerCase()
     );
   }
 
+  /**
+   * Function for adding new card to the current player or specific card id
+   * @param card Added valid card
+   * @param cardId Specific card id (optional)
+   */
   async addNewCard(card: string, cardId?: Types.ObjectId) {
     await CardModel.findOneAndUpdate(
       { _id: !cardId ? this.card._id : cardId },
@@ -48,6 +78,10 @@ export class Card {
     );
   }
 
+  /**
+   * Function for removing specific card from current player (E.G get stacked)
+   * @param card Valid given card
+   */
   async removeCardFromPlayer(card: string) {
     const indexToRemove = this.card.cards!.indexOf(card);
     this.card.cards!.splice(indexToRemove, 1);
@@ -55,6 +89,11 @@ export class Card {
     await this.card.save();
   }
 
+  /**
+   * Function for retrieving user and game specific card
+   * @param user User specific id
+   * @returns Card document from specific user and current game id
+   */
   async getCardByUserAndThisGame(user: Types.ObjectId) {
     return await CardModel.findOne({
       game: this.game.uid,
@@ -62,6 +101,9 @@ export class Card {
     });
   }
 
+  /**
+   * Function for draw a card for current player
+   */
   async drawToCurrentPlayer() {
     const nextPlayer = this.game.getNextPosition();
     const playerList = this.game.players!.filter(
@@ -147,6 +189,11 @@ export class Card {
     }
   }
 
+  /**
+   * Function for checking if the user is a winner or not
+   * @param notAWinnerCallback If the user not a winner (still in game session)
+   * @returns void
+   */
   private async checkIsWinner(notAWinnerCallback: () => Promise<void>) {
     if (this.cards!.length > 0) return await notAWinnerCallback();
 
@@ -174,6 +221,13 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     ]);
   }
 
+  /**
+   * Function for simplifying send to current person templated message
+   * @param text Text that will sended
+   * @param currentCardImage A current card image that will sended
+   * @param backCardsImage A back cards image that will sended
+   * @param nextPlayerName The next player username
+   */
   async sendToCurrentPersonInGame(
     text: string,
     currentCardImage: DataURL,
@@ -192,6 +246,14 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     );
   }
 
+  /**
+   * Function for simplifying send to current other player without current person templated message
+   * @param text Text that will sended
+   * @param playerList A list of all players that will get the message
+   * @param currentCardImage A current card image that will sended
+   * @param backCardsImage A back cards image that will sended
+   * @param nextPlayerName The next player username
+   */
   async sendToOtherPlayersWithoutCurrentPersonInGame(
     text: string,
     playerList: Ref<User, Types.ObjectId | undefined>[] | undefined,
@@ -213,6 +275,14 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     );
   }
 
+  /**
+   * Function for simplifying send to other person templated message
+   * @param firstText The first text in three message that will sended
+   * @param lastText The last text in three message that will sended
+   * @param phoneNumber The specific person phone number
+   * @param currentCardImage A current card image that will sended
+   * @param backOrFrontCardsImage A back or front cards image that will sended
+   */
   async sendToOtherPersonInGame(
     firstText: string,
     lastText: string,
@@ -234,6 +304,10 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     );
   }
 
+  /**
+   * Function that handle user play event
+   * @param givenCard Valid given card
+   */
   async solve(givenCard: allCard) {
     const status = compareTwoCard(this.game.currentCard as allCard, givenCard);
 
@@ -663,6 +737,11 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     }
   }
 
+  /**
+   * Function for checking is player has a specific given card or not
+   * @param card Valid given card
+   * @returns Boolean that indicate is current player has a card or not
+   */
   isIncluded(card: string) {
     if (card.match(regexValidWildColorOnly))
       return this.card.cards?.includes("wild");
@@ -671,6 +750,9 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     else return this.card.cards?.includes(card);
   }
 
+  /**
+   * Get all cards from current player
+   */
   get cards() {
     return this.card.cards;
   }

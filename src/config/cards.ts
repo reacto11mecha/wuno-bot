@@ -1,7 +1,18 @@
 import { random, getRandom, randomWithBias } from "../utils";
 
+/**
+ * Typing for all possible UNO card color
+ */
 export type color = "red" | "green" | "blue" | "yellow";
+
+/**
+ * Typing for all possible UNO card number
+ */
 export type possibleNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+
+/**
+ * Typing for all possible UNO card
+ */
 export type allCard =
   | `${color}${possibleNumber}`
   | `wild${color}`
@@ -12,6 +23,9 @@ export type allCard =
   | "wild"
   | "wilddraw4";
 
+/**
+ * Enum for single state card
+ */
 export enum EGetCardState {
   VALID_NORMAL,
   VALID_WILD_PLUS4,
@@ -20,6 +34,9 @@ export enum EGetCardState {
   INVALID,
 }
 
+/**
+ * Interface for return type of "getCardState" function
+ */
 export interface IGetCardState {
   state: EGetCardState;
   color?: color;
@@ -27,6 +44,9 @@ export interface IGetCardState {
   type?: "draw2" | "reverse" | "skip";
 }
 
+/**
+ * List of all available cards
+ */
 export const cards: allCard[] = [
   "red0",
   "red1",
@@ -119,6 +139,9 @@ const appropriateInitialCards = cards
   .filter((e) => !e.endsWith("draw2"))
   .filter((e) => !e.endsWith("reverse"));
 
+/**
+ * Class that have contains collection for static function
+ */
 export class filterCardByGivenCard {
   static ValidNormal(
     actualCard: allCard,
@@ -162,6 +185,9 @@ enum givenCardCondition {
   ByInitialCard,
 }
 
+/**
+ * Class that contains static function for picking card stuff
+ */
 export class CardPicker {
   /**
    * Pick a random card or wild card in ratio 16:1
@@ -316,6 +342,9 @@ export class CardPicker {
   }
 }
 
+/**
+ * Enum that used for "getSwitchState" function
+ */
 export enum switchState {
   FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME,
   FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR,

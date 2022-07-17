@@ -7,15 +7,29 @@ const packageInfo = JSON.parse(
   fs.readFileSync(path.resolve("package.json"), "utf-8")
 );
 
+/**
+ * Main github repository for this project
+ */
 export const GITHUB_URL = packageInfo.repository.url
   .replace("git+", "")
   .replace(".git", "");
+
+/**
+ * Greeting template for all help message
+ */
 export const greeting = `Halo, saya bot untuk bermain uno.
 Prefix: \`\`\`${PREFIX}\`\`\``;
+
+/**
+ * Footer template for all help message
+ */
 export const footer = `Sumber Kode: ${GITHUB_URL}
 
 Dibuat oleh ${packageInfo.author} di bawah lisensi MIT.`;
 
+/**
+ * General information about this bot
+ */
 export const botInfo = `${greeting}
 
 Untuk perintah lengkap ketik:
@@ -23,6 +37,11 @@ Untuk perintah lengkap ketik:
 
 ${footer}`;
 
+/**
+ * Function for generate dynamic of all available commands name and serve other information
+ * @param commands All valid commands available
+ * @returns Help message string template
+ */
 export const helpTemplate = (commands: string[]) => `${greeting}
 
 *Daftar Perintah*
@@ -90,6 +109,15 @@ Untuk melihat lebih jelas apa maksud dari perintah, gunakan
 
 ${footer}`;
 
+/**
+ * Function for generate specific command can do
+ * @param command Command name
+ * @param explanation Explanation about what the command will do
+ * @param alias List of all command alias available
+ * @param messageExample Example of the command if triggered
+ * @param param Parameter explanation (optional)
+ * @returns  Template string for replying specific command
+ */
 const replyBuilder = (
   command: string,
   explanation: string,
@@ -114,6 +142,9 @@ const replyBuilder = (
 
 ${footer}`;
 
+/**
+ * All replies string collection for help message
+ */
 export const replies = {
   cards: replyBuilder(
     "cards",
