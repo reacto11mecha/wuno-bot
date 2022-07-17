@@ -1,5 +1,5 @@
 <p align="center">
-    <h2 align="center">Wuno Bot</h2>
+    <h2 align="center">WUNO (Whatsapp UNO) Bot</h2>
     <span><p align="center">Bot whatsapp yang berguna untuk bermain UNO.</p></span>
 </p>
 
@@ -32,6 +32,12 @@ Anda butuh
 - Handphone tak terpakai (opsional)
 
 ## Pemakaian
+
+### Ikhtisar Daftar Perintah
+
+Berikut daftar perintah yang sudah dibuat.
+
+// TODO: Buat daftar perintah dari penjelasan yang sudah dijelaskan di message
 
 ### Cloning Dari Github
 

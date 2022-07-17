@@ -4,6 +4,8 @@
   "description": "Bot whatsapp yang berguna untuk bermain UNO",
   "main": "dist/index.js",
   "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
     "dev": "nodemon src/index.ts",
     "start": "node .",
     "build": "tsc",
@@ -11,7 +13,8 @@
     "build:all": "tsc && typedoc",
     "build:watch": "tsc --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ./src",
+    "format": "prettier -w ./src ./test",
+    "lint": "eslint ./src ./test",
     "prepare": "husky install"
   },
   "repository": {
@@ -33,6 +36,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.0.2",
     "@commitlint/config-conventional": "^17.0.2",
+    "@types/jest": "^28.1.4",
     "@types/luxon": "^2.3.2",
     "@types/node": "^18.0.0",
     "@types/sharp": "^0.30.4",
@@ -41,17 +45,17 @@
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "husky": "^8.0.1",
-    "nodemon": "^2.0.18",
+    "jest": "^28.1.2",
+    "nodemon": "^2.0.19",
     "prettier": "^2.7.1",
+    "ts-jest": "^28.0.5",
     "ts-node": "^10.8.1",
     "typedoc": "^0.23.5",
     "typedoc-plugin-missing-exports": "^0.23.0",
     "typescript": "^4.7.3"
   },
   "dependencies": {
-    "@adiwajshing/baileys": "^4.2.0",
-    "@adiwajshing/keyed-db": "^0.2.4",
-    "@hapi/boom": "^10.0.0",
+    "@open-wa/wa-automate": "^4.42.5",
     "@typegoose/typegoose": "^9.9.0",
     "dotenv": "^16.0.1",
     "libphonenumber-js": "^1.10.6",

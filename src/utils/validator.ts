@@ -2,11 +2,20 @@ import { Chat, Game, Card } from "../lib";
 
 import { GameModel, CardModel } from "../models";
 
+/**
+ * "requiredJoinGameSession" util callback controller type
+ */
 export type TypeReqJGS = (cb: {
   chat: Chat;
   game: Game;
   card: Card;
 }) => Promise<void>;
+
+/**
+ * Util for checking user is joining game session before accessing main controller
+ * @param cb Callback controller
+ * @returns void
+ */
 export const requiredJoinGameSession =
   (cb: TypeReqJGS) => async (chat: Chat) => {
     try {
@@ -26,15 +35,23 @@ export const requiredJoinGameSession =
         return await cb({ chat, game, card });
       }
 
-      await chat.replyToCurrentPerson({
-        text: "Kamu belum masuk ke sesi game manapun!",
-      });
+      await chat.replyToCurrentPerson("Kamu belum masuk ke sesi game manapun!");
     } catch (error) {
       chat.logger.error(error);
     }
   };
 
+/**
+ * "atLeastGameId" util callback not joining game and joining game
+ */
 export type commonCb = (cb: { chat: Chat; game: Game }) => Promise<void>;
+
+/**
+ * Util for grabbing game id from args and takes care if the game exists or not, either user is joining the game or not
+ * @param cbNotJoiningGame Callback for not joining the game
+ * @param cbJoiningGame Callback for the joining the game
+ * @returns void
+ */
 export const atLeastGameID =
   (cbNotJoiningGame: commonCb, cbJoiningGame: commonCb) =>
   async (chat: Chat) => {
@@ -43,13 +60,13 @@ export const atLeastGameID =
 
       if (!chat.isJoiningGame) {
         if (!gameID || gameID === "") {
-          return await chat.replyToCurrentPerson({
-            text: "Diperlukan parameter game id!",
-          });
+          return await chat.replyToCurrentPerson(
+            "Diperlukan parameter game id!"
+          );
         } else if (gameID.length < 11) {
-          return await chat.replyToCurrentPerson({
-            text: "Minimal panjang game id adalah 11 karakter!",
-          });
+          return await chat.replyToCurrentPerson(
+            "Minimal panjang game id adalah 11 karakter!"
+          );
         }
 
         const searchedGame = await GameModel.findOne({
@@ -57,9 +74,7 @@ export const atLeastGameID =
         });
 
         if (!searchedGame)
-          return await chat.replyToCurrentPerson({
-            text: "Game tidak ditemukan.",
-          });
+          return await chat.replyToCurrentPerson("Game tidak ditemukan.");
 
         const game = new Game(searchedGame!, chat);
 
@@ -84,11 +99,18 @@ export const atLeastGameID =
     }
   };
 
+/**
+ * "isDMChat" util callback type
+ */
 export type isDMChatCb = (cb: Chat) => Promise<void>;
+
+/**
+ * Util for checking whether the chat is coming from DM or not
+ * @param cb General callback that can be passed basic chat instance
+ * @returns void
+ */
 export const isDMChat = (cb: isDMChatCb) => async (chat: Chat) => {
   if (chat.isDMChat) return await cb(chat);
 
-  await chat.replyToCurrentPerson({
-    text: "Kirim pesan ini lewat DM WhatsApp!",
-  });
+  await chat.replyToCurrentPerson("Kirim pesan ini lewat DM WhatsApp!");
 };

@@ -1,4 +1,4 @@
-import type { proto, WASocket } from "@adiwajshing/baileys";
+import type { Client, Message } from "@open-wa/wa-automate";
 import pLimit from "p-limit";
 import { Logger } from "pino";
 
@@ -9,27 +9,30 @@ import { getController } from "./controller";
 
 import { botInfo } from "../config/messages";
 
+/**
+ * A "bone" for this bot handling incoming messages whatsoever
+ * @param client open-wa/wa-automate client instance
+ * @param logger pino logger instance
+ * @param limitter p-limit instance
+ * @returns A function that can be used for queue callback
+ */
 export const messageHandler = async (
-  sock: WASocket,
+  client: Client,
   logger: Logger,
   limitter: ReturnType<typeof pLimit>
 ) => {
   const controller = await getController();
   const emitter = emitHandler(controller);
 
-  return async (WebMessage: proto.IWebMessageInfo) => {
-    const text =
-      WebMessage!.message!.conversation ||
-      WebMessage!.message!.extendedTextMessage!.text;
-
-    const command = text!
+  return async (message: Message) => {
+    const command = message.body
       .slice(PREFIX.length)!
       .trim()!
       .split(/ +/)!
       .shift()!
       .toLowerCase();
 
-    const chat = new Chat(sock, WebMessage, logger, text!, limitter);
+    const chat = new Chat(client, message, logger, limitter);
 
     switch (command) {
       case "cg":
@@ -85,18 +88,21 @@ export const messageHandler = async (
       case "draw":
         emitter.emit("draw", chat);
         break;
+      case "k":
+      case "kick":
+        emitter.emit("kick", chat);
+        break;
       case "h":
       case "help":
         emitter.emit("help", chat);
         break;
 
       default: {
-        await chat.sendToCurrentPerson({
-          text:
-            command.length > 0
-              ? `Tidak ada perintah yang bernama "${command}"`
-              : botInfo,
-        });
+        await chat.sendToCurrentPerson(
+          command.length > 0
+            ? `Tidak ada perintah yang bernama "${command}"`
+            : botInfo
+        );
         break;
       }
     }

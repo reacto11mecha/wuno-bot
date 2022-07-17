@@ -21,19 +21,17 @@ export default async function creategame(chat: Chat) {
       `[DB] Berhasil membuat sesi game baru | ${newGame.gameID}`
     );
 
-    await chat.replyToCurrentPerson({
-      text: `Game berhasil dibuat.\nAjak teman kamu untuk bermain.\n\nPemain yang sudah tergabung\n- ${
+    await chat.replyToCurrentPerson(
+      `Game berhasil dibuat.\nAjak teman kamu untuk bermain.\n\nPemain yang sudah tergabung\n- ${
         chat.user!.userName
-      }\n\nKode: ${newGame.gameID}`,
-    });
-    await chat.replyToCurrentPerson({
-      text: `${PREFIX}j ${newGame.gameID}`,
-    });
+      }\n\nKode: ${newGame.gameID}`
+    );
+    await chat.replyToCurrentPerson(`${PREFIX}j ${newGame.gameID}`);
   } else {
-    await chat.replyToCurrentPerson({
-      text: `Kamu sudah masuk ke sesi game: ${
+    await chat.replyToCurrentPerson(
+      `Kamu sudah masuk ke sesi game: ${
         chat.isGroupChat ? "[REDACTED]" : chat.user!.gameProperty?.gameID
-      }`,
-    });
+      }`
+    );
   }
 }

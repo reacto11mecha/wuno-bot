@@ -5,7 +5,7 @@ import { GameModel } from "../models";
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.NotFound) {
-    await chat.replyToCurrentPerson({ text: "Game tidak ditemukan." });
+    await chat.replyToCurrentPerson("Game tidak ditemukan.");
   } else if (game.isGameCreator) {
     if (!game.state.ENDED) {
       const gameClone = await GameModel.findOne({ gameID: game.gameID });
@@ -16,21 +16,17 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
       await Promise.all([
         game.sendToOtherPlayersWithoutCurrentPerson(
-          {
-            text: `${creatorUsername} telah menghentikan permainan. Terimakasih sudah bermain!`,
-          },
+          `${creatorUsername} telah menghentikan permainan. Terimakasih sudah bermain!`,
           gameClone!.players
         ),
-        chat.replyToCurrentPerson({
-          text: "Game berhasil dihentikan. Terimakasih sudah bermain!",
-        }),
+        chat.replyToCurrentPerson(
+          "Game berhasil dihentikan. Terimakasih sudah bermain!"
+        ),
       ]);
     } else {
-      await chat.replyToCurrentPerson({ text: "Game sudah dihentikan!" });
+      await chat.replyToCurrentPerson("Game sudah dihentikan!");
     }
   } else {
-    await chat.replyToCurrentPerson({
-      text: "Kamu bukan orang yang membuat gamenya!",
-    });
+    await chat.replyToCurrentPerson("Kamu bukan orang yang membuat gamenya!");
   }
 });

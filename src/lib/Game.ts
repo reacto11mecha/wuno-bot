@@ -20,17 +20,36 @@ import {
 } from "../models";
 
 import type { allCard } from "../config/cards";
-import type { AnyMessageContent } from "@adiwajshing/baileys";
+import type { Content, DataURL } from "@open-wa/wa-automate";
 
+/**
+ * Class for handling user game event
+ */
 export class Game {
+  /**
+   * Game document by specific user
+   */
   private game: DocumentType<GameType>;
+
+  /**
+   * Chat message instance
+   */
   private chat: Chat;
 
+  /**
+   * Game class constructor
+   * @param gameData Game document by specific user
+   * @param chat Chat message instance
+   */
   constructor(gameData: DocumentType<GameType>, chat: Chat) {
     this.game = gameData;
     this.chat = chat;
   }
 
+  /**
+   * Function that can get POJO (Pure JavaScript Object) document of current game session
+   * @returns POJO document of current game session
+   */
   async getPojoSelf() {
     const pojo: {
       players: Types.ObjectId[];
@@ -44,6 +63,11 @@ export class Game {
     return pojo;
   }
 
+  /**
+   * Abstract function that used for checking specific player is it turn or not
+   * @param user The specific player
+   * @returns Boolean that indicate is player turn or not
+   */
   private _isPlayerTurn(user: DocumentType<UserType>) {
     return (
       isRefType(this.game.currentPosition, Types.ObjectId) &&
@@ -51,6 +75,9 @@ export class Game {
     );
   }
 
+  /**
+   * Function for starting current game
+   */
   async startGame() {
     const shuffledPlayer = this.game
       .players!.sort(() => random() - 0.5)
@@ -65,6 +92,9 @@ export class Game {
     await this.game.save();
   }
 
+  /**
+   * Function for joining current game
+   */
   async joinGame() {
     this.chat.user!.gameProperty = {};
 
@@ -81,6 +111,9 @@ export class Game {
     ]);
   }
 
+  /**
+   * Function for end current game
+   */
   async endGame() {
     const pojo = await this.getPojoSelf();
 
@@ -98,6 +131,10 @@ export class Game {
     this.chat.logger.info(`[DB] Game ${this.game.gameID} selesai`);
   }
 
+  /**
+   * Function for updating user gameProperty for not joining game session anymore
+   * @param _id Specific user id
+   */
   async leaveGameForUser(_id: Types.ObjectId) {
     await UserModel.findOneAndUpdate(
       { _id },
@@ -109,6 +146,10 @@ export class Game {
     );
   }
 
+  /**
+   * Function for removing user from player array (leaving, get kicked)
+   * @param _id Specific user id
+   */
   async removeUserFromArray(_id: Types.ObjectId) {
     const pojo = await this.getPojoSelf();
 
@@ -125,16 +166,25 @@ export class Game {
     await Promise.all([
       this.game.save(),
       this.leaveGameForUser(_id),
-      CardModel.deleteOne({ user: _id, game_id: this.game._id }),
+      CardModel.deleteOne({ user: _id, game: this.game._id }),
     ]);
   }
 
+  /**
+   * Function for updating game current position
+   * @param position User specific id
+   */
   async updatePosition(position: Types.ObjectId) {
     this.game.currentPosition = position;
 
     await this.game.save();
   }
 
+  /**
+   * Function for updating game current card and current position
+   * @param card Valid given card
+   * @param position User specific id
+   */
   async updateCardAndPosition(card: allCard, position: Types.ObjectId) {
     this.game.currentCard = card;
     this.game.currentPosition = position;
@@ -142,6 +192,9 @@ export class Game {
     await this.game.save();
   }
 
+  /**
+   * Function for reversing players order (uno reverse card)
+   */
   async reversePlayersOrder() {
     if (isRefTypeArray(this.game.playersOrder, Types.ObjectId)) {
       this.game.playersOrder = [...this.game.playersOrder].reverse();
@@ -149,7 +202,15 @@ export class Game {
     }
   }
 
-  async sendToOtherPlayersWithoutCurrentPlayer(message: AnyMessageContent) {
+  /**
+   * Send message or image with caption to all players without current player
+   * @param message Text that will sended
+   * @param image Image that will sended (Optional)
+   */
+  async sendToOtherPlayersWithoutCurrentPlayer(
+    message: Content,
+    image?: DataURL
+  ) {
     if (isDocumentArray(this.game.players)) {
       await Promise.all(
         this.game
@@ -159,15 +220,26 @@ export class Game {
           .filter((id) => id !== this.game.currentPosition)
           .map(
             async (user) =>
-              await this.chat.sendToOtherPerson(user.phoneNumber, message)
+              await this.chat.sendToOtherPerson(
+                user.phoneNumber,
+                message,
+                image
+              )
           )
       );
     }
   }
 
+  /**
+   * Send message or image with caption to all players without current person
+   * @param message Text that will sended
+   * @param players Players list (optional)
+   * @param image Image that will sendd (optional)
+   */
   async sendToOtherPlayersWithoutCurrentPerson(
-    message: AnyMessageContent,
-    players?: Ref<UserType>[]
+    message: Content,
+    players?: Ref<UserType>[],
+    image?: DataURL
   ) {
     if (players && isDocumentArray(players)) {
       await Promise.all(
@@ -175,7 +247,11 @@ export class Game {
           .filter((user) => user.phoneNumber !== this.chat.message.userNumber)
           .map(
             async (user) =>
-              await this.chat.sendToOtherPerson(user.phoneNumber, message)
+              await this.chat.sendToOtherPerson(
+                user.phoneNumber,
+                message,
+                image
+              )
           )
       );
     } else if (isDocumentArray(this.game.players)) {
@@ -186,16 +262,28 @@ export class Game {
           )
           .map(
             async (user) =>
-              await this.chat.sendToOtherPerson(user.phoneNumber, message)
+              await this.chat.sendToOtherPerson(
+                user.phoneNumber,
+                message,
+                image
+              )
           )
       );
     }
   }
 
+  /**
+   * Function for saving this game document
+   */
   async save() {
     await this.game.save();
   }
 
+  /**
+   * Function that will retrieve user next position
+   * @param increment What it N-Position next player (default 1)
+   * @returns User specific id document
+   */
   getNextPosition(increment = 1) {
     if (isNaN(increment) || increment < 1) throw new Error("Invalid increment");
 
@@ -213,30 +301,52 @@ export class Game {
     }
   }
 
+  /**
+   * Function for retrieve elapsed since game started and ended
+   * @returns Human readable elapsed time
+   */
   getElapsedTime() {
     return calcElapsedTime(this.game.startTime!, this.game.endTime!);
   }
 
+  /**
+   * Get list of all players order id
+   */
   get playersOrderIds() {
     return this.game.playersOrder;
   }
 
+  /**
+   * Get this game session unique id
+   */
   get uid() {
     return this.game._id;
   }
 
+  /**
+   * Get this game session human readable id
+   */
   get gameID() {
     return this.game.gameID;
   }
 
+  /**
+   * Get this game current position id
+   */
   get currentPositionId() {
     return <Types.ObjectId>(<unknown>this.game.currentPosition);
   }
 
+  /**
+   * Get this game a time when it's created
+   */
   get created_at() {
     return this.game.created_at;
   }
 
+  /**
+   * Get this game current state
+   */
   get state() {
     return {
       WAITING: this.game.status === "WAITING",
@@ -245,10 +355,16 @@ export class Game {
     };
   }
 
+  /**
+   * Get if this game is not found
+   */
   get NotFound() {
     return !this.game;
   }
 
+  /**
+   * Get this game human readable status
+   */
   get translatedStatus() {
     switch (this.game.status) {
       case "WAITING":
@@ -262,14 +378,23 @@ export class Game {
     }
   }
 
+  /**
+   * Get all players of this game
+   */
   get players() {
     return this.game.players;
   }
 
+  /**
+   * Get current card of this game
+   */
   get currentCard() {
     return this.game.currentCard;
   }
 
+  /**
+   * Get user document that created this game
+   */
   get creator() {
     return this.players!.find(
       (player) =>
@@ -277,10 +402,16 @@ export class Game {
     );
   }
 
+  /**
+   * Get if current chatter is game creator or not
+   */
   get isGameCreator() {
     return this.chat.user!._id.equals(this.game.gameCreatorID);
   }
 
+  /**
+   * Get current player user document
+   */
   get currentPlayer() {
     return this.players!.find(
       (player) =>
@@ -288,6 +419,9 @@ export class Game {
     );
   }
 
+  /**
+   * Get if current player is an author of this game
+   */
   get currentPlayerIsAuthor() {
     return (
       isDocument(this.creator) &&
@@ -295,10 +429,16 @@ export class Game {
     );
   }
 
+  /**
+   * Get if current chatter is it turn to play
+   */
   get isCurrentChatTurn() {
     return this._isPlayerTurn(this.chat.user!);
   }
 
+  /**
+   * Setter that can set game creator id
+   */
   set gameCreatorID(id: Types.ObjectId) {
     this.game.gameCreatorID = id;
   }

@@ -7,10 +7,17 @@ const files = fs
   .filter((file) => file.endsWith(".js") || !file.includes(".d.ts"))
   .filter((file) => !file.endsWith(".map"));
 
+/**
+ * Lists of all controller name
+ */
 export const controllerName = files.map((file) =>
   file.replace(".js", "").replace(".ts", "")
 );
 
+/**
+ * Function that call all of the controller from controller directory
+ * @returns List of all controllers object
+ */
 export async function getController() {
   const controller = await Promise.all(
     files.map(async (file) => {

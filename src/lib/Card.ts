@@ -14,52 +14,63 @@ import { createAllCardImage } from "../utils";
 
 import {
   cards,
-  regexValidNormal,
-  regexValidSpecial,
   regexValidWildColorOnly,
   regexValidWildColorPlus4Only,
 } from "../config/cards";
 
 import { Card as CardType, CardModel, User } from "../models";
-import type {
-  allCard,
-  color as colorType,
-  possibleNumber,
-} from "../config/cards";
+import type { DataURL } from "@open-wa/wa-automate";
+import type { allCard } from "../config/cards";
 
-export interface IGetCardState {
-  state:
-    | "VALID_NORMAL"
-    | "VALID_WILD_PLUS4"
-    | "VALID_WILD"
-    | "VALID_SPECIAL"
-    | "REQUIRED_ADDITIONAL_COLOR"
-    | "INVALID_ADDITIONAL_COLOR"
-    | "INVALID";
-  color?: colorType;
-  number?: possibleNumber;
-  type?: "draw2" | "reverse" | "skip";
-}
+import { CardPicker, compareTwoCard } from "../config/cards";
 
-import { CardPicker } from "../config/cards";
-
+/**
+ * Class for handling user card
+ */
 export class Card {
+  /**
+   * Card document by specific user and game
+   */
   private card: DocumentType<CardType>;
+
+  /**
+   * Chat message instance
+   */
   private chat: Chat;
+
+  /**
+   * Game message instance
+   */
   private game: Game;
 
+  /**
+   * Card class constructor
+   * @param cardData Card document by specific user and game
+   * @param chat Chat message instance
+   * @param game Game message instance
+   */
   constructor(cardData: DocumentType<CardType>, chat: Chat, game: Game) {
     this.card = cardData;
     this.chat = chat;
     this.game = game;
   }
 
+  /**
+   * Static function for checking a given card is valid or not
+   * @param card Valid or invalid card string
+   * @returns Boolean that indicate the card is valid or not
+   */
   static isValidCard(card: string) {
     return (cards as string[]).includes(
       card.trim().replace(" ", "").toLocaleLowerCase()
     );
   }
 
+  /**
+   * Function for adding new card to the current player or specific card id
+   * @param card Added valid card
+   * @param cardId Specific card id (optional)
+   */
   async addNewCard(card: string, cardId?: Types.ObjectId) {
     await CardModel.findOneAndUpdate(
       { _id: !cardId ? this.card._id : cardId },
@@ -67,6 +78,10 @@ export class Card {
     );
   }
 
+  /**
+   * Function for removing specific card from current player (E.G get stacked)
+   * @param card Valid given card
+   */
   async removeCardFromPlayer(card: string) {
     const indexToRemove = this.card.cards!.indexOf(card);
     this.card.cards!.splice(indexToRemove, 1);
@@ -74,6 +89,11 @@ export class Card {
     await this.card.save();
   }
 
+  /**
+   * Function for retrieving user and game specific card
+   * @param user User specific id
+   * @returns Card document from specific user and current game id
+   */
   async getCardByUserAndThisGame(user: Types.ObjectId) {
     return await CardModel.findOne({
       game: this.game.uid,
@@ -81,13 +101,18 @@ export class Card {
     });
   }
 
+  /**
+   * Function for draw a card for current player
+   */
   async drawToCurrentPlayer() {
     const nextPlayer = this.game.getNextPosition();
     const playerList = this.game.players!.filter(
       (player) => isDocument(player) && player._id !== nextPlayer!._id
     );
 
-    const newCard = CardPicker.pickRandomCard();
+    const newCard = CardPicker.pickCardByGivenCard(
+      this.game.currentCard as allCard
+    );
 
     if (isDocument(nextPlayer) && isDocumentArray(playerList)) {
       await this.addNewCard(newCard);
@@ -106,67 +131,69 @@ export class Card {
       await Promise.all([
         (async () => {
           await this.game.sendToOtherPlayersWithoutCurrentPerson(
-            {
-              text: `${this.chat.message.userName} telah mengambil kartu, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
-            },
+            `${this.chat.message.userName} telah mengambil kartu, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
             playerList
           );
 
           await this.game.sendToOtherPlayersWithoutCurrentPerson(
-            {
-              image: currentCardImage,
-              caption: `Kartu saat ini: ${this.game.currentCard}`,
-            },
-            playerList
+            `Kartu saat ini: ${this.game.currentCard}`,
+            playerList,
+            currentCardImage
           );
           await this.game.sendToOtherPlayersWithoutCurrentPerson(
-            {
-              image: backCardsImage,
-              caption: `Kartu yang ${
-                isDocument(this.game.currentPlayer)
-                  ? this.game.currentPlayer.userName
-                  : ""
-              } miliki`,
-            },
-            playerList
-          );
-        })(),
-        (async () => {
-          await this.chat.sendToCurrentPerson({
-            text: `Berhasil mengambil kartu baru, *${newCard}*. selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
-          });
-
-          await this.chat.sendToCurrentPerson({
-            image: currentCardImage,
-            caption: `Kartu saat ini: ${this.game.currentCard}`,
-          });
-          await this.chat.sendToCurrentPerson({
-            image: backCardsImage,
-            caption: `Kartu yang ${
+            `Kartu yang ${
               isDocument(this.game.currentPlayer)
                 ? this.game.currentPlayer.userName
                 : ""
             } miliki`,
-          });
+            playerList,
+            backCardsImage
+          );
         })(),
         (async () => {
-          await this.chat.sendToOtherPerson(otherPlayer, {
-            text: `${this.chat.message.userName} telah mengambil kartu baru, Sekarang giliran kamu untuk bermain`,
-          });
+          await this.chat.sendToCurrentPerson(
+            `Berhasil mengambil kartu baru, *${newCard}*. selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`
+          );
 
-          await this.chat.sendToOtherPerson(otherPlayer, {
-            image: currentCardImage,
-            caption: `Kartu saat ini: ${this.game.currentCard}`,
-          });
-          await this.chat.sendToOtherPerson(otherPlayer, {
-            image: frontCardsImage,
-            caption: `Kartu kamu: ${nextUserCard?.cards?.join(", ")}.`,
-          });
+          await this.chat.sendToCurrentPerson(
+            `Kartu saat ini: ${this.game.currentCard}`,
+            currentCardImage
+          );
+          await this.chat.sendToCurrentPerson(
+            `Kartu yang ${
+              isDocument(this.game.currentPlayer)
+                ? this.game.currentPlayer.userName
+                : ""
+            } miliki`,
+            backCardsImage
+          );
+        })(),
+        (async () => {
+          await this.chat.sendToOtherPerson(
+            otherPlayer,
+            `${this.chat.message.userName} telah mengambil kartu baru, Sekarang giliran kamu untuk bermain`
+          );
+
+          await this.chat.sendToOtherPerson(
+            otherPlayer,
+            `Kartu saat ini: ${this.game.currentCard}`,
+            currentCardImage
+          );
+          await this.chat.sendToOtherPerson(
+            otherPlayer,
+            `Kartu kamu: ${nextUserCard?.cards?.join(", ")}.`,
+            frontCardsImage
+          );
         })(),
       ]);
     }
   }
 
+  /**
+   * Function for checking if the user is a winner or not
+   * @param notAWinnerCallback If the user not a winner (still in game session)
+   * @returns void
+   */
   private async checkIsWinner(notAWinnerCallback: () => Promise<void>) {
     if (this.cards!.length > 0) return await notAWinnerCallback();
 
@@ -176,102 +203,113 @@ export class Card {
     const gameDuration = this.game.getElapsedTime();
 
     await Promise.all([
-      this.chat.sendToCurrentPerson({
-        text: `Selamat! Kamu memenangkan kesempatan permainan kali ini.
+      this.chat
+        .sendToCurrentPerson(`Selamat! Kamu memenangkan kesempatan permainan kali ini.
 
 Kamu telah memanangkan permainan ini dengan durasi ${gameDuration}.
 
-Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
-      }),
+Game otomatis telah dihentikan. Terimakasih sudah bermain!`),
       this.game.sendToOtherPlayersWithoutCurrentPerson(
-        {
-          text: `${this.chat.message.userName} memenangkan kesempatan permainan kali ini.
+        `${this.chat.message.userName} memenangkan kesempatan permainan kali ini.
 
 Dia telah memanangkan permainan ini dengan durasi ${gameDuration}.
 
 Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
-        },
+
         playerList
       ),
     ]);
   }
 
+  /**
+   * Function for simplifying send to current person templated message
+   * @param text Text that will sended
+   * @param currentCardImage A current card image that will sended
+   * @param backCardsImage A back cards image that will sended
+   * @param nextPlayerName The next player username
+   */
   async sendToCurrentPersonInGame(
     text: string,
-    currentCardImage: Buffer,
-    backCardsImage: Buffer,
+    currentCardImage: DataURL,
+    backCardsImage: DataURL,
     nextPlayerName: string
   ) {
-    await this.chat.sendToCurrentPerson({
-      text,
-    });
+    await this.chat.sendToCurrentPerson(text);
 
-    await this.chat.sendToCurrentPerson({
-      image: currentCardImage,
-      caption: `Kartu saat ini: ${this.game.currentCard}`,
-    });
-    await this.chat.sendToCurrentPerson({
-      image: backCardsImage,
-      caption: `Kartu yang ${nextPlayerName} miliki`,
-    });
+    await this.chat.sendToCurrentPerson(
+      `Kartu saat ini: ${this.game.currentCard}`,
+      currentCardImage
+    );
+    await this.chat.sendToCurrentPerson(
+      `Kartu yang ${nextPlayerName} miliki`,
+      backCardsImage
+    );
   }
 
+  /**
+   * Function for simplifying send to current other player without current person templated message
+   * @param text Text that will sended
+   * @param playerList A list of all players that will get the message
+   * @param currentCardImage A current card image that will sended
+   * @param backCardsImage A back cards image that will sended
+   * @param nextPlayerName The next player username
+   */
   async sendToOtherPlayersWithoutCurrentPersonInGame(
     text: string,
     playerList: Ref<User, Types.ObjectId | undefined>[] | undefined,
-    currentCardImage: Buffer,
-    backCardsImage: Buffer,
+    currentCardImage: DataURL,
+    backCardsImage: DataURL,
     nextPlayerName: string
   ) {
-    await this.game.sendToOtherPlayersWithoutCurrentPerson(
-      {
-        text,
-      },
-      playerList
-    );
+    await this.game.sendToOtherPlayersWithoutCurrentPerson(text, playerList);
 
     await this.game.sendToOtherPlayersWithoutCurrentPerson(
-      {
-        image: currentCardImage,
-        caption: `Kartu saat ini: ${this.game.currentCard}`,
-      },
-      playerList
+      `Kartu saat ini: ${this.game.currentCard}`,
+      playerList,
+      currentCardImage
     );
     await this.game.sendToOtherPlayersWithoutCurrentPerson(
-      {
-        image: backCardsImage,
-        caption: `Kartu yang ${nextPlayerName} miliki`,
-      },
-      playerList
+      `Kartu yang ${nextPlayerName} miliki`,
+      playerList,
+      backCardsImage
     );
   }
 
+  /**
+   * Function for simplifying send to other person templated message
+   * @param firstText The first text in three message that will sended
+   * @param lastText The last text in three message that will sended
+   * @param phoneNumber The specific person phone number
+   * @param currentCardImage A current card image that will sended
+   * @param backOrFrontCardsImage A back or front cards image that will sended
+   */
   async sendToOtherPersonInGame(
     firstText: string,
     lastText: string,
     phoneNumber: string,
-    currentCardImage: Buffer,
-    backOrFrontCardsImage: Buffer
+    currentCardImage: DataURL,
+    backOrFrontCardsImage: DataURL
   ) {
-    await this.chat.sendToOtherPerson(phoneNumber, {
-      text: firstText,
-    });
+    await this.chat.sendToOtherPerson(phoneNumber, firstText);
 
-    await this.chat.sendToOtherPerson(phoneNumber, {
-      image: currentCardImage,
-      caption: `Kartu saat ini: ${this.game.currentCard}`,
-    });
-    await this.chat.sendToOtherPerson(phoneNumber, {
-      image: backOrFrontCardsImage,
-      caption: lastText,
-    });
+    await this.chat.sendToOtherPerson(
+      phoneNumber,
+      `Kartu saat ini: ${this.game.currentCard}`,
+      currentCardImage
+    );
+    await this.chat.sendToOtherPerson(
+      phoneNumber,
+      lastText,
+      backOrFrontCardsImage
+    );
   }
 
+  /**
+   * Function that handle user play event
+   * @param givenCard Valid given card
+   */
   async solve(givenCard: allCard) {
-    const status = this.compareTwoCard(
-      this.game.currentCard as allCard,
-      givenCard
-    );
+    const status = compareTwoCard(this.game.currentCard as allCard, givenCard);
 
     switch (status) {
       case "STACK": {
@@ -342,7 +380,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           );
 
         const newCards = Array.from(new Array(2)).map(() =>
-          CardPicker.pickRandomCard()
+          CardPicker.pickCardByGivenCard(this.game.currentCard as allCard)
         );
 
         await Promise.all([
@@ -558,7 +596,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           );
 
         const newCards = Array.from(new Array(4)).map(() =>
-          CardPicker.pickRandomCard()
+          CardPicker.pickCardByGivenCard(this.game.currentCard as allCard)
         );
 
         await Promise.all([
@@ -692,13 +730,18 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
       }
 
       case "UNMATCH": {
-        await this.chat.sendToCurrentPerson({
-          text: `Kartu *${givenCard}*, tidak valid jika disandingkan dengan kartu *${this.game.currentCard}*! Jika tidak memiliki kartu lagi, ambil dengan '${PREFIX}d' untuk mengambil kartu baru.`,
-        });
+        await this.chat.sendToCurrentPerson(
+          `Kartu *${givenCard}*, tidak valid jika disandingkan dengan kartu *${this.game.currentCard}*! Jika tidak memiliki kartu lagi, ambil dengan '${PREFIX}d' untuk mengambil kartu baru.`
+        );
       }
     }
   }
 
+  /**
+   * Function for checking is player has a specific given card or not
+   * @param card Valid given card
+   * @returns Boolean that indicate is current player has a card or not
+   */
   isIncluded(card: string) {
     if (card.match(regexValidWildColorOnly))
       return this.card.cards?.includes("wild");
@@ -707,159 +750,9 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     else return this.card.cards?.includes(card);
   }
 
-  private compareTwoCard(firstCard: allCard, secCard: allCard) {
-    const firstState = this.getCardState(firstCard);
-    const secState = this.getCardState(secCard);
-
-    if (
-      secState.state === "REQUIRED_ADDITIONAL_COLOR" ||
-      secState.state === "INVALID_ADDITIONAL_COLOR"
-    )
-      return secState.state;
-
-    const switchState = this.getSwitchState(firstState, secState);
-
-    switch (true) {
-      /* eslint-disable no-fallthrough */
-
-      // Valid wilddraw4 from player
-      case switchState.SECONDCARD_IS_WILD4:
-        return "STACK_PLUS_4";
-
-      // Valid wild color only from player
-      case switchState.SECONDCARD_IS_WILD:
-        return "STACK_WILD";
-
-      case switchState.FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME:
-
-      case switchState.FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO:
-      case switchState.SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD:
-        return `VALID_SPECIAL_${secState.type!.toUpperCase()}`;
-
-      // Wild color only, stack with specific color
-      case switchState.FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR:
-        return "STACK";
-
-      default:
-        return "UNMATCH";
-    }
-  }
-
-  private getSwitchState(firstState: IGetCardState, secState: IGetCardState) {
-    /**
-     * If the color or number is the same, but it's not special or plus4 card
-     */
-    const FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME =
-      (firstState?.color === secState?.color ||
-        firstState?.number === secState?.number) &&
-      secState.state !== "VALID_SPECIAL";
-
-    /**
-     * If the first card is the wild and the color of second card is the same
-     * or the first card is the plus4 and the color of second card is the same
-     */
-    const FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR =
-      (firstState.state === "VALID_WILD" &&
-        firstState.color === secState.color) ||
-      (firstState.state === "VALID_WILD_PLUS4" &&
-        firstState.color === secState.color);
-
-    /**
-     * If the second card is special card and the color
-     * of the second card is the same as the first card color
-     */
-    const SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD =
-      secState.state === "VALID_SPECIAL" && secState.color === firstState.color;
-
-    /**
-     * If the first card is special card and the type of
-     * the second card is the same as the first card type
-     */
-    const FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO =
-      firstState.state === "VALID_SPECIAL" &&
-      secState.state === "VALID_SPECIAL" &&
-      firstState.type === secState.type;
-
-    /**
-     * If the second card is wild card or in the other word is color only
-     */
-    const SECONDCARD_IS_WILD = secState.state === "VALID_WILD";
-
-    /**
-     * If the second card is plus4 card
-     */
-    const SECONDCARD_IS_WILD4 = secState.state === "VALID_WILD_PLUS4";
-
-    return {
-      FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME,
-      FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR,
-      SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD,
-      FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO,
-      SECONDCARD_IS_WILD,
-      SECONDCARD_IS_WILD4,
-    };
-  }
-
   /**
-   * Get the state of the current card (normal card, wild card, etc.)
-   * @param card Valid given card
-   * @returns Object of the card state
+   * Get all cards from current player
    */
-  private getCardState(card: allCard): IGetCardState {
-    const normalizeCard = card.trim().toLowerCase();
-
-    switch (true) {
-      case regexValidNormal.test(normalizeCard): {
-        const color = normalizeCard.match(
-          regexValidNormal
-        )![1] as IGetCardState["color"];
-        const number = Number(
-          normalizeCard.slice(color!.length)
-        )! as IGetCardState["number"];
-
-        return { state: "VALID_NORMAL", color, number };
-      }
-
-      case regexValidWildColorPlus4Only.test(normalizeCard): {
-        const color = normalizeCard.match(
-          regexValidWildColorPlus4Only
-        )![2] as IGetCardState["color"];
-
-        return { state: "VALID_WILD_PLUS4", color };
-      }
-
-      case regexValidWildColorOnly.test(normalizeCard): {
-        const color = normalizeCard.match(
-          regexValidWildColorOnly
-        )![2] as IGetCardState["color"];
-
-        return {
-          state: "VALID_WILD",
-          color,
-        };
-      }
-
-      case regexValidSpecial.test(normalizeCard): {
-        const color = normalizeCard.match(
-          regexValidSpecial
-        )![1]! as IGetCardState["color"];
-        const type = normalizeCard.match(
-          regexValidSpecial
-        )![2]! as IGetCardState["type"];
-
-        return {
-          state: "VALID_SPECIAL",
-          color,
-          type,
-        };
-      }
-
-      default: {
-        return { state: "INVALID" };
-      }
-    }
-  }
-
   get cards() {
     return this.card.cards;
   }

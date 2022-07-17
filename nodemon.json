@@ -2,5 +2,5 @@
     "execMap": {
         "ts": "ts-node"
     },
-    "ignore": ["auth_info_baileys", "baileys_store_multi.json", "dist"]
+    "ignore": ["_IGNORE_WUNO_BOT", "WUNO_BOT.data.json", "dist"]
 }
