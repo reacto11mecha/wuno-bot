@@ -56,62 +56,81 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
     await Promise.all([
       (async () => {
-        if (isDocument(game.currentPlayer)) {
+        if (isDocument(game.currentPlayer) && isDocument(currentPlayerCard)) {
           await chat.replyToCurrentPerson(
             `Game berhasil dimulai! Sekarang giliran ${
               game.currentPlayerIsAuthor ? "kamu" : game.currentPlayer.userName
             } untuk bermain`
           );
-        }
 
-        if (game.currentPlayerIsAuthor) {
-          await chat.sendToCurrentPerson(
+          if (!game.currentPlayerIsAuthor) {
+            await Promise.all([
+              chat.sendToOtherPerson(
+                game.currentPlayer.phoneNumber,
+                `${chat.message.userName} telah memulai permainan! Sekarang giliran kamu untuk bermain`
+              ),
+              (async () => {
+                if (isDocument(game.currentPlayer)) {
+                  await chat.sendToCurrentPerson(
+                    `Kartu saat ini: ${game.currentCard}`,
+                    currentCardImage
+                  );
+                  await chat.sendToCurrentPerson(
+                    `Kartu yang ${game.currentPlayer.userName} miliki`,
+                    backCardsImage
+                  );
+                }
+              })(),
+            ]);
+          }
+
+          const currentPlayerNumber = game.currentPlayer.phoneNumber;
+
+          await chat.sendToOtherPerson(
+            currentPlayerNumber,
             `Kartu saat ini: ${game.currentCard}`,
             currentCardImage
           );
-
-          await chat.sendToCurrentPerson(
-            `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
+          await chat.sendToOtherPerson(
+            currentPlayerNumber,
+            `Kartu kamu: ${currentPlayerCard.cards?.join(", ")}.`,
             frontCardsImage
           );
         }
       })(),
-      (async () => {
-        if (
-          !game.currentPlayerIsAuthor &&
-          isDocument(game.currentPlayer) &&
-          isDocument(currentPlayerCard)
-        ) {
-          const toPerson = game.currentPlayer!.phoneNumber;
 
-          await chat.sendToOtherPerson(
-            toPerson,
-            `${chat.message.userName} telah memulai permainan! Sekarang giliran kamu untuk bermain`
-          );
-          await chat.sendToOtherPerson(
-            toPerson,
-            `Kartu saat ini: ${game.currentCard}`,
-            currentCardImage
-          );
-          await chat.sendToOtherPerson(
-            toPerson,
-            `Kartu kamu: ${currentPlayerCard!.cards?.join(", ")}.`,
-            frontCardsImage
-          );
-        }
-      })(),
       (async () => {
-        if (isDocument(game.currentPlayer)) {
-          await game.sendToOtherPlayersWithoutCurrentPlayer(
-            `${chat.message.userName} telah memulai permainan! Sekarang giliran ${game.currentPlayer.userName} untuk bermain`
+        if (isDocument(game.players) && isDocument(game.currentPlayer)) {
+          const PlayerList = game.players
+            .filter(
+              (player) =>
+                isDocument(player) &&
+                isDocument(game.currentPlayer) &&
+                player.phoneNumber !== game.currentPlayer.phoneNumber
+            )
+            .filter(
+              (player) =>
+                isDocument(player) &&
+                player.phoneNumber !== chat.message.userNumber
+            );
+
+          await game.sendToOtherPlayersWithoutCurrentPerson(
+            `${
+              chat.message.userName
+            } telah memulai permainan! Sekarang giliran ${
+              game.currentPlayerIsAuthor ? "dia" : game.currentPlayer.userName
+            } untuk bermain`,
+            PlayerList
           );
 
-          await game.sendToOtherPlayersWithoutCurrentPlayer(
+          await game.sendToOtherPlayersWithoutCurrentPerson(
             `Kartu saat ini: ${game.currentCard}`,
+            PlayerList,
             currentCardImage
           );
-          await game.sendToOtherPlayersWithoutCurrentPlayer(
+          await game.sendToOtherPlayersWithoutCurrentPerson(
             `Kartu yang ${game.currentPlayer.userName} miliki`,
+            PlayerList,
             backCardsImage
           );
         }
