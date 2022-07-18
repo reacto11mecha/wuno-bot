@@ -11,8 +11,8 @@
     "build": "tsc",
     "build:doc": "typedoc",
     "build:all": "tsc && typedoc",
-    "build:watch": "tsc --watch",
     "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch",
     "format": "prettier -w ./src ./test",
     "lint": "eslint ./src ./test",
     "prepare": "husky install"
@@ -26,8 +26,7 @@
   "keywords": [
     "typescript",
     "uno",
-    "whatsapp-bot",
-    "baileys"
+    "whatsapp-bot"
   ],
   "bugs": {
     "url": "https://github.com/reacto11mecha/wuno-bot/issues"
