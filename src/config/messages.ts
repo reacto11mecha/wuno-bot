@@ -137,7 +137,7 @@ const replyBuilder = (
 
   Alias: ${alias.map((a) => `\`\`\`${a}\`\`\``).join(", ")}
 
-  Contoh pesan:
+  Contoh balasan:
   ${messageExample}
 
 ${footer}`;
