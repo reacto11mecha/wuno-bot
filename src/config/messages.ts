@@ -170,7 +170,7 @@ export const replies = {
   
   Terkadang kamu tidak memiliki kartu yang pas pada saat bermain, perintah ini bertujuan untuk mengambil kartu baru.`,
     ["d", "pickup", "newcard"],
-    '"Berhasil mengambil kartu baru, *red6* selanjutnya adalah giliran A untuk bermain"'
+    '"Berhasil mengambil kartu baru, *red6*. Selanjutnya adalah giliran A untuk bermain"'
   ),
 
   endgame: replyBuilder(
@@ -178,7 +178,7 @@ export const replies = {
     `Perintah ini digunakan untuk menghentikan permainan yang belum/sedang berjalan.
     
   Perintah ini hanya bisa digunakan oleh orang yang membuat permainan.`,
-    ["eg, end"],
+    ["eg", "end"],
     '"A telah menghentikan permainan. Terimakasih sudah bermain!"'
   ),
 
@@ -215,7 +215,7 @@ export const replies = {
     "play",
     `Perintah ini digunakan untuk mengeluarkan kartu dalam sebuah permainan.
     
-    Jika kartu cocok akan ditaruh ke deck dan pemain selanjutnya akan mendapatkan giliran.`,
+Jika kartu cocok akan ditaruh ke deck dan pemain selanjutnya akan mendapatkan giliran.`,
     ["p"],
     '"Berhasil mengeluarkan kartu *red9*, selanjutnya adalah giliran B untuk bermain"',
     "<kartu>"
@@ -225,7 +225,7 @@ export const replies = {
     "say",
     `Perintah ini digunakan untuk mengatakan sesuatu dalam sebuah permainan.
     
-  Isi pesan sesuai yang kamu inginkan, tapi perlu ingat, bercakaplah dengan bahasa yang sopan.`,
+  Isi pesan sesuai yang kamu inginkan, tapi perlu di ingat, bercakaplah dengan bahasa yang sopan.`,
     ["s"],
     '"USERNAME: pesan disini"',
     "<pesan>"

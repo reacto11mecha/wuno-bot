@@ -152,7 +152,7 @@ export class Card {
         })(),
         (async () => {
           await this.chat.sendToCurrentPerson(
-            `Berhasil mengambil kartu baru, *${newCard}*. selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`
+            `Berhasil mengambil kartu baru, *${newCard}*. Selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`
           );
 
           await this.chat.sendToCurrentPerson(
@@ -171,7 +171,7 @@ export class Card {
         (async () => {
           await this.chat.sendToOtherPerson(
             otherPlayer,
-            `${this.chat.message.userName} telah mengambil kartu baru, Sekarang giliran kamu untuk bermain`
+            `${this.chat.message.userName} telah mengambil kartu baru. Sekarang giliran kamu untuk bermain`
           );
 
           await this.chat.sendToOtherPerson(
