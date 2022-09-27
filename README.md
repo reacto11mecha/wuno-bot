@@ -35,9 +35,207 @@ Anda butuh
 
 ### Ikhtisar Daftar Perintah
 
-Berikut daftar perintah yang sudah dibuat.
+Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka prefix akan mengikuti konfigurasi yang sudah ada.
 
-// TODO: Buat daftar perintah dari penjelasan yang sudah dijelaskan di message
+- `cards`
+
+  Perintah ini digunakan untuk mengecek kartu yang ada pada saat kamu bermain.
+
+  Contoh penggunaan:
+
+  _`U# cards`_
+
+  Alias: _`c`_
+
+  <br />
+
+  Contoh balasan:
+
+  ```
+  Kartu kamu: greenskip, yellow4, red6, blue1
+  ```
+
+- `creategame`
+
+  Perintah ini digunakan untuk membuat permainan baru.
+
+  Setelah kode berhasil dibuat, bot akan mengirimkan kode yang bisa diteruskan ke pemain lain agar bisa bergabung ke dalam permainan.
+
+  Contoh penggunaan:
+
+  `U# creategame`
+
+  Alias: _`cg`_, _`create`_
+
+  <br />
+
+  Contoh balasan:
+
+  ```
+  Game berhasil dibuat.
+
+  Ajak teman kamu untuk bermain...
+  ```
+
+- `draw`
+
+  Perintah ini digunakan untuk mengambil kartu baru pada saat giliranmu.
+
+  Terkadang kamu tidak memiliki kartu yang pas pada saat bermain, perintah ini bertujuan untuk mengambil kartu baru. ke dalam permainan.
+
+  <br />
+
+  Contoh penggunaan:
+
+  _`U# draw`_
+
+  Alias: _`d`_, _`pickup`_, _`newcard`_
+
+  Contoh balasan:
+
+  ```
+  Berhasil mengambil kartu baru, red6. Selanjutnya adalah giliran A untuk bermain
+  ```
+
+- `endgame`
+
+  Perintah ini digunakan untuk menghentikan permainan yang belum/sedang berjalan.
+
+  Perintah ini hanya bisa digunakan oleh orang yang membuat permainan.
+
+  <br />
+
+  Contoh penggunaan:
+
+  _`U# endgame`_
+
+  Alias: _`eg`_, _`end`_
+
+  Contoh balasan:
+
+  ```
+  A telah menghentikan permainan. Terimakasih sudah bermain!
+  ```
+
+- `infogame`
+
+  Perintah ini digunakan untuk mengetahui informasi dari sebuah permainan.
+
+  Jika kamu sudah memasuki sebuah permainan, tidak perlu memasukan id game, tetapi kalau belum diperlukan id game tersebut.
+
+  <br />
+
+  Contoh penggunaan:
+
+  _`U# infogame <id game>`_
+
+  Alias: _`i`_, _`ig`_, _`info`_
+
+  Contoh balasan:
+
+  ```
+  A telah menghentikan permainan. Terimakasih sudah bermain!
+  ```
+
+- `joingame`
+
+  Perintah ini digunakan untuk masuk ke sebuah permainan.
+
+  Diperlukan id dari game yang sudah dibuat, biasanya tidak perlu mengetikkan lagi karena sudah diberikan oleh pembuat gamenya langsung.
+
+  <br />
+
+  Contoh penggunaan:
+
+  _`U# joingame <id game>`_
+
+  Alias: _`j`_, _`jg`_, _`join`_
+
+  Contoh balasan:
+
+  ```
+  Berhasil join ke game "XXXX", tunggu pembuat ruang game ini memulai permainannya!
+  ```
+
+- `leavegame`
+
+  Perintah ini digunakan untuk keluar dari sebuah permainan.
+
+  Perintah ini bisa digunakan pada saat permainan atau saat menunggu.
+
+  <br />
+
+  Contoh penggunaan:
+
+  _`U# leavegame`_
+
+  Alias: _`l`_, _`lg`_, _`quit`_, _`leave`_, _`leavegame`_
+
+  Contoh balasan:
+
+  ```
+  Anda berhasil keluar dari game. Terimakasih telah bermain!
+  ```
+
+- `play`
+
+  Perintah ini digunakan untuk mengeluarkan kartu dalam sebuah permainan.
+
+  Jika kartu cocok akan ditaruh ke deck dan pemain selanjutnya akan mendapatkan giliran.
+
+  <br />
+
+  Contoh penggunaan:
+
+  _`U# play <kartu>`_
+
+  Alias: _`p`_
+
+  Contoh balasan:
+
+  ```
+  Berhasil mengeluarkan kartu *red9*, selanjutnya adalah giliran B untuk bermain
+  ```
+
+- `say`
+
+  Perintah ini digunakan untuk mengatakan sesuatu dalam sebuah permainan.
+
+  Isi pesan sesuai yang kamu inginkan, tapi perlu di ingat, bercakaplah dengan bahasa yang sopan.
+
+  <br />
+
+  Contoh penggunaan:
+
+  _`U# say <pesan>`_
+
+  Alias: _`s`_
+
+  Contoh balasan:
+
+  ```
+  USERNAME: pesan disini
+  ```
+
+- `startgame`
+
+  Perintah ini digunakan untuk memulai permainan yang belum berjalan.
+
+  Perintah ini hanya bisa digunakan oleh orang yang membuat permainan.
+
+  <br />
+
+  Contoh penggunaan:
+
+  _`U# startgame`_
+
+  Alias: _`sg`_, _`start`_
+
+  Contoh balasan:
+
+  ```
+  Game berhasil dimulai! Sekarang giliran C untuk bermain
+  ```
 
 ### Cloning Dari Github
 
