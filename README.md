@@ -33,7 +33,26 @@ Anda butuh
 
 ## Pemakaian
 
-### Ikhtisar Daftar Perintah
+### Penjelasan Awal
+
+Bot ini adalah bot yang digunakan untuk bermain uno di whatsapp. Cara kerjanya dengan mengirimkan perintah lewat DM pribadi ke bot ini, tapi masih bisa digunakan di grup semisal untuk membuat permainan.
+
+Untuk membuat permainan caranya dengan menjalankan `U#creategame` (atau `U#cg`) dan akan membuat kode yang bisa diteruskan ke orang lain.
+
+Orang yang diberikan meneruskan kembali kode itu ke bot dan akan masuk ke sesi permainan sesuai dengan kode yang sudah diberikan sebelumnya.
+
+Setelah dirasa sudah cukup orang, permainan bisa dimulai menggunakan `U#startgame` (atau `U#sg`) kartu akan diberikan dan permainan dimulai.
+
+Untuk bermain, gunakan `U#play <kartu kamu>`
+(atau `U#p <kartu kamu>`) untuk menaruh kartu yang sesuai dengan apa yang ada di deck. Jika valid, kartu akan ditaruh dan giliran bermain akan beralih ke pemain selanjutnya.
+
+Jika kamu tidak memiliki kartu ambilah kartu baru dengan menggunakan `U#draw` (atau `U#d`) maka kartu baru akan diambil dan giliran bermain akan beralih ke pemain selanjutnya.
+
+Untuk berkomunikasi dengan pemain lain di game, gunakan `U#say <pesan mu>`.
+
+Untuk melihat lebih jelas apa maksud dari perintah, gunakan `U#help <nama lengkap perintah>`.
+
+### Daftar Perintah
 
 Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka prefix akan mengikuti konfigurasi yang sudah ada.
 
@@ -46,8 +65,6 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
   _`U# cards`_
 
   Alias: _`c`_
-
-  <br />
 
   Contoh balasan:
 
@@ -67,8 +84,6 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
 
   Alias: _`cg`_, _`create`_
 
-  <br />
-
   Contoh balasan:
 
   ```
@@ -82,8 +97,6 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
   Perintah ini digunakan untuk mengambil kartu baru pada saat giliranmu.
 
   Terkadang kamu tidak memiliki kartu yang pas pada saat bermain, perintah ini bertujuan untuk mengambil kartu baru. ke dalam permainan.
-
-  <br />
 
   Contoh penggunaan:
 
@@ -103,8 +116,6 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
 
   Perintah ini hanya bisa digunakan oleh orang yang membuat permainan.
 
-  <br />
-
   Contoh penggunaan:
 
   _`U# endgame`_
@@ -122,8 +133,6 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
   Perintah ini digunakan untuk mengetahui informasi dari sebuah permainan.
 
   Jika kamu sudah memasuki sebuah permainan, tidak perlu memasukan id game, tetapi kalau belum diperlukan id game tersebut.
-
-  <br />
 
   Contoh penggunaan:
 
@@ -143,8 +152,6 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
 
   Diperlukan id dari game yang sudah dibuat, biasanya tidak perlu mengetikkan lagi karena sudah diberikan oleh pembuat gamenya langsung.
 
-  <br />
-
   Contoh penggunaan:
 
   _`U# joingame <id game>`_
@@ -162,8 +169,6 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
   Perintah ini digunakan untuk keluar dari sebuah permainan.
 
   Perintah ini bisa digunakan pada saat permainan atau saat menunggu.
-
-  <br />
 
   Contoh penggunaan:
 
@@ -183,8 +188,6 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
 
   Jika kartu cocok akan ditaruh ke deck dan pemain selanjutnya akan mendapatkan giliran.
 
-  <br />
-
   Contoh penggunaan:
 
   _`U# play <kartu>`_
@@ -203,8 +206,6 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
 
   Isi pesan sesuai yang kamu inginkan, tapi perlu di ingat, bercakaplah dengan bahasa yang sopan.
 
-  <br />
-
   Contoh penggunaan:
 
   _`U# say <pesan>`_
@@ -222,8 +223,6 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
   Perintah ini digunakan untuk memulai permainan yang belum berjalan.
 
   Perintah ini hanya bisa digunakan oleh orang yang membuat permainan.
-
-  <br />
 
   Contoh penggunaan:
 
