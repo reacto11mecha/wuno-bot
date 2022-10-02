@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import path from "path";
 import P from "pino";
 
+import { df as formatTime } from "./utils/index";
 import { messageHandler } from "./handler/message";
 import { connectDatabase } from "./handler/database";
 import { PREFIX } from "./config/prefix";
@@ -49,7 +50,14 @@ export default class Bot {
     });
 
     this.waClient.on("qr", (qr) => qrcode.generate(qr, { small: true }));
-    this.waClient.on("ready", () => logger.info("[BOT] Siap digunakan"));
+    this.waClient.on("ready", () => {
+      logger.info("[BOT] Siap digunakan");
+      this.waClient.setStatus(
+        `Ketik "${PREFIX}" untuk memulai percakapan! Dinyalakan pada ${formatTime(
+          new Date()
+        )}.`
+      );
+    });
     this.waClient.on("authenticated", () =>
       logger.info("[BOT] Berhasil melakukan proses autentikasi")
     );
@@ -58,27 +66,6 @@ export default class Bot {
     );
 
     this.queue.start();
-
-    this.queue.on("add", () =>
-      logger.info(
-        `[P-QUEUE] Task is added.  Size: ${this.queue.size}  Pending: ${this.queue.pending}`
-      )
-    );
-    this.queue.on("active", () =>
-      logger.info(
-        `[P-QUEUE] Active Queue. Size: ${this.queue.size}  Pending: ${this.queue.pending}`
-      )
-    );
-    this.queue.on("next", () =>
-      logger.info(
-        `[P-QUEUE] Task is completed.  Size: ${this.queue.size}  Pending: ${this.queue.pending}`
-      )
-    );
-    this.queue.on("idle", () =>
-      logger.info(
-        `[P-QUEUE] Queue is idle.  Size: ${this.queue.size}  Pending: ${this.queue.pending}`
-      )
-    );
   }
 
   /**
