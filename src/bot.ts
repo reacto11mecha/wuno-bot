@@ -1,4 +1,5 @@
-import { create, Client } from "@open-wa/wa-automate";
+import { Client, LocalAuth } from "whatsapp-web.js";
+import qrcode from "qrcode-terminal";
 import PQueue from "p-queue";
 import pLimit from "p-limit";
 import dotenv from "dotenv";
@@ -40,8 +41,22 @@ export default class Bot {
     autoStart: false,
   });
   private messageLimitter = pLimit(8);
+  private waClient: Client;
 
-  constructor() {
+  constructor(clientId: string) {
+    this.waClient = new Client({
+      authStrategy: new LocalAuth({ clientId }),
+    });
+
+    this.waClient.on("qr", (qr) => qrcode.generate(qr, { small: true }));
+    this.waClient.on("ready", () => logger.info("[BOT] Siap digunakan"));
+    this.waClient.on("authenticated", () =>
+      logger.info("[BOT] Berhasil melakukan proses autentikasi")
+    );
+    this.waClient.on("change_state", (state) =>
+      logger.info(`[BOT] State bot berubah, saat ini: ${state}`)
+    );
+
     this.queue.start();
 
     this.queue.on("add", () =>
@@ -67,57 +82,32 @@ export default class Bot {
   }
 
   /**
-   * The second gate for this bot is working
-   * @param messageQueue Message queue from p-queue
-   * @param messageLimitter Message limiter from p-limit
-   * @param client Client instance from "@open-wa/wa-automate"
-   */
-  private async clientHandler(
-    messageQueue: PQueue,
-    messageLimitter: ReturnType<typeof pLimit>,
-    client: Client
-  ) {
-    const onMessageQueue = await messageHandler(
-      client,
-      logger,
-      messageLimitter
-    );
-
-    client.onStateChanged((state) => {
-      logger.info(`[STATE] Current State: ${state}`);
-      if (state === "CONFLICT" || state === "UNLAUNCHED") client.forceRefocus();
-    });
-
-    client.onMessage((message) => {
-      if (message.body.startsWith(PREFIX)) {
-        logger.info(`[Pesan] Ada pesan dari: ${message.sender.pushname}`);
-        messageQueue.add(async () => await onMessageQueue(message));
-      }
-    });
-
-    logger.info("[BOT] Bot berhasil dihidupkan | Pesan Pertama");
-  }
-
-  /**
    * The main entrance gate for this bot is working
    */
-  init() {
+  async init() {
     if (!process.env.MONGO_URI)
       throw new Error("[DB] Diperlukan sebuah URI MongDB | MONGO_URI");
 
-    connectDatabase(process.env.MONGO_URI, logger).then(() =>
-      create({
-        sessionId: "WUNO_BOT",
-        authTimeout: 60,
-        blockCrashLogs: true,
-        disableSpins: true,
-        headless: true,
-        logConsole: false,
-        popup: true,
-        qrTimeout: 0,
-      }).then((client) =>
-        this.clientHandler(this.queue, this.messageLimitter, client)
-      )
+    logger.info("[INIT] Inisialisasi bot");
+
+    const onMessageQueue = await messageHandler(
+      this.waClient,
+      logger,
+      this.messageLimitter
     );
+
+    this.waClient.on("message", async (message) => {
+      if (message.body.startsWith(PREFIX)) {
+        const contact = await message.getContact();
+
+        logger.info(`[Pesan] Ada pesan dari: ${contact.pushname}`);
+        this.queue.add(async () => await onMessageQueue(message, contact));
+      }
+    });
+
+    connectDatabase(process.env.MONGO_URI, logger).then(() => {
+      logger.info("[BOT] Menyalakan bot");
+      this.waClient.initialize();
+    });
   }
 }

@@ -19,7 +19,7 @@ import {
 } from "../config/cards";
 
 import { Card as CardType, CardModel, User } from "../models";
-import type { DataURL } from "@open-wa/wa-automate";
+import { MessageMedia } from "whatsapp-web.js";
 import type { allCard } from "../config/cards";
 
 import { CardPicker, compareTwoCard } from "../config/cards";
@@ -230,18 +230,18 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
    */
   async sendToCurrentPersonInGame(
     text: string,
-    currentCardImage: DataURL,
-    backCardsImage: DataURL,
+    currentCardImage: MessageMedia,
+    backCardsImage: MessageMedia,
     nextPlayerName: string
   ) {
     await this.chat.sendToCurrentPerson(text);
 
     await this.chat.sendToCurrentPerson(
-      `Kartu saat ini: ${this.game.currentCard}`,
+      { caption: `Kartu saat ini: ${this.game.currentCard}` },
       currentCardImage
     );
     await this.chat.sendToCurrentPerson(
-      `Kartu yang ${nextPlayerName} miliki`,
+      { caption: `Kartu yang ${nextPlayerName} miliki` },
       backCardsImage
     );
   }
@@ -257,19 +257,19 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
   async sendToOtherPlayersWithoutCurrentPersonInGame(
     text: string,
     playerList: Ref<User, Types.ObjectId | undefined>[] | undefined,
-    currentCardImage: DataURL,
-    backCardsImage: DataURL,
+    currentCardImage: MessageMedia,
+    backCardsImage: MessageMedia,
     nextPlayerName: string
   ) {
     await this.game.sendToOtherPlayersWithoutCurrentPerson(text, playerList);
 
     await this.game.sendToOtherPlayersWithoutCurrentPerson(
-      `Kartu saat ini: ${this.game.currentCard}`,
+      { caption: `Kartu saat ini: ${this.game.currentCard}` },
       playerList,
       currentCardImage
     );
     await this.game.sendToOtherPlayersWithoutCurrentPerson(
-      `Kartu yang ${nextPlayerName} miliki`,
+      { caption: `Kartu yang ${nextPlayerName} miliki` },
       playerList,
       backCardsImage
     );
@@ -287,19 +287,19 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     firstText: string,
     lastText: string,
     phoneNumber: string,
-    currentCardImage: DataURL,
-    backOrFrontCardsImage: DataURL
+    currentCardImage: MessageMedia,
+    backOrFrontCardsImage: MessageMedia
   ) {
     await this.chat.sendToOtherPerson(phoneNumber, firstText);
 
     await this.chat.sendToOtherPerson(
       phoneNumber,
-      `Kartu saat ini: ${this.game.currentCard}`,
+      { caption: `Kartu saat ini: ${this.game.currentCard}` },
       currentCardImage
     );
     await this.chat.sendToOtherPerson(
       phoneNumber,
-      lastText,
+      { caption: lastText },
       backOrFrontCardsImage
     );
   }

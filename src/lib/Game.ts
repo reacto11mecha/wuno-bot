@@ -20,7 +20,11 @@ import {
 } from "../models";
 
 import type { allCard } from "../config/cards";
-import type { Content, DataURL } from "@open-wa/wa-automate";
+import {
+  MessageContent,
+  MessageMedia,
+  MessageSendOptions,
+} from "whatsapp-web.js";
 
 /**
  * Class for handling user game event
@@ -208,8 +212,8 @@ export class Game {
    * @param image Image that will sended (Optional)
    */
   async sendToOtherPlayersWithoutCurrentPlayer(
-    message: Content,
-    image?: DataURL
+    message: MessageContent | MessageSendOptions,
+    image?: MessageMedia
   ) {
     if (isDocumentArray(this.game.players)) {
       await Promise.all(
@@ -234,12 +238,12 @@ export class Game {
    * Send message or image with caption to all players without current person
    * @param message Text that will sended
    * @param players Players list (optional)
-   * @param image Image that will sendd (optional)
+   * @param image Image that will send (optional)
    */
   async sendToOtherPlayersWithoutCurrentPerson(
-    message: Content,
+    message: MessageContent | MessageSendOptions,
     players?: Ref<UserType>[],
-    image?: DataURL
+    image?: MessageMedia
   ) {
     if (players && isDocumentArray(players)) {
       await Promise.all(
