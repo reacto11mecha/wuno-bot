@@ -97,7 +97,7 @@ export class Chat {
     this.incomingMessage = IncomingMessage;
 
     this.message = {
-      userNumber: contact.number,
+      userNumber: contact.id._serialized,
       userName: contact.pushname,
       from: IncomingMessage.from,
       id: IncomingMessage.id.id,
@@ -119,24 +119,7 @@ export class Chat {
     content: MessageContent | MessageSendOptions,
     image?: MessageMedia
   ) {
-    if (image) {
-      await this.limitter(
-        async () =>
-          await this.client.sendMessage(
-            this.message.from,
-            image,
-            content as MessageSendOptions
-          )
-      );
-    } else {
-      await this.limitter(
-        async () =>
-          await this.client.sendMessage(
-            this.message.from,
-            content as MessageContent
-          )
-      );
-    }
+    await this.sendToOtherPerson(this.message.from, content, image);
   }
 
   /**
@@ -175,9 +158,18 @@ export class Chat {
     image?: MessageMedia
   ) {
     if (image) {
-      // await this._sendImage(<ChatId>to, content, image);
+      await this.limitter(
+        async () =>
+          await this.client.sendMessage(
+            to,
+            image,
+            content as MessageSendOptions
+          )
+      );
     } else {
-      // await this._sendText(<ChatId>to, content);
+      await this.limitter(
+        async () => await this.client.sendMessage(to, content as MessageContent)
+      );
     }
   }
 
