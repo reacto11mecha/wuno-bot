@@ -22,5 +22,5 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
   await game.sendToOtherPlayersWithoutCurrentPerson(
     `${chat.message.userName}: ${message}`
   );
-  await chat.replyToCurrentPerson("Pesan berhasil terkirim 👍");
+  await chat.reactToCurrentPerson("👍");
 });

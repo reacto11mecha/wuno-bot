@@ -148,6 +148,14 @@ export class Chat {
   }
 
   /**
+   * Send reaction to current person chatter
+   * @param emoji Emoji that will sended
+   */
+  async reactToCurrentPerson(emoji: string) {
+    await this.limitter(async () => await this.incomingMessage.react(emoji));
+  }
+
+  /**
    * Send text or image with caption to someone
    * @param content The text that will sended
    * @param image Image that will sended in base64 data URL (Optional)
