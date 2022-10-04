@@ -136,16 +136,18 @@ export class Card {
           );
 
           await this.game.sendToOtherPlayersWithoutCurrentPerson(
-            `Kartu saat ini: ${this.game.currentCard}`,
+            { caption: `Kartu saat ini: ${this.game.currentCard}` },
             playerList,
             currentCardImage
           );
           await this.game.sendToOtherPlayersWithoutCurrentPerson(
-            `Kartu yang ${
-              isDocument(this.game.currentPlayer)
-                ? this.game.currentPlayer.userName
-                : ""
-            } miliki`,
+            {
+              caption: `Kartu yang ${
+                isDocument(this.game.currentPlayer)
+                  ? this.game.currentPlayer.userName
+                  : ""
+              } miliki`,
+            },
             playerList,
             backCardsImage
           );
@@ -156,15 +158,17 @@ export class Card {
           );
 
           await this.chat.sendToCurrentPerson(
-            `Kartu saat ini: ${this.game.currentCard}`,
+            { caption: `Kartu saat ini: ${this.game.currentCard}` },
             currentCardImage
           );
           await this.chat.sendToCurrentPerson(
-            `Kartu yang ${
-              isDocument(this.game.currentPlayer)
-                ? this.game.currentPlayer.userName
-                : ""
-            } miliki`,
+            {
+              caption: `Kartu yang ${
+                isDocument(this.game.currentPlayer)
+                  ? this.game.currentPlayer.userName
+                  : ""
+              } miliki`,
+            },
             backCardsImage
           );
         })(),
@@ -176,12 +180,12 @@ export class Card {
 
           await this.chat.sendToOtherPerson(
             otherPlayer,
-            `Kartu saat ini: ${this.game.currentCard}`,
+            { caption: `Kartu saat ini: ${this.game.currentCard}` },
             currentCardImage
           );
           await this.chat.sendToOtherPerson(
             otherPlayer,
-            `Kartu kamu: ${nextUserCard?.cards?.join(", ")}.`,
+            { caption: `Kartu kamu: ${nextUserCard?.cards?.join(", ")}.` },
             frontCardsImage
           );
         })(),
@@ -731,7 +735,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
 
       case "UNMATCH": {
         await this.chat.sendToCurrentPerson(
-          `Kartu *${givenCard}*, tidak valid jika disandingkan dengan kartu *${this.game.currentCard}*! Jika tidak memiliki kartu lagi, ambil dengan '${PREFIX}d' untuk mengambil kartu baru.`
+          `Kartu *${givenCard}* tidak valid jika disandingkan dengan kartu *${this.game.currentCard}*! Jika tidak memiliki kartu lagi, ambil dengan '${PREFIX}d' untuk mengambil kartu baru.`
         );
       }
     }
