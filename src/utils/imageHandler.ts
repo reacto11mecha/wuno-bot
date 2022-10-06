@@ -3,7 +3,7 @@ import path from "path";
 import sharp from "sharp";
 import NodeCache from "node-cache";
 
-import type { DataURL } from "@open-wa/wa-automate";
+import { MessageMedia } from "whatsapp-web.js";
 import type { allCard } from "../config/cards";
 
 const imgCache = new NodeCache({ stdTTL: 60 * 60 * 24 });
@@ -32,14 +32,15 @@ const cardBuilder = (width: number, height: number) =>
  */
 export const getCardImage = (card: allCard) => {
   const cacheKeyName = `an-image-${card}`;
-  if (imgCache.has(cacheKeyName)) return imgCache.get(cacheKeyName) as DataURL;
+  if (imgCache.has(cacheKeyName))
+    return imgCache.get(cacheKeyName) as MessageMedia;
 
   const imgBuffer = fs.readFileSync(path.join(cardsDir, `${card}.png`));
 
-  const img = `data:image/png;base64,${imgBuffer.toString("base64")}`;
+  const img = new MessageMedia("image/png", imgBuffer.toString("base64"));
 
   imgCache.set(cacheKeyName, img);
-  return img as DataURL;
+  return img;
 };
 
 /**
@@ -49,7 +50,8 @@ export const getCardImage = (card: allCard) => {
  */
 export const createCardsImageFront = async (cards: allCard[]) => {
   const cacheKeyName = `front-${cards.join("-")}`;
-  if (imgCache.has(cacheKeyName)) return imgCache.get(cacheKeyName) as DataURL;
+  if (imgCache.has(cacheKeyName))
+    return imgCache.get(cacheKeyName) as MessageMedia;
 
   const imgBuffer = await cardBuilder(cards.length * 95, 137)
     .composite(
@@ -62,10 +64,10 @@ export const createCardsImageFront = async (cards: allCard[]) => {
     .toFormat("png")
     .toBuffer();
 
-  const img = `data:image/png;base64,${imgBuffer.toString("base64")}`;
+  const img = new MessageMedia("image/png", imgBuffer.toString("base64"));
 
   imgCache.set(cacheKeyName, img, 60 * 20);
-  return img as DataURL;
+  return img;
 };
 
 /**
@@ -75,7 +77,8 @@ export const createCardsImageFront = async (cards: allCard[]) => {
  */
 export const createCardsImageBack = async (cardsLength: number) => {
   const cacheKeyName = `back${cardsLength}`;
-  if (imgCache.has(cacheKeyName)) return imgCache.get(cacheKeyName) as DataURL;
+  if (imgCache.has(cacheKeyName))
+    return imgCache.get(cacheKeyName) as MessageMedia;
 
   const imgBuffer = await cardBuilder(cardsLength * 95 - 10, 135)
     .composite(
@@ -88,10 +91,10 @@ export const createCardsImageBack = async (cardsLength: number) => {
     .toFormat("png")
     .toBuffer();
 
-  const img = `data:image/png;base64,${imgBuffer.toString("base64")}`;
+  const img = new MessageMedia("image/png", imgBuffer.toString("base64"));
 
   imgCache.set(cacheKeyName, img);
-  return img as DataURL;
+  return img;
 };
 
 /**

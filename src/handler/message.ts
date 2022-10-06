@@ -1,4 +1,4 @@
-import type { Client, Message } from "@open-wa/wa-automate";
+import type { Client, Contact, Message } from "whatsapp-web.js";
 import pLimit from "p-limit";
 import { Logger } from "pino";
 
@@ -11,7 +11,7 @@ import { botInfo } from "../config/messages";
 
 /**
  * A "bone" for this bot handling incoming messages whatsoever
- * @param client open-wa/wa-automate client instance
+ * @param client whatsapp-web.js client instance
  * @param logger pino logger instance
  * @param limitter p-limit instance
  * @returns A function that can be used for queue callback
@@ -24,7 +24,7 @@ export const messageHandler = async (
   const controller = await getController();
   const emitter = emitHandler(controller);
 
-  return async (message: Message) => {
+  return async (message: Message, contact: Contact) => {
     const command = message.body
       .slice(PREFIX.length)!
       .trim()!
@@ -32,7 +32,7 @@ export const messageHandler = async (
       .shift()!
       .toLowerCase();
 
-    const chat = new Chat(client, message, logger, limitter);
+    const chat = new Chat(client, message, logger, limitter, contact);
 
     switch (command) {
       case "cg":

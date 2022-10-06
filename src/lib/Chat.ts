@@ -1,12 +1,11 @@
 import type {
+  MessageSendOptions,
   Message,
   Client,
-  ChatId,
-  ContactId,
-  Content,
-  MessageId,
-  DataURL,
-} from "@open-wa/wa-automate";
+  Contact,
+  MessageContent,
+  MessageMedia,
+} from "whatsapp-web.js";
 import { DocumentType } from "@typegoose/typegoose";
 import { Logger } from "pino";
 import pLimit from "p-limit";
@@ -21,7 +20,7 @@ export interface IMessage {
   /**
    * User number
    */
-  userNumber: ContactId;
+  userNumber: string;
 
   /**
    * User username
@@ -31,12 +30,12 @@ export interface IMessage {
   /**
    * Incoming chat from property
    */
-  from: ChatId;
+  from: string;
 
   /**
    * Incoming chat specific message id
    */
-  id: MessageId;
+  id: string;
 }
 
 /**
@@ -57,6 +56,11 @@ export class Chat {
    * Accessible message instance that contains information about incoming message
    */
   message: IMessage;
+
+  /**
+   * Actual incoming message object
+   */
+  private incomingMessage: Message;
 
   /**
    * Message limitter instance from p-limit
@@ -84,17 +88,19 @@ export class Chat {
     client: Client,
     IncomingMessage: Message,
     logger: Logger,
-    limitter: ReturnType<typeof pLimit>
+    limitter: ReturnType<typeof pLimit>,
+    contact: Contact
   ) {
     this.client = client;
     this.logger = logger;
     this.limitter = limitter;
+    this.incomingMessage = IncomingMessage;
 
     this.message = {
-      userNumber: IncomingMessage.sender.id,
-      userName: IncomingMessage.sender.pushname,
+      userNumber: contact.id._serialized,
+      userName: contact.pushname,
       from: IncomingMessage.from,
-      id: IncomingMessage.id,
+      id: IncomingMessage.id.id,
     };
 
     this.args = IncomingMessage.body
@@ -105,49 +111,15 @@ export class Chat {
   }
 
   /**
-   * Abstract function for sending text to someone
-   * @param to Chat id for intended person
-   * @param content The text that will sended
-   */
-  private async _sendText(to: ChatId, content: Content) {
-    await this.limitter(async () => {
-      await this.client.simulateTyping(to, true);
-      await this.client.sendText(to, content);
-      await this.client.simulateTyping(to, false);
-    });
-  }
-
-  /**
-   * Abstract function for sending image with caption to someone
-   * @param to Chat id for intended person
-   * @param caption The text that will sended
-   * @param image Image that will sended in base64 data URL
-   * @param quotedMsgId Quoted specific message for replying (Optional)
-   */
-  private async _sendImage(
-    to: ChatId,
-    caption: Content,
-    image: DataURL,
-    quotedMsgId?: MessageId
-  ) {
-    await this.limitter(async () => {
-      await this.client.simulateTyping(to, true);
-      await this.client.sendImage(to, image, "img.png", caption, quotedMsgId);
-      await this.client.simulateTyping(to, false);
-    });
-  }
-
-  /**
    * Send text or image with caption to current person chatter
    * @param content The text that will sended
    * @param image Image that will sended in base64 data URL (Optional)
    */
-  async sendToCurrentPerson(content: Content, image?: DataURL) {
-    if (image) {
-      await this._sendImage(this.message.from, content, image);
-    } else {
-      await this._sendText(this.message.from, content);
-    }
+  async sendToCurrentPerson(
+    content: MessageContent | MessageSendOptions,
+    image?: MessageMedia
+  ) {
+    await this.sendToOtherPerson(this.message.from, content, image);
   }
 
   /**
@@ -155,16 +127,32 @@ export class Chat {
    * @param content The text that will sended
    * @param image Image that will sended in base64 data URL (Optional)
    */
-  async replyToCurrentPerson(content: Content, image?: DataURL) {
+  async replyToCurrentPerson(
+    content: MessageContent | MessageSendOptions,
+    image?: MessageMedia
+  ) {
     if (image) {
-      await this._sendImage(this.message.from, content, image, this.message.id);
+      await this.limitter(
+        async () =>
+          await this.incomingMessage.reply(
+            image,
+            this.message.id,
+            content as MessageSendOptions
+          )
+      );
     } else {
-      await this.limitter(async () => {
-        await this.client.simulateTyping(this.message.from, true);
-        await this.client.reply(this.message.from, content, this.message.id);
-        await this.client.simulateTyping(this.message.from, false);
-      });
+      await this.limitter(
+        async () => await this.incomingMessage.reply(content as MessageContent)
+      );
     }
+  }
+
+  /**
+   * Send reaction to current person chatter
+   * @param emoji Emoji that will sended
+   */
+  async reactToCurrentPerson(emoji: string) {
+    await this.limitter(async () => await this.incomingMessage.react(emoji));
   }
 
   /**
@@ -172,11 +160,24 @@ export class Chat {
    * @param content The text that will sended
    * @param image Image that will sended in base64 data URL (Optional)
    */
-  async sendToOtherPerson(to: string, content: Content, image?: DataURL) {
+  async sendToOtherPerson(
+    to: string,
+    content: MessageContent | MessageSendOptions,
+    image?: MessageMedia
+  ) {
     if (image) {
-      await this._sendImage(<ChatId>to, content, image);
+      await this.limitter(
+        async () =>
+          await this.client.sendMessage(
+            to,
+            image,
+            content as MessageSendOptions
+          )
+      );
     } else {
-      await this._sendText(<ChatId>to, content);
+      await this.limitter(
+        async () => await this.client.sendMessage(to, content as MessageContent)
+      );
     }
   }
 
