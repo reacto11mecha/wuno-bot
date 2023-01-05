@@ -260,7 +260,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
    */
   async sendToOtherPlayersWithoutCurrentPersonInGame(
     text: string,
-    playerList: Ref<User, Types.ObjectId | undefined>[] | undefined,
+    playerList: Ref<User, Types.ObjectId>[],
     currentCardImage: MessageMedia,
     backCardsImage: MessageMedia,
     nextPlayerName: string

@@ -75,6 +75,12 @@ export class Game {
   public players?: Ref<User>[];
 
   /**
+   * Lists of all banned players
+   */
+  @prop({ autopopulate: true, ref: () => User })
+  public bannedPlayers?: Ref<User>[];
+
+  /**
    * When is the game session created
    */
   @prop({ default: () => Date.now() })

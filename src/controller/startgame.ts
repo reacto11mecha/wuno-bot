@@ -1,5 +1,9 @@
 import { Types } from "mongoose";
-import { DocumentType, isDocument } from "@typegoose/typegoose";
+import {
+  DocumentType,
+  isDocument,
+  isDocumentArray,
+} from "@typegoose/typegoose";
 import { requiredJoinGameSession, createAllCardImage } from "../utils";
 
 import { Card, CardModel } from "../models";
@@ -100,7 +104,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       })(),
 
       (async () => {
-        if (isDocument(game.players) && isDocument(game.currentPlayer)) {
+        if (isDocumentArray(game.players) && isDocument(game.currentPlayer)) {
           const PlayerList = game.players
             .filter(
               (player) =>
