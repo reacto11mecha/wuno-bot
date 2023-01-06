@@ -9,11 +9,16 @@ import { CardPicker } from "../config/cards";
 /**
  * Enum that can indicate game status
  */
-export enum GameStatus {
-  WAITING = "WAITING",
-  PLAYING = "PLAYING",
-  ENDED = "ENDED",
-}
+export const GameStatus = {
+  WAITING: "WAITING",
+  PLAYING: "PLAYING",
+  ENDED: "ENDED",
+} as const;
+
+/**
+ * Typing for GameStatus enum, contains key of GameStatus variable
+ */
+export type GameStatusType = keyof typeof GameStatus;
 
 /**
  * Model skeleton for handling user game information
@@ -30,7 +35,7 @@ export class Game {
    * The status of the game indicator
    */
   @prop({ enum: GameStatus, default: GameStatus.WAITING })
-  public status?: GameStatus;
+  public status?: GameStatusType;
 
   /**
    * Stored game creator identity

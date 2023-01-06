@@ -26,19 +26,24 @@ export type allCard =
 /**
  * Enum for single state card
  */
-export enum EGetCardState {
-  VALID_NORMAL,
-  VALID_WILD_PLUS4,
-  VALID_WILD,
-  VALID_SPECIAL,
-  INVALID,
-}
+export const EGetCardState = {
+  VALID_NORMAL: "VALID_NORMAL",
+  VALID_WILD_PLUS4: "VALID_WILD_PLUS4",
+  VALID_WILD: "VALID_WILD",
+  VALID_SPECIAL: "VALID_SPECIAL",
+  INVALID: "INVALID",
+} as const;
+
+/**
+ * Typing for EGetCardState enum
+ */
+export type EGetCardStateType = keyof typeof EGetCardState;
 
 /**
  * Interface for return type of "getCardState" function
  */
 export interface IGetCardState {
-  state: EGetCardState;
+  state: EGetCardStateType;
   color?: color;
   number?: possibleNumber;
   type?: "draw2" | "reverse" | "skip";
@@ -345,14 +350,17 @@ export class CardPicker {
 /**
  * Enum that used for "getSwitchState" function
  */
-export enum switchState {
-  FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME,
-  FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR,
-  SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD,
-  FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO,
-  SECONDCARD_IS_WILD,
-  SECONDCARD_IS_WILD4,
-}
+export const switchState = {
+  FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME: "FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME",
+  FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR:
+    "FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR",
+  SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD:
+    "SECONDCARD_IS_VALIDSPECIAL_AND_SAME_COLOR_AS_FIRSTCARD",
+  FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO:
+    "FIRSTCARD_IS_NTYPE_AND_SECONDCARD_IS_NTYPE_TOO",
+  SECONDCARD_IS_WILD: "SECONDCARD_IS_WILD",
+  SECONDCARD_IS_WILD4: "SECONDCARD_IS_WILD4",
+} as const;
 
 /**
  * A function that used to defining the state for switch case comparer
