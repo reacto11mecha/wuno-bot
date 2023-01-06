@@ -175,6 +175,14 @@ export class Game {
   }
 
   /**
+   * Function for adding user on banned player array
+   * @param _id Specific user id
+   */
+  async addUserToBannedList(_id: Types.ObjectId) {
+    await this.game.update({ $push: { bannedPlayers: _id } });
+  }
+
+  /**
    * Function for updating game current position
    * @param position User specific id
    */
@@ -311,6 +319,13 @@ export class Game {
    */
   getElapsedTime() {
     return calcElapsedTime(this.game.startTime!, this.game.endTime!);
+  }
+
+  isPlayerGotBanned(_id: Types.ObjectId) {
+    return (
+      isDocumentArray(this.game.bannedPlayers) &&
+      this.game.bannedPlayers.findIndex((player) => player._id === _id) > -1
+    );
   }
 
   /**
