@@ -34,7 +34,7 @@ export class Game {
   /**
    * The status of the game indicator
    */
-  @prop({ enum: GameStatus, default: GameStatus.WAITING })
+  @prop({ enum: Object.values(GameStatus), default: GameStatus.WAITING })
   public status?: GameStatusType;
 
   /**
