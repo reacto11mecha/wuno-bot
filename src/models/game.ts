@@ -82,7 +82,7 @@ export class Game {
   /**
    * Lists of all banned players
    */
-  @prop({ autopopulate: true, ref: () => User })
+  @prop({ ref: () => User })
   public bannedPlayers?: Ref<User>[];
 
   /**

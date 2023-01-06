@@ -179,7 +179,10 @@ export class Game {
    * @param _id Specific user id
    */
   async addUserToBannedList(_id: Types.ObjectId) {
-    await this.game.update({ $push: { bannedPlayers: _id } });
+    await GameModel.updateOne(
+      { _id: this.game._id },
+      { $push: { bannedPlayers: _id } }
+    );
   }
 
   /**
@@ -321,11 +324,13 @@ export class Game {
     return calcElapsedTime(this.game.startTime!, this.game.endTime!);
   }
 
+  /**
+   * Function fir retrieve if given player was already banned
+   * @param _id Specific user id
+   * @returns True or false boolean
+   */
   isPlayerGotBanned(_id: Types.ObjectId) {
-    return (
-      isDocumentArray(this.game.bannedPlayers) &&
-      this.game.bannedPlayers.findIndex((player) => player._id === _id) > -1
-    );
+    return !!this.game.bannedPlayers?.find((player) => player._id.equals(_id));
   }
 
   /**
