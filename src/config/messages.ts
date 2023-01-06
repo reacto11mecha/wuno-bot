@@ -146,6 +146,14 @@ ${footer}`;
  * All replies string collection for help message
  */
 export const replies = {
+  ban: replyBuilder(
+    "ban",
+    "Perintah ini digunakan untuk menge-ban seseorang, semisal ada orang yang tidak dikenali masuk ke permainan.",
+    ["b"],
+    '"Berhasil menge-ban E. Sekarang dia tidak ada dalam permainan."',
+    "<nama yang ingin di ban>"
+  ),
+
   cards: replyBuilder(
     "cards",
     "Perintah ini digunakan untuk mengecek kartu yang ada pada saat kamu bermain.",
@@ -200,6 +208,14 @@ export const replies = {
     ["j", "jg", "join"],
     '"Berhasil join ke game "XXXX", tunggu pembuat ruang game ini memulai permainannya!"',
     "<id game>"
+  ),
+
+  kick: replyBuilder(
+    "kick",
+    "Perintah ini digunakan untuk kick seseorang, semisal ada teman yang AFK pada saat permainan.",
+    ["k"],
+    '"Berhasil mengkick E. Sekarang dia tidak ada dalam permainan."',
+    "<nama yang ingin di kick>"
   ),
 
   leavegame: replyBuilder(
