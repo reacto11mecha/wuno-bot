@@ -29,6 +29,7 @@ export const emitHandler = (
   messageHandler.on("cards", isDMChat(findOrCreateUser(controller.cards)));
   messageHandler.on("draw", isDMChat(findOrCreateUser(controller.draw)));
   messageHandler.on("kick", isDMChat(findOrCreateUser(controller.kick)));
+  messageHandler.on("ban", isDMChat(findOrCreateUser(controller.ban)));
 
   messageHandler.on("help", handleHelpCommand(controller));
 

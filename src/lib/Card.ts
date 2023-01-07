@@ -201,26 +201,36 @@ export class Card {
   private async checkIsWinner(notAWinnerCallback: () => Promise<void>) {
     if (this.cards!.length > 0) return await notAWinnerCallback();
 
+    const winnerProfilePictUrl = await this.chat.getContactProfilePicture();
+    const profilePict = await MessageMedia.fromUrl(winnerProfilePictUrl);
+
     const playerList = this.game.players;
     await this.game.endGame();
 
     const gameDuration = this.game.getElapsedTime();
 
     await Promise.all([
-      this.chat
-        .sendToCurrentPerson(`Selamat! Kamu memenangkan kesempatan permainan kali ini.
+      this.chat.sendToCurrentPerson(
+        {
+          caption: `Selamat! Kamu memenangkan kesempatan permainan kali ini.
 
 Kamu telah memanangkan permainan ini dengan durasi ${gameDuration}.
 
-Game otomatis telah dihentikan. Terimakasih sudah bermain!`),
+Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
+        },
+        profilePict
+      ),
       this.game.sendToOtherPlayersWithoutCurrentPerson(
-        `${this.chat.message.userName} memenangkan kesempatan permainan kali ini.
+        {
+          caption: `${this.chat.message.userName} memenangkan kesempatan permainan kali ini.
 
 Dia telah memanangkan permainan ini dengan durasi ${gameDuration}.
 
 Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
+        },
 
-        playerList
+        playerList,
+        profilePict
       ),
     ]);
   }
@@ -260,7 +270,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
    */
   async sendToOtherPlayersWithoutCurrentPersonInGame(
     text: string,
-    playerList: Ref<User, Types.ObjectId | undefined>[] | undefined,
+    playerList: Ref<User, Types.ObjectId>[],
     currentCardImage: MessageMedia,
     backCardsImage: MessageMedia,
     nextPlayerName: string

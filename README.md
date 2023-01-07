@@ -56,6 +56,22 @@ Untuk melihat lebih jelas apa maksud dari perintah, gunakan `U#help <nama lengka
 
 Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka prefix akan mengikuti konfigurasi yang sudah ada.
 
+- `ban`
+
+  Perintah ini digunakan untuk menge-ban seseorang, semisal ada orang yang tidak dikenali masuk ke permainan.
+
+  Contoh penggunaan:
+
+  _`U# ban <nama yang ingin di ban>`_
+
+  Alias: _`b`_
+
+  Contoh balasan:
+
+  ```
+  Berhasil menge-ban E. Sekarang dia tidak ada dalam permainan.
+  ```
+
 - `cards`
 
   Perintah ini digunakan untuk mengecek kartu yang ada pada saat kamu bermain.
@@ -162,6 +178,22 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
 
   ```
   Berhasil join ke game "XXXX", tunggu pembuat ruang game ini memulai permainannya!
+  ```
+
+- `kick`
+
+  Perintah ini digunakan untuk kick seseorang, semisal ada teman yang AFK pada saat permainan.
+
+  Contoh penggunaan:
+
+  _`U# kick <nama yang ingin di kick>`_
+
+  Alias: _`k`_
+
+  Contoh balasan:
+
+  ```
+  Berhasil mengkick E. Sekarang dia tidak ada dalam permainan.
   ```
 
 - `leavegame`

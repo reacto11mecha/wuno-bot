@@ -11,6 +11,9 @@ export default requiredJoinGameSession(async ({ chat, game, card }) => {
     const image = await createCardsImageFront(card.cards! as allCard[]);
     const cards = card.cards!.join(", ");
 
-    await chat.replyToCurrentPerson(`Kartu kamu: ${cards}.`, image);
+    await chat.replyToCurrentPerson(
+      { caption: `Kartu kamu: ${cards}.` },
+      image
+    );
   }
 });

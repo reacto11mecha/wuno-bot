@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import type { Logger } from "pino";
 
+mongoose.set("strictQuery", false);
+
 /**
  * Function that handle database connectivity
  * @param mongoUri Valid MongoDB URI

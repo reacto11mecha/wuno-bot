@@ -68,6 +68,11 @@ export class Chat {
   private limitter: ReturnType<typeof pLimit>;
 
   /**
+   * Current chatter contact instance
+   */
+  private contact: Contact;
+
+  /**
    * Accessible user document by phone number
    */
   user?: DocumentType<User>;
@@ -83,6 +88,7 @@ export class Chat {
    * @param IncomingMessage Open whatsapp .onMessage message instance
    * @param logger Pino logger instance
    * @param limitter p-limit instance for limitting message
+   * @param contact Current chatter contact instance
    */
   constructor(
     client: Client,
@@ -93,6 +99,7 @@ export class Chat {
   ) {
     this.client = client;
     this.logger = logger;
+    this.contact = contact;
     this.limitter = limitter;
     this.incomingMessage = IncomingMessage;
 
@@ -136,7 +143,7 @@ export class Chat {
         async () =>
           await this.incomingMessage.reply(
             image,
-            this.message.id,
+            this.message.from,
             content as MessageSendOptions
           )
       );
@@ -179,6 +186,13 @@ export class Chat {
         async () => await this.client.sendMessage(to, content as MessageContent)
       );
     }
+  }
+
+  /**
+   * Get current contact profile picture string
+   */
+  async getContactProfilePicture() {
+    return await this.contact.getProfilePicUrl();
   }
 
   /**

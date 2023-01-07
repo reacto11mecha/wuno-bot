@@ -20,10 +20,7 @@ export const requiredJoinGameSession =
   (cb: TypeReqJGS) => async (chat: Chat) => {
     try {
       if (chat.isJoiningGame) {
-        const gameData = await GameModel.findOne({
-          id: chat.gameProperty!.gameUID,
-          gameID: chat.gameProperty!.gameID,
-        });
+        const gameData = await GameModel.findById(chat.gameProperty!.gameUID);
         const game = new Game(gameData!, chat);
 
         const cardData = await CardModel.findOne({
