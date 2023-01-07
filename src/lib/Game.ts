@@ -288,9 +288,10 @@ export class Game {
   }
 
   /**
-   * Function for saving this game document
+   * Function for set game creator
    */
-  async save() {
+  async setCreatorId(id: Types.ObjectId) {
+    this.game.gameCreatorID = id;
     await this.game.save();
   }
 
@@ -458,12 +459,5 @@ export class Game {
    */
   get isCurrentChatTurn() {
     return this._isPlayerTurn(this.chat.user!);
-  }
-
-  /**
-   * Setter that can set game creator id
-   */
-  set gameCreatorID(id: Types.ObjectId) {
-    this.game.gameCreatorID = id;
   }
 }

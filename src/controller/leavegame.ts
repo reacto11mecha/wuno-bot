@@ -12,8 +12,7 @@ async function removeGameAuthorAndSetToNextPlayer(chat: Chat, game: Game) {
       (player) => isDocument(player) && player._id.equals(id)
     );
 
-    game.gameCreatorID = id;
-    await game.save();
+    await game.setCreatorId(id);
 
     if (isDocument(player)) {
       await Promise.all([
@@ -59,8 +58,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     if (isDocument(currentPlayer) && isDocument(nextPlayer)) {
       if (game.currentPlayerIsAuthor) {
         // Is current chatter the author and it's turn
-        game.gameCreatorID = nextPlayer._id;
-        await game.save();
+        await game.setCreatorId(nextPlayer._id);
 
         await game.updatePosition(nextPlayer._id);
 
