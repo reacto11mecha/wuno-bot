@@ -326,7 +326,7 @@ export class Game {
   }
 
   /**
-   * Function fir retrieve if given player was already banned
+   * Function for retrieve if given player was already banned
    * @param _id Specific user id
    * @returns True or false boolean
    */

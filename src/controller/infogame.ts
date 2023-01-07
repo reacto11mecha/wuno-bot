@@ -1,25 +1,58 @@
 import { atLeastGameID, df, type commonCb } from "../utils";
+import { UserModel } from "../models";
+import { Game } from "../lib";
 
-import { isDocument } from "@typegoose/typegoose";
+import { isDocument, isDocumentArray } from "@typegoose/typegoose";
 
-const commonCallback: commonCb = async ({ chat, game }) =>
+const getReplied = async (game: Game) => {
+  const mainTemplate = `Pemain yang sudah tergabung:
+${game
+  .players!.map((player) => isDocument(player) && `- ${player.userName}`)
+  .join("\n")}`;
+
+  switch (true) {
+    case game.state.PLAYING:
+      return `${mainTemplate}
+
+Kartu Saat Ini: ${game.currentCard}
+Giliran Pemain Saat Ini: ${
+        isDocument(game.currentPlayer) ? game.currentPlayer.userName : ""
+      }
+
+Giliran Bermain:
+${game
+  .playersOrderIds!.map(
+    (player, idx) =>
+      isDocumentArray(game.players) &&
+      `${idx + 1}. ${
+        game.players!.find((user) => user._id.equals(player))!.userName
+      }`
+  )
+  .join("\n")}`;
+
+    case game.state.ENDED: {
+      const winner = await UserModel.findById(game.currentPositionId);
+
+      return `Durasi Permainan: ${game.getElapsedTime()}
+Pemenang Permainan: ${winner ? winner.userName : "<USER TELAH DIHAPUS>"}`;
+    }
+
+    // Waiting
+    default:
+      return mainTemplate;
+  }
+};
+
+const commonCallback: commonCb = async ({ chat, game }) => {
+  const replied = await getReplied(game);
+
   await chat.replyToCurrentPerson(
     `GAME ID: ${game.gameID}
 Game Status: ${game.translatedStatus}
 Tanggal Dibuat: ${df(game.created_at!)}
 
-Pemain yang sudah tergabung:
-${game
-  .players!.map((player) => isDocument(player) && `- ${player.userName}`)
-  .join("\n")}${
-      !game.state.PLAYING
-        ? ""
-        : `\n
-Kartu Saat Ini: ${game.currentCard}
-Giliran Pemain Saat Ini: ${
-            isDocument(game.currentPlayer) ? game.currentPlayer.userName : ""
-          }`
-    }`
+${replied}`.trim()
   );
+};
 
 export default atLeastGameID(commonCallback, commonCallback);
