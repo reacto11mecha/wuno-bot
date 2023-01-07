@@ -207,6 +207,8 @@ export class Card {
     const playerList = this.game.players;
     await this.game.endGame();
 
+    await this.game.setWinner(this.chat.user?._id);
+
     const gameDuration = this.game.getElapsedTime();
 
     await Promise.all([

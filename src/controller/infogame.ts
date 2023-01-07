@@ -31,7 +31,10 @@ ${game
   .join("\n")}`;
 
     case game.state.ENDED: {
-      const winner = await UserModel.findById(game.currentPositionId);
+      if (!game.winner)
+        return "Permainan dihentikan tanpa ada seorang pemenang.";
+
+      const winner = await UserModel.findById(game.winner);
 
       return `Durasi Permainan: ${game.getElapsedTime()}
 Pemenang Permainan: ${winner ? winner.userName : "<USER TELAH DIHAPUS>"}`;

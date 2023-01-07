@@ -74,6 +74,12 @@ export class Game {
   public playersOrder?: Ref<User>[];
 
   /**
+   * What are the players' order
+   */
+  @prop({ ref: () => User })
+  public winner?: Ref<User>;
+
+  /**
    * Lists of all players
    */
   @prop({ autopopulate: true, ref: () => User })
