@@ -195,6 +195,10 @@ export class Chat {
     return await this.contact.getProfilePicUrl();
   }
 
+  /**
+   * Function for set user game property
+   * @param gameProperty Game property of the user
+   */
   async setUserGameProperty(gameProperty: GameProperty) {
     if (isDocument(this.user)) {
       this.user.gameProperty = gameProperty;
