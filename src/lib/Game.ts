@@ -100,14 +100,12 @@ export class Game {
    * Function for joining current game
    */
   async joinGame() {
-    this.chat.user!.gameProperty = {};
-
-    this.chat.user!.gameProperty.isJoiningGame = true;
-    this.chat.user!.gameProperty.gameUID = this.game._id;
-    this.chat.user!.gameProperty.gameID = this.game.gameID;
-
     await Promise.all([
-      this.chat.user!.save(),
+      this.chat.setUserGameProperty({
+        isJoiningGame: true,
+        gameUID: this.game._id,
+        gameID: this.game.gameID,
+      }),
       GameModel.findOneAndUpdate(
         { _id: this.game._id },
         { $push: { players: this.chat.user!._id } }
