@@ -13,30 +13,30 @@ import { PREFIX } from "./config/prefix";
 
 dotenv.config();
 
-const logger = P({
-  transport: {
-    targets: [
-      {
-        target: "pino-pretty",
-        level: "debug",
-        options: {
-          colorize: true,
-          ignore: "pid,hostname",
-          translateTime: "SYS:standard",
-        },
-      },
-      {
-        target: "pino/file",
-        level: "debug",
-        options: {
-          destination: path.join(__dirname, "..", "bot.log"),
-        },
-      },
-    ],
-  },
-});
-
 export default class Bot {
+  private logger = P({
+    transport: {
+      targets: [
+        {
+          target: "pino-pretty",
+          level: "debug",
+          options: {
+            colorize: true,
+            ignore: "pid,hostname",
+            translateTime: "SYS:standard",
+          },
+        },
+        {
+          target: "pino/file",
+          level: "debug",
+          options: {
+            destination: path.join(__dirname, "..", "bot.log"),
+          },
+        },
+      ],
+    },
+  });
+
   private queue = new PQueue({
     concurrency: 4,
     autoStart: false,
@@ -51,7 +51,7 @@ export default class Bot {
 
     this.waClient.on("qr", (qr) => qrcode.generate(qr, { small: true }));
     this.waClient.on("ready", () => {
-      logger.info("[BOT] Siap digunakan");
+      this.logger.info("[BOT] Siap digunakan");
       this.waClient.setStatus(
         `Ketik "${PREFIX}" untuk memulai percakapan! Dinyalakan pada ${formatTime(
           new Date()
@@ -59,10 +59,10 @@ export default class Bot {
       );
     });
     this.waClient.on("authenticated", () =>
-      logger.info("[BOT] Berhasil melakukan proses autentikasi")
+      this.logger.info("[BOT] Berhasil melakukan proses autentikasi")
     );
     this.waClient.on("change_state", (state) =>
-      logger.info(`[BOT] State bot berubah, saat ini: ${state}`)
+      this.logger.info(`[BOT] State bot berubah, saat ini: ${state}`)
     );
 
     this.queue.start();
@@ -75,11 +75,11 @@ export default class Bot {
     if (!process.env.MONGO_URI)
       throw new Error("[DB] Diperlukan sebuah URI MongDB | MONGO_URI");
 
-    logger.info("[INIT] Inisialisasi bot");
+    this.logger.info("[INIT] Inisialisasi bot");
 
     const onMessageQueue = await messageHandler(
       this.waClient,
-      logger,
+      this.logger,
       this.messageLimitter
     );
 
@@ -87,13 +87,13 @@ export default class Bot {
       if (message.body.startsWith(PREFIX)) {
         const contact = await message.getContact();
 
-        logger.info(`[Pesan] Ada pesan dari: ${contact.pushname}`);
+        this.logger.info(`[Pesan] Ada pesan dari: ${contact.pushname}`);
         this.queue.add(async () => await onMessageQueue(message, contact));
       }
     });
 
-    connectDatabase(process.env.MONGO_URI, logger).then(() => {
-      logger.info("[BOT] Menyalakan bot");
+    connectDatabase(process.env.MONGO_URI, this.logger).then(() => {
+      this.logger.info("[BOT] Menyalakan bot");
       this.waClient.initialize();
     });
   }
