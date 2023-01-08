@@ -309,7 +309,7 @@ npm run build
 pnpm build
 ```
 
-Selesai mem-build bot, **jangan lupa menjalankan MongoDB**. Jika sudah berjalan baru bisa menggunakam bot dengan mengetikkan
+Selesai mem-build bot, **jangan lupa menjalankan MongoDB**. Jika sudah berjalan baru bisa menggunakan bot dengan mengetikkan
 
 ```sh
 npm start
@@ -319,6 +319,12 @@ pnpm start
 ```
 
 Jika baru pertama kali menjalankan, scan barcode di terminal untuk dihubungkan ke whatsapp di handphone.
+
+Atau ingin dijalankan seperti mode production menggunakan `pm2` bisa menjalankan perintah di bawah ini, jangan lupa autentikasi terlebih dahulu menggunakan `pnpm start` karena lebih mudah dan menginstall `pm2` secara global.
+
+```sh
+pm2 start ecosystem.config.js
+```
 
 ### Lisensi
 
