@@ -10,12 +10,11 @@ export default async function creategame(chat: Chat) {
       players: [chat.user!._id],
     } as Game);
 
-    chat.user!.gameProperty = {
+    await chat.setUserGameProperty({
       isJoiningGame: true,
       gameUID: newGame._id,
       gameID: newGame.gameID,
-    };
-    await chat.user!.save();
+    });
 
     chat.logger.info(
       `[DB] Berhasil membuat sesi game baru | ${newGame.gameID}`

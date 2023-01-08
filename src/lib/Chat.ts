@@ -6,12 +6,12 @@ import type {
   MessageContent,
   MessageMedia,
 } from "whatsapp-web.js";
-import { DocumentType } from "@typegoose/typegoose";
+import { DocumentType, isDocument } from "@typegoose/typegoose";
 import { Logger } from "pino";
 import pLimit from "p-limit";
 
 import { PREFIX } from "../config/prefix";
-import { User } from "../models";
+import { User, GameProperty } from "../models";
 
 /**
  * Interface for accessible Chat's message property
@@ -193,6 +193,13 @@ export class Chat {
    */
   async getContactProfilePicture() {
     return await this.contact.getProfilePicUrl();
+  }
+
+  async setUserGameProperty(gameProperty: GameProperty) {
+    if (isDocument(this.user)) {
+      this.user.gameProperty = gameProperty;
+      await this.user.save();
+    }
   }
 
   /**
