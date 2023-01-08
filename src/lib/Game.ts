@@ -296,6 +296,14 @@ export class Game {
   }
 
   /**
+   * Function for set game winner
+   */
+  async setWinner(id: Types.ObjectId) {
+    this.game.winner = id;
+    await this.game.save();
+  }
+
+  /**
    * Function that will retrieve user next position
    * @param increment What it N-Position next player (default 1)
    * @returns User specific id document
@@ -326,7 +334,7 @@ export class Game {
   }
 
   /**
-   * Function fir retrieve if given player was already banned
+   * Function for retrieve if given player was already banned
    * @param _id Specific user id
    * @returns True or false boolean
    */
@@ -452,6 +460,13 @@ export class Game {
       isDocument(this.creator) &&
       this.creator?._id.equals(this.game.currentPosition)
     );
+  }
+
+  /**
+   * Get this game winner player id if there is a winner
+   */
+  get winner() {
+    return this.game.winner;
   }
 
   /**
