@@ -92,7 +92,13 @@ export const atLeastGameID =
         game,
       });
     } catch (error) {
-      chat.logger.error({ error });
+      const timeReference = Date.now();
+
+      chat.logger.error({ error, timeReference });
+
+      await chat.sendToCurrentPerson(
+        `Terjadi sebuah kesalahan internal. Laporkan kesalahan ini kepada administrator bot.\n\n\`\`\`timeReference\`\`\`: ${timeReference}.`
+      );
     }
   };
 
