@@ -20,6 +20,22 @@ export default async function creategame(chat: Chat) {
       `[DB] Berhasil membuat sesi game baru | ${newGame.gameID}`
     );
 
+    if (chat.isGroupChat) {
+      await chat.replyToCurrentPerson(
+        `Game berhasil dibuat.\n\nPemain yang sudah tergabung\n- ${
+          chat.user!.userName
+        }\n\nKode: ${newGame.gameID}`
+      );
+
+      await chat.sendToCurrentPerson(
+        "Ayo semua yang berada di grup ini untuk bermain UNO bersama-sama! Teruskan pesan di bawah ke saya dan tunggu permainan untuk dimulai!"
+      );
+
+      await chat.sendToCurrentPerson(`${PREFIX}j ${newGame.gameID}`);
+
+      return;
+    }
+
     await chat.replyToCurrentPerson(
       `Game berhasil dibuat.\nAjak teman kamu untuk bermain.\n\nPemain yang sudah tergabung\n- ${
         chat.user!.userName
