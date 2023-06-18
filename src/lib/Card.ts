@@ -1,12 +1,3 @@
-import {
-  DocumentType,
-  isRefType,
-  isDocument,
-  isDocumentArray,
-  Ref,
-} from "@typegoose/typegoose";
-import { Types } from "mongoose";
-
 import { Chat } from "./Chat";
 import { Game } from "./Game";
 import { PREFIX } from "../config/prefix";
@@ -18,7 +9,8 @@ import {
   regexValidWildColorPlus4Only,
 } from "../config/cards";
 
-import { Card as CardType, CardModel, User } from "../models";
+import { prisma, type Card as CardDbType } from "./database";
+
 import { MessageMedia } from "whatsapp-web.js";
 import type { allCard } from "../config/cards";
 
@@ -31,7 +23,7 @@ export class Card {
   /**
    * Card document by specific user and game
    */
-  private card: DocumentType<CardType>;
+  private card: CardDbType;
 
   /**
    * Chat message instance
@@ -49,7 +41,7 @@ export class Card {
    * @param chat Chat message instance
    * @param game Game message instance
    */
-  constructor(cardData: DocumentType<CardType>, chat: Chat, game: Game) {
+  constructor(cardData: CardDbType, chat: Chat, game: Game) {
     this.card = cardData;
     this.chat = chat;
     this.game = game;

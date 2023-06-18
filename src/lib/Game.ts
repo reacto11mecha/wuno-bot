@@ -1,23 +1,10 @@
-import {
-  Ref,
-  DocumentType,
-  isRefTypeArray,
-  isRefType,
-  isDocument,
-  isDocumentArray,
-} from "@typegoose/typegoose";
-import { Types } from "mongoose";
 import { Chat } from "./Chat";
 
-import { calcElapsedTime, random } from "../utils";
 import {
-  GameModel,
-  Game as GameType,
-  User as UserType,
-  GameStatus,
-  UserModel,
-  CardModel,
-} from "../models";
+  calcElapsedTime,
+  // random
+} from "../utils";
+import { prisma, type Game as GameDatabase } from "../lib/database";
 
 import type { allCard } from "../config/cards";
 import {
@@ -33,7 +20,7 @@ export class Game {
   /**
    * Game document by specific user
    */
-  private game: DocumentType<GameType>;
+  private game: GameDatabase;
 
   /**
    * Chat message instance
@@ -45,26 +32,9 @@ export class Game {
    * @param gameData Game document by specific user
    * @param chat Chat message instance
    */
-  constructor(gameData: DocumentType<GameType>, chat: Chat) {
+  constructor(gameData: GameDatabase, chat: Chat) {
     this.game = gameData;
     this.chat = chat;
-  }
-
-  /**
-   * Function that can get POJO (Pure JavaScript Object) document of current game session
-   * @returns POJO document of current game session
-   */
-  async getPojoSelf() {
-    const pojo: {
-      players: Types.ObjectId[];
-      playersOrder: Types.ObjectId[];
-      _id: Types.ObjectId;
-    } = await GameModel.findOne({
-      _id: this.game._id,
-      gameID: this.game.gameID,
-    }).lean();
-
-    return pojo;
   }
 
   /**
@@ -72,125 +42,162 @@ export class Game {
    * @param user The specific player
    * @returns Boolean that indicate is player turn or not
    */
-  private _isPlayerTurn(user: DocumentType<UserType>) {
-    return (
-      isRefType(this.game.currentPosition, Types.ObjectId) &&
-      this.game.currentPosition!.equals(user._id)
-    );
+  private _isPlayerTurn() {
+    // user: User
+    // return (
+    //   isRefType(this.game.currentPosition, number) &&
+    //   this.game.currentPosition!.equals(user._id)
+    // );
+    return false;
   }
 
   /**
    * Function for starting current game
    */
   async startGame() {
-    const shuffledPlayer = this.game
-      .players!.sort(() => random() - 0.5)
-      .map((player) => isDocument(player) && player._id);
-    const currentPlayer = shuffledPlayer[0];
-
-    this.game.status = GameStatus.PLAYING;
-    this.game.startTime = new Date();
-    this.game.playersOrder = shuffledPlayer;
-    this.game.currentPosition = currentPlayer;
-
-    await this.game.save();
+    // const shuffledPlayer = this.game
+    //   .players!.sort(() => random() - 0.5)
+    //   .map((player) => isDocument(player) && player._id);
+    // const currentPlayer = shuffledPlayer[0];
+    //
+    // this.game.status = GameStatus.PLAYING;
+    // this.game.startTime = new Date();
+    // this.game.playersOrder = shuffledPlayer;
+    // this.game.currentPosition = currentPlayer;
+    //
+    // await this.game.save();
   }
 
   /**
    * Function for joining current game
    */
   async joinGame() {
-    await Promise.all([
-      this.chat.setUserGameProperty({
-        isJoiningGame: true,
-        gameUID: this.game._id,
-        gameID: this.game.gameID,
-      }),
-      GameModel.findOneAndUpdate(
-        { _id: this.game._id },
-        { $push: { players: this.chat.user!._id } }
-      ),
-    ]);
+    // await Promise.all([
+    //   this.chat.setUserGameProperty({
+    //     isJoiningGame: true,
+    //     id: this.game.id,
+    //     gameID: this.game.gameID,
+    //   }),
+    //   GameModel.findOneAndUpdate(
+    //     { id: this.game._id },
+    //     { $push: { players: this.chat.user!._id } }
+    //   ),
+    // ]);
   }
 
   /**
    * Function for end current game
    */
   async endGame() {
-    const pojo = await this.getPojoSelf();
-
-    this.game.endTime = new Date();
-    this.game.status = GameStatus.ENDED;
-    this.game.playersOrder = [];
-    this.game.players = [];
-
-    await Promise.all([
-      this.game.save(),
-      CardModel.deleteMany({ game: pojo._id }),
-      [...pojo.players].map(async (id) => await this.leaveGameForUser(id)),
-    ]);
-
-    this.chat.logger.info(`[DB] Game ${this.game.gameID} selesai`);
+    // const pojo = await this.getPojoSelf();
+    //
+    // this.game.endTime = new Date();
+    // this.game.status = GameStatus.ENDED;
+    // this.game.playersOrder = [];
+    // this.game.players = [];
+    //
+    // await Promise.all([
+    //   this.game.save(),
+    //   CardModel.deleteMany({ game: pojo._id }),
+    //   [...pojo.players].map(async (id) => await this.leaveGameForUser(id)),
+    // ]);
+    //
+    // this.chat.logger.info(`[DB] Game ${this.game.gameID} selesai`);
   }
 
   /**
    * Function for updating user gameProperty for not joining game session anymore
    * @param _id Specific user id
    */
-  async leaveGameForUser(_id: Types.ObjectId) {
-    await UserModel.findOneAndUpdate(
-      { _id },
-      {
-        gameProperty: {
-          isJoiningGame: false,
-        },
-      }
-    );
+  async leaveGameForUser(id: number) {
+    await prisma.userGameProperty.update({
+      where: {
+        userId: id,
+      },
+      data: {
+        isJoiningGame: false,
+      },
+    });
   }
 
   /**
    * Function for removing user from player array (leaving, get kicked)
    * @param _id Specific user id
    */
-  async removeUserFromArray(_id: Types.ObjectId) {
-    const pojo = await this.getPojoSelf();
-
-    const removedFromPlayersOrder = [...pojo.playersOrder].filter(
-      (id) => !id.equals(_id)
-    );
-    const removedFromPlayers = [...pojo.players].filter(
-      (id) => !id.equals(_id)
-    );
-
-    this.game.playersOrder = removedFromPlayersOrder;
-    this.game.players = removedFromPlayers;
-
-    await Promise.all([
-      this.game.save(),
-      this.leaveGameForUser(_id),
-      CardModel.deleteOne({ user: _id, game: this.game._id }),
+  async removeUserFromArray(id: number) {
+    await prisma.$transaction([
+      prisma.game.update({
+        where: {
+          id: this.game.id,
+        },
+        data: {
+          playerOrders: {
+            delete: {
+              playerId: id,
+            },
+          },
+        },
+      }),
     ]);
+    // await prisma.playerOrder.delete({
+    //   where: {
+    //     playerId: id,
+    //   },
+    // });
+
+    // const removedFromPlayersOrder = [...gameSelf.playersOrder].filter(
+    //   (id) => !id.equals(_id)
+    // );
+    // const removedFromPlayers = [...gameSelf.players].filter(
+    //   (id) => !id.equals(_id)
+    // );
+
+    // this.game.playersOrder = removedFromPlayersOrder;
+    // this.game.players = removedFromPlayers;
+
+    // await Promise.all([
+    //   this.game.save(),
+    //   this.leaveGameForUser(_id),
+    //   CardModel.deleteOne({ user: _id, game: this.game._id }),
+    // ]);
   }
 
   /**
    * Function for adding user on banned player array
-   * @param _id Specific user id
+   * @param id Specific user id
    */
-  async addUserToBannedList(_id: Types.ObjectId) {
-    await GameModel.updateOne(
-      { _id: this.game._id },
-      { $push: { bannedPlayers: _id } }
-    );
+  async addUserToBannedList(id: number) {
+    await prisma.game.update({
+      where: {
+        id: this.game.id,
+      },
+      data: {
+        bannedPlayers: {
+          create: {
+            playerId: id,
+          },
+        },
+      },
+    });
   }
 
   /**
    * Function for updating game current position
    * @param position User specific id
    */
-  async updatePosition(position: Types.ObjectId) {
-    this.game.currentPosition = position;
-
-    await this.game.save();
+  async updatePosition(position: number) {
+    await prisma.game.update({
+      where: {
+        id: this.game.id,
+      },
+      data: {
+        currentPlayer: {
+          update: {
+            playerId: position,
+          },
+        },
+      },
+    });
   }
 
   /**
@@ -198,7 +205,7 @@ export class Game {
    * @param card Valid given card
    * @param position User specific id
    */
-  async updateCardAndPosition(card: allCard, position: Types.ObjectId) {
+  async updateCardAndPosition(card: allCard, position: number) {
     this.game.currentCard = card;
     this.game.currentPosition = position;
 
@@ -209,7 +216,7 @@ export class Game {
    * Function for reversing players order (uno reverse card)
    */
   async reversePlayersOrder() {
-    if (isRefTypeArray(this.game.playersOrder, Types.ObjectId)) {
+    if (isRefTypeArray(this.game.playersOrder, number)) {
       this.game.playersOrder = [...this.game.playersOrder].reverse();
       await this.game.save();
     }
@@ -288,7 +295,7 @@ export class Game {
   /**
    * Function for set game creator
    */
-  async setCreatorId(id: Types.ObjectId) {
+  async setCreatorId(id: number) {
     this.game.gameCreatorID = id;
     await this.game.save();
   }
@@ -296,7 +303,7 @@ export class Game {
   /**
    * Function for set game winner
    */
-  async setWinner(id: Types.ObjectId) {
+  async setWinner(id: number) {
     this.game.winner = id;
     await this.game.save();
   }
@@ -310,7 +317,7 @@ export class Game {
     if (isNaN(increment) || increment < 1) throw new Error("Invalid increment");
 
     if (isDocument(this.currentPlayer) && isDocumentArray(this.players)) {
-      const playersOrder = [...(this.game.playersOrder as Types.ObjectId[])];
+      const playersOrder = [...(this.game.playersOrder as number[])];
       const currentPlayer = this.currentPlayer;
 
       const currentIndex = playersOrder.findIndex((player) =>
@@ -336,7 +343,7 @@ export class Game {
    * @param _id Specific user id
    * @returns True or false boolean
    */
-  isPlayerGotBanned(_id: Types.ObjectId) {
+  isPlayerGotBanned(id: number) {
     return !!this.game.bannedPlayers?.find((player) => player._id.equals(_id));
   }
 
@@ -365,7 +372,7 @@ export class Game {
    * Get this game current position id
    */
   get currentPositionId() {
-    return <Types.ObjectId>(<unknown>this.game.currentPosition);
+    return <number>(<unknown>this.game.currentPosition);
   }
 
   /**

@@ -1,5 +1,5 @@
 import { Chat } from "../lib/Chat";
-import { UserModel } from "../models";
+import { prisma } from "../lib/database";
 
 /**
  * Util for finding or create user if it doesn't exist
@@ -8,22 +8,31 @@ import { UserModel } from "../models";
  */
 export const findOrCreateUser =
   (callback: (chat: Chat) => Promise<void>) => async (chat: Chat) => {
-    const user = await UserModel.findOne({
-      phoneNumber: chat.message.userNumber,
+    const user = await prisma.user.findFirst({
+      where: {
+        phoneNumber: chat.message.userNumber,
+      },
     });
 
     if (!user) {
       try {
-        const newUser = await UserModel.create({
-          phoneNumber: chat.message.userNumber,
-          userName: chat.message.userName,
+        const newUser = await prisma.user.create({
+          data: {
+            phoneNumber: chat.message.userNumber,
+            username: chat.message.userName,
+          },
+        });
+        const newGameProperty = await prisma.userGameProperty.create({
+          data: {
+            userId: newUser.id,
+          },
         });
 
         chat.logger.info(
           `[DB] Berhasil mendaftarkan user dengan username: ${chat.message.userName}`
         );
 
-        chat.setUser(newUser);
+        chat.setUserAndGameProperty(newUser, newGameProperty);
         await callback(chat);
       } catch (error) {
         chat.logger.error(error);
@@ -33,12 +42,37 @@ export const findOrCreateUser =
         );
       }
     } else {
-      if (user.userName !== chat.message.userName) {
-        user.userName = chat.message.userName;
-        await user.save();
+      let gameProperty = await prisma.userGameProperty.findUnique({
+        where: {
+          userId: user.id,
+        },
+      });
+
+      if (!gameProperty) {
+        gameProperty = await prisma.userGameProperty.create({
+          data: {
+            userId: user.id,
+          },
+        });
       }
 
-      chat.setUser(user);
+      if (user.username !== chat.message.userName) {
+        const updated = await prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            username: chat.message.userName,
+          },
+        });
+
+        chat.setUserAndGameProperty(updated, gameProperty);
+        await callback(chat);
+
+        return;
+      }
+
+      chat.setUserAndGameProperty(user, gameProperty);
       await callback(chat);
     }
   };
