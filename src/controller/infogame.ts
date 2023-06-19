@@ -1,43 +1,41 @@
 import { atLeastGameID, df, type commonCb } from "../utils";
-import { UserModel } from "../models";
 import { Game } from "../lib";
 
-import { isDocument, isDocumentArray } from "@typegoose/typegoose";
+import { prisma } from "../lib/database";
 
 const getReplied = async (game: Game) => {
+  const players = await game.getAllPlayerUserObject();
+  const currentPlayer = await game.getCurrentPlayerUserData();
+
   const mainTemplate = `Pemain yang sudah tergabung:
-${game
-  .players!.map((player) => isDocument(player) && `- ${player.userName}`)
-  .join("\n")}`;
+${players!.map((player) => `- ${player?.username}`).join("\n")}`;
 
   switch (true) {
-    case game.state.PLAYING:
+    case game.state.PLAYING: {
       return `${mainTemplate}
 
 Kartu Saat Ini: ${game.currentCard}
 Giliran Pemain Saat Ini: ${
-        isDocument(game.currentPlayer) ? game.currentPlayer.userName : ""
+        game.currentPositionId ? currentPlayer?.username : ""
       }
 
 Giliran Bermain:
 ${game
-  .playersOrderIds!.map(
-    (player, idx) =>
-      isDocumentArray(game.players) &&
-      `${idx + 1}. ${
-        game.players!.find((user) => user._id.equals(player))!.userName
-      }`
-  )
+  .playersOrderIds!.map((player) => players.find((user) => user?.id === player))
+  .map((player, idx) => `${idx + 1}. ${player?.username}`)
   .join("\n")}`;
+    }
 
     case game.state.ENDED: {
       if (!game.winner)
         return "Permainan dihentikan tanpa ada seorang pemenang.";
 
-      const winner = await UserModel.findById(game.winner);
+      const winner = await prisma.user.findUnique({
+        where: { id: game.winner },
+      });
 
       return `Durasi Permainan: ${game.getElapsedTime()}
-Pemenang Permainan: ${winner ? winner.userName : "<USER TELAH DIHAPUS>"}`;
+Pemenang Permainan: ${winner ? winner.username : "<USER TELAH DIHAPUS>"}`;
     }
 
     // Waiting
@@ -52,7 +50,7 @@ const commonCallback: commonCb = async ({ chat, game }) => {
   await chat.replyToCurrentPerson(
     `GAME ID: ${game.gameID}
 Game Status: ${game.translatedStatus}
-Tanggal Dibuat: ${df(game.created_at!)}
+Tanggal Dibuat: ${df(game.created_at)}
 
 ${replied}`.trim()
   );

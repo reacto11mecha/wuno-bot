@@ -12,7 +12,7 @@ export default atLeastGameID(
       return await chat.replyToCurrentPerson("Game ini sudah selesai!");
     }
 
-    if (game.isPlayerGotBanned(chat.user?._id))
+    if (game.isPlayerGotBanned(chat.user!.id))
       return await chat.sendToCurrentPerson(
         "Kamu sudah di banned dari permainan ini!"
       );

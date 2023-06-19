@@ -1,23 +1,29 @@
 import { requiredJoinGameSession } from "../utils";
-import { isDocument } from "@typegoose/typegoose";
 
-import { GameModel } from "../models";
+import { prisma } from "../lib/database";
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.NotFound) {
     await chat.replyToCurrentPerson("Game tidak ditemukan.");
   } else if (game.isGameCreator) {
     if (!game.state.ENDED) {
-      const gameClone = await GameModel.findOne({ gameID: game.gameID });
-      const creatorUsername =
-        isDocument(game.creator) && game.creator.userName.slice();
+      const gameClone = await prisma.game.findUnique({
+        where: {
+          gameID: game.gameID,
+        },
+        include: {
+          allPlayers: true,
+        },
+      });
+
+      const creator = await game.getCreatorUser();
 
       await game.endGame();
 
       await Promise.all([
         game.sendToOtherPlayersWithoutCurrentPerson(
-          `${creatorUsername} telah menghentikan permainan. Terimakasih sudah bermain!`,
-          gameClone!.players
+          `${creator?.username} telah menghentikan permainan. Terimakasih sudah bermain!`,
+          gameClone!.allPlayers
         ),
         chat.replyToCurrentPerson(
           "Game berhasil dihentikan. Terimakasih sudah bermain!"

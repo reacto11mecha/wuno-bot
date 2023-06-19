@@ -10,7 +10,7 @@ import { Logger } from "pino";
 import pLimit from "p-limit";
 
 import { PREFIX } from "../config/prefix";
-import { prisma, UserGameProperty, type User } from "./database";
+import type { UserGameProperty, User } from "./database";
 
 /**
  * Interface for accessible Chat's message property

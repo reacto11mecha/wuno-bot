@@ -1,5 +1,4 @@
 import { requiredJoinGameSession } from "../utils";
-import { isDocument } from "@typegoose/typegoose";
 
 // This function is almost the same like leavegame controller
 export default requiredJoinGameSession(async ({ chat, game }) => {
@@ -7,22 +6,22 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     return await chat.replyToCurrentPerson("Kamu bukan pembuat gamenya!");
 
   const message = chat.args.join(" ").trim();
-  const player = game.players!.find(
-    (player) => isDocument(player) && player.userName === message
-  );
+  const players = await game.getAllPlayerUserObject();
+
+  const player = players.find((player) => player?.username === message);
 
   if (message === "")
     return await chat.replyToCurrentPerson(
       "Sebutkan siapa yang ingin di kick!"
     );
 
-  if (isDocument(player)) {
-    if (player._id.equals(chat.user!._id))
+  if (player) {
+    if (player.id === chat.user!.id)
       return await chat.replyToCurrentPerson(
         "Kamu tidak bisa mengkick dirimu sendiri. Jika ingin keluar dari game gunakan perintah *leavegame*!"
       );
 
-    await game.removeUserFromArray(player._id);
+    await game.removeUserFromArray(player.id);
 
     switch (true) {
       case game.state.PLAYING && game.players!.length < 2: {
@@ -34,7 +33,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             "Anda dikeluarkan dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!"
           ),
           chat.sendToCurrentPerson(
-            `Pemain ${player.userName} berhasil dikeluarkan dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!`
+            `Pemain ${player.username} berhasil dikeluarkan dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!`
           ),
         ]);
 
@@ -42,34 +41,34 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       }
 
       case game.state.WAITING ||
-        (game.state.PLAYING && !player._id.equals(game.currentPositionId)): {
+        (game.state.PLAYING && player.id !== game.currentPositionId): {
         await Promise.all([
           chat.sendToCurrentPerson(
-            `Berhasil mengkick ${player.userName}. Sekarang dia tidak ada dalam permainan.`
+            `Berhasil mengkick ${player.username}. Sekarang dia tidak ada dalam permainan.`
           ),
           chat.sendToOtherPerson(
             player.phoneNumber,
             `Anda telah di kick oleh ${chat.message.userName}. Sekarang kamu keluar dari permainan.`
           ),
           game.sendToOtherPlayersWithoutCurrentPerson(
-            `${player.userName} telah di kick oleh ${chat.message.userName}. Sekarang dia tidak ada lagi didalam permainan.`
+            `${player.username} telah di kick oleh ${chat.message.userName}. Sekarang dia tidak ada lagi didalam permainan.`
           ),
         ]);
 
         break;
       }
 
-      case game.state.PLAYING && player._id.equals(game.currentPositionId): {
+      case game.state.PLAYING && player.id === game.currentPositionId: {
         await Promise.all([
           chat.sendToCurrentPerson(
-            `Berhasil mengkick ${player.userName}. Sekarang dia tidak ada dalam permainan.`
+            `Berhasil mengkick ${player.username}. Sekarang dia tidak ada dalam permainan.`
           ),
           chat.sendToOtherPerson(
             player.phoneNumber,
             `Anda telah di kick oleh ${chat.message.userName}. Sekarang kamu keluar dari permainan.`
           ),
           game.sendToOtherPlayersWithoutCurrentPerson(
-            `${player.userName} telah di kick oleh ${chat.message.userName}. Sekarang dia tidak ada lagi didalam permainan.`
+            `${player.username} telah di kick oleh ${chat.message.userName}. Sekarang dia tidak ada lagi didalam permainan.`
           ),
         ]);
 

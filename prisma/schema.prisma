@@ -22,8 +22,7 @@ model User {
 model UserGameProperty {
   id            Int     @id @default(autoincrement())
   isJoiningGame Boolean @default(false)
-  gameId        Int?
-  cardId        String?
+  gameID        String? // Marker
 
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id])
@@ -33,6 +32,8 @@ model UserGameProperty {
   CurrentPlayer CurrentPlayer?
   GameCreator   GameCreator?
   UserCard      UserCard?
+  Player        Player?
+  GameWinner    GameWinner?
 }
 
 enum GameStatus {
@@ -47,13 +48,23 @@ model Game {
   status        GameStatus     @default(WAITING)
   created_at    DateTime       @default(now())
   currentCard   String?        @db.Text()
+  allPlayers    Player[]
   playerOrders  PlayerOrder[]
   bannedPlayers BannedPlayer[]
   currentPlayer CurrentPlayer?
   gameCreator   GameCreator?
+  winner        GameWinner?
   cards         UserCard[]
-  started_at    DateTime
-  ended_at      DateTime
+  started_at    DateTime?
+  ended_at      DateTime?
+}
+
+model GameWinner {
+  id       Int              @id @default(autoincrement())
+  game     Game             @relation(fields: [gameId], references: [id])
+  gameId   Int              @unique
+  player   UserGameProperty @relation(fields: [playerId], references: [id])
+  playerId Int              @unique
 }
 
 model GameCreator {
@@ -68,6 +79,14 @@ model CurrentPlayer {
   id       Int              @id @default(autoincrement())
   game     Game             @relation(fields: [gameId], references: [id])
   gameId   Int              @unique
+  player   UserGameProperty @relation(fields: [playerId], references: [id])
+  playerId Int              @unique
+}
+
+model Player {
+  id       Int              @id @default(autoincrement())
+  game     Game             @relation(fields: [gameId], references: [id])
+  gameId   Int
   player   UserGameProperty @relation(fields: [playerId], references: [id])
   playerId Int              @unique
 }

@@ -8,8 +8,8 @@ import P from "pino";
 
 import { df as formatTime } from "./utils/index";
 import { messageHandler } from "./handler/message";
-import { connectDatabase } from "./handler/database";
 import { PREFIX } from "./config/prefix";
+import { prisma } from "./lib/database";
 
 dotenv.config();
 
@@ -72,8 +72,10 @@ export default class Bot {
    * The main entrance gate for this bot is working
    */
   async init() {
-    if (!process.env.MONGO_URI)
-      throw new Error("[DB] Diperlukan sebuah URI MongDB | MONGO_URI");
+    if (!process.env.DATABASE_URL)
+      throw new Error(
+        "[DB] Diperlukan sebuah URL Database MySQL | DATABASE_URL"
+      );
 
     this.logger.info("[INIT] Inisialisasi bot");
 
@@ -92,8 +94,10 @@ export default class Bot {
       }
     });
 
-    connectDatabase(process.env.MONGO_URI, this.logger).then(() => {
+    prisma.$connect().then(() => {
+      this.logger.info("[DB] Berhasil terhubung dengan database");
       this.logger.info("[BOT] Menyalakan bot");
+
       this.waClient.initialize();
     });
   }
