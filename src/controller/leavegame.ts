@@ -31,14 +31,17 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
   await game.removeUserFromArray(chat.user!.id);
 
   const nextPlayerMetadata = game.getNextPosition();
-  const nextPlayer = await prisma.user.findUnique({
-    where: { id: nextPlayerMetadata?.playerId },
-  });
+
+  const nextPlayer = nextPlayerMetadata
+    ? await prisma.user.findUnique({
+        where: { id: nextPlayerMetadata.playerId },
+      })
+    : null;
 
   if (game.state.PLAYING) {
     const currentPlayer = await prisma.user.findUnique({
       where: {
-        id: game.currentPositionId,
+        id: game.currentPositionId!,
       },
     });
 

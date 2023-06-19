@@ -28,10 +28,7 @@ export const requiredJoinGameSession =
             allPlayers: true,
             bannedPlayers: true,
             cards: true,
-            currentPlayer: true,
-            gameCreator: true,
             playerOrders: true,
-            winner: true,
           },
         });
 
@@ -93,10 +90,7 @@ export const atLeastGameID =
             allPlayers: true,
             bannedPlayers: true,
             cards: true,
-            currentPlayer: true,
-            gameCreator: true,
             playerOrders: true,
-            winner: true,
           },
         });
 
@@ -119,10 +113,7 @@ export const atLeastGameID =
           allPlayers: true,
           bannedPlayers: true,
           cards: true,
-          currentPlayer: true,
-          gameCreator: true,
           playerOrders: true,
-          winner: true,
         },
       });
       const game = new Game(gameData!, chat);
@@ -134,7 +125,8 @@ export const atLeastGameID =
     } catch (error) {
       const timeReference = Date.now();
 
-      chat.logger.error({ error, timeReference });
+      chat.logger.error(error);
+      chat.logger.error({ timeReference });
 
       await chat.sendToCurrentPerson(
         `Terjadi sebuah kesalahan internal. Laporkan kesalahan ini kepada administrator bot.\n\n\`\`\`timeReference\`\`\`: ${timeReference}.`

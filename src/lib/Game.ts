@@ -42,7 +42,7 @@ export class Game {
    * @returns Boolean that indicate is player turn or not
    */
   private _isPlayerTurn(user: User) {
-    return this.game.currentPlayer?.playerId === user.id;
+    return this.game.currentPlayerId === user.id;
   }
 
   /**
@@ -62,11 +62,7 @@ export class Game {
         data: {
           status: "PLAYING",
           started_at: new Date(),
-          currentPlayer: {
-            update: {
-              playerId: currentPlayer,
-            },
-          },
+          currentPlayerId: currentPlayer,
         },
       });
 
@@ -193,6 +189,9 @@ export class Game {
    * @param _id Specific user id
    */
   async removeUserFromArray(id: number) {
+    const playerOrdersExist = this.game.playerOrders.length > 0;
+    const cardsExist = this.game.cards.length > 0;
+
     await prisma.$transaction([
       prisma.game.update({
         where: {
@@ -204,16 +203,20 @@ export class Game {
               playerId: id,
             },
           },
-          playerOrders: {
-            delete: {
-              playerId: id,
-            },
-          },
-          cards: {
-            delete: {
-              playerId: id,
-            },
-          },
+          playerOrders: playerOrdersExist
+            ? {
+                delete: {
+                  playerId: id,
+                },
+              }
+            : {},
+          cards: cardsExist
+            ? {
+                delete: {
+                  playerId: id,
+                },
+              }
+            : {},
         },
       }),
       prisma.userGameProperty.update({
@@ -222,6 +225,7 @@ export class Game {
         },
         data: {
           isJoiningGame: false,
+          gameID: null,
         },
       }),
     ]);
@@ -256,11 +260,7 @@ export class Game {
         id: this.game.id,
       },
       data: {
-        currentPlayer: {
-          update: {
-            playerId: position,
-          },
-        },
+        currentPlayerId: position,
       },
     });
   }
@@ -277,11 +277,7 @@ export class Game {
       },
       data: {
         currentCard: card,
-        currentPlayer: {
-          update: {
-            id: position,
-          },
-        },
+        currentPlayerId: position,
       },
     });
   }
@@ -340,7 +336,7 @@ export class Game {
       await Promise.all(
         users
           .filter((user) => user?.phoneNumber !== this.chat.message.userNumber)
-          .filter((user) => user?.id !== this.game.currentPlayer?.playerId)
+          .filter((user) => user?.id !== this.game.currentPlayerId)
           .map(
             async (user) =>
               await this.chat.sendToOtherPerson(
@@ -376,14 +372,14 @@ export class Game {
       await Promise.all(
         users
           .filter((user) => user?.phoneNumber !== this.chat.message.userNumber)
-          .map(
-            async (user) =>
+          .map(async (user) => {
+            if (user)
               await this.chat.sendToOtherPerson(
-                user!.phoneNumber,
+                user.phoneNumber,
                 message,
                 image
-              )
-          )
+              );
+          })
       );
     }
   }
@@ -397,11 +393,7 @@ export class Game {
         id: this.game.id,
       },
       data: {
-        gameCreator: {
-          update: {
-            playerId: id,
-          },
-        },
+        gameCreatorId: id,
       },
     });
   }
@@ -415,11 +407,7 @@ export class Game {
         id: this.game.id,
       },
       data: {
-        winner: {
-          update: {
-            playerId: id,
-          },
-        },
+        winnerId: id,
       },
     });
   }
@@ -428,11 +416,13 @@ export class Game {
    * Get current player user document
    */
   async getCurrentPlayerUserData() {
-    return await prisma.user.findUnique({
-      where: {
-        id: this.game.currentPlayer?.playerId,
-      },
-    });
+    return this.game.currentPlayerId
+      ? await prisma.user.findUnique({
+          where: {
+            id: this.game.currentPlayerId,
+          },
+        })
+      : null;
   }
 
   /**
@@ -441,7 +431,7 @@ export class Game {
   async getCreatorUser() {
     return await prisma.user.findUnique({
       where: {
-        id: this.game.gameCreator?.playerId,
+        id: this.game.gameCreatorId,
       },
     });
   }
@@ -465,11 +455,11 @@ export class Game {
   getNextPosition(increment = 1) {
     if (isNaN(increment) || increment < 1) throw new Error("Invalid increment");
 
-    if (this.game.playerOrders.length > 0 && this.game.currentPlayer) {
+    if (this.game.playerOrders.length > 0 && this.game.currentPlayerId) {
       const playersOrder = this.game.playerOrders.sort(
         (a, b) => a.playerOrder - b.playerOrder
       );
-      const currentPlayer = this.game.currentPlayer.playerId;
+      const currentPlayer = this.game.currentPlayerId;
 
       const currentIndex = playersOrder.findIndex(
         (player) => player.id === currentPlayer
@@ -526,7 +516,7 @@ export class Game {
    * Get this game current position id
    */
   get currentPositionId() {
-    return this.game.currentPlayer?.playerId;
+    return this.game.currentPlayerId;
   }
 
   /**
@@ -588,23 +578,21 @@ export class Game {
    * Get if current chatter is game creator or not
    */
   get isGameCreator() {
-    return this.chat.user!.id === this.game.gameCreator?.playerId;
+    return this.chat.user!.id === this.game.gameCreatorId;
   }
 
   /**
    * Get if current player is an author of this game
    */
   get currentPlayerIsAuthor() {
-    return (
-      this.game.gameCreator?.playerId === this.game.currentPlayer?.playerId
-    );
+    return this.game.gameCreatorId === this.game.currentPlayerId;
   }
 
   /**
    * Get this game winner player id if there is a winner
    */
   get winner() {
-    return this.game.winner?.playerId;
+    return this.game.winnerId;
   }
 
   /**

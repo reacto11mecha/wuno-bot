@@ -13,11 +13,7 @@ export default async function creategame(chat: Chat) {
       const game = await tx.game.create({
         data: {
           gameID,
-          gameCreator: {
-            create: {
-              playerId: userId,
-            },
-          },
+          gameCreatorId: userId,
           allPlayers: {
             create: {
               playerId: userId,

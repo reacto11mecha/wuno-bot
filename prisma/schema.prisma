@@ -29,11 +29,8 @@ model UserGameProperty {
 
   PlayerOrder   PlayerOrder?
   BannedPlayers BannedPlayer?
-  CurrentPlayer CurrentPlayer?
-  GameCreator   GameCreator?
   UserCard      UserCard?
   Player        Player?
-  GameWinner    GameWinner?
 }
 
 enum GameStatus {
@@ -43,44 +40,20 @@ enum GameStatus {
 }
 
 model Game {
-  id            Int            @id @default(autoincrement())
-  gameID        String         @unique @db.Char(11)
-  status        GameStatus     @default(WAITING)
-  created_at    DateTime       @default(now())
-  currentCard   String?        @db.Text()
-  allPlayers    Player[]
-  playerOrders  PlayerOrder[]
-  bannedPlayers BannedPlayer[]
-  currentPlayer CurrentPlayer?
-  gameCreator   GameCreator?
-  winner        GameWinner?
-  cards         UserCard[]
-  started_at    DateTime?
-  ended_at      DateTime?
-}
-
-model GameWinner {
-  id       Int              @id @default(autoincrement())
-  game     Game             @relation(fields: [gameId], references: [id])
-  gameId   Int              @unique
-  player   UserGameProperty @relation(fields: [playerId], references: [id])
-  playerId Int              @unique
-}
-
-model GameCreator {
-  id       Int              @id @default(autoincrement())
-  game     Game             @relation(fields: [gameId], references: [id])
-  gameId   Int              @unique
-  player   UserGameProperty @relation(fields: [playerId], references: [id])
-  playerId Int              @unique
-}
-
-model CurrentPlayer {
-  id       Int              @id @default(autoincrement())
-  game     Game             @relation(fields: [gameId], references: [id])
-  gameId   Int              @unique
-  player   UserGameProperty @relation(fields: [playerId], references: [id])
-  playerId Int              @unique
+  id              Int            @id @default(autoincrement())
+  gameID          String         @unique @db.Char(11)
+  status          GameStatus     @default(WAITING)
+  created_at      DateTime       @default(now())
+  currentCard     String?        @db.Text()
+  allPlayers      Player[]
+  playerOrders    PlayerOrder[]
+  bannedPlayers   BannedPlayer[]
+  currentPlayerId Int?
+  gameCreatorId   Int
+  winnerId        Int?
+  cards           UserCard[]
+  started_at      DateTime?
+  ended_at        DateTime?
 }
 
 model Player {

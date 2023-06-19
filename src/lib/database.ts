@@ -17,11 +17,8 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export type FullGameType = Prisma.GameGetPayload<{
   include: {
-    winner: true;
     cards: true;
     bannedPlayers: true;
-    currentPlayer: true;
-    gameCreator: true;
     playerOrders: true;
     allPlayers: true;
   };
