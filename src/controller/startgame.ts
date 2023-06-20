@@ -1,7 +1,8 @@
 import { requiredJoinGameSession, createAllCardImage } from "../utils";
 
-import { CardPicker } from "../config/cards";
 import type { allCard } from "../config/cards";
+
+import { prisma } from "../lib/database";
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.NotFound) {
@@ -19,210 +20,186 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
     await game.startGame();
 
-    // const currentPlayerCard = <DocumentType<Card>>(
-    //   usersCard.find(
-    //     (card) =>
-    //       isDocument(card) &&
-    //       game.currentPositionId!.equals(card.user as Types.ObjectId)
-    //   )
-    // );
+    const currentPlayerCard = await prisma.userCard.findUnique({
+      where: {
+        playerId: game.currentPositionId!,
+      },
+      include: {
+        cards: true,
+      },
+    });
 
-    // const [currentCardImage, frontCardsImage, backCardsImage] =
-    //   await createAllCardImage(
-    //     game.currentCard as allCard,
-    //     currentPlayerCard.cards as allCard[]
-    //   );
+    const [currentCardImage, frontCardsImage, backCardsImage] =
+      await createAllCardImage(
+        game.currentCard as allCard,
+        currentPlayerCard?.cards.map((card) => card.cardName) as allCard[]
+      );
 
-    // const playersOrder = game
-    //   .playersOrderIds!.map(
-    //     (player) =>
-    //       game.players!.find((user) =>
-    //         user._id.equals(player)
-    //       ) as DocumentType<User>
-    //   )
-    //   .map((player, idx) => `${idx + 1}. ${player.userName}`)
-    //   .join("\n");
+    const playersUserData = await game.getAllPlayerUserObject();
+    const playersOrder = game.playersOrderIds
+      .map((playerId) =>
+        playersUserData.find((player) => player?.id === playerId)
+      )
+      .map((player, idx) => `${idx + 1}. ${player?.username}`)
+      .join("\n");
 
-    // switch (true) {
-    //   case game.currentPlayerIsAuthor: {
-    //     await Promise.all([
-    //       // Admin as current player Side
-    //       (async () => {
-    //         if (isDocument(game.currentPlayer)) {
-    //           await chat.replyToCurrentPerson(
-    //             "Game berhasil dimulai! Sekarang giliran kamu untuk bermain"
-    //           );
-    //           await chat.replyToCurrentPerson(
-    //             `Urutan Bermain:\n${playersOrder}`
-    //           );
+    const currentPlayer = await game.getCurrentPlayerUserData();
 
-    //           await chat.sendToCurrentPerson(
-    //             { caption: `Kartu saat ini: ${game.currentCard}` },
-    //             currentCardImage
-    //           );
-    //           await chat.sendToCurrentPerson(
-    //             {
-    //               caption: `Kartu kamu: ${currentPlayerCard.cards?.join(
-    //                 ", "
-    //               )}.`,
-    //             },
-    //             frontCardsImage
-    //           );
-    //         }
-    //       })(),
+    switch (true) {
+      case game.currentPlayerIsAuthor: {
+        await Promise.all([
+          // Admin as current player Side
+          (async () => {
+            if (currentPlayer) {
+              await chat.replyToCurrentPerson(
+                "Game berhasil dimulai! Sekarang giliran kamu untuk bermain"
+              );
+              await chat.replyToCurrentPerson(
+                `Urutan Bermain:\n${playersOrder}`
+              );
 
-    //       // Other player side
-    //       (async () => {
-    //         if (
-    //           isDocumentArray(game.players) &&
-    //           isDocument(game.currentPlayer)
-    //         ) {
-    //           const PlayerList = game.players
-    //             .filter(
-    //               (player) =>
-    //                 isDocument(player) &&
-    //                 isDocument(game.currentPlayer) &&
-    //                 player.phoneNumber !== game.currentPlayer.phoneNumber
-    //             )
-    //             .filter(
-    //               (player) =>
-    //                 isDocument(player) &&
-    //                 player.phoneNumber !== chat.message.userNumber
-    //             );
+              await chat.sendToCurrentPerson(
+                { caption: `Kartu saat ini: ${game.currentCard}` },
+                currentCardImage
+              );
+              await chat.sendToCurrentPerson(
+                {
+                  caption: `Kartu kamu: ${currentPlayerCard?.cards
+                    .map((card) => card.cardName)
+                    .join(", ")}.`,
+                },
+                frontCardsImage
+              );
+            }
+          })(),
 
-    //           await game.sendToOtherPlayersWithoutCurrentPerson(
-    //             `${
-    //               chat.message.userName
-    //             } telah memulai permainan! Sekarang giliran ${
-    //               game.currentPlayerIsAuthor
-    //                 ? "dia"
-    //                 : game.currentPlayer.userName
-    //             } untuk bermain`,
-    //             PlayerList
-    //           );
-    //           await game.sendToOtherPlayersWithoutCurrentPerson(
-    //             `Urutan Bermain:\n${playersOrder}`,
-    //             PlayerList
-    //           );
+          // Other player side
+          (async () => {
+            if (currentPlayer) {
+              const PlayerList = game.players
+                .filter((player) => player.playerId !== currentPlayer.id)
+                .filter((player) => player.playerId === chat.user!.id);
 
-    //           await game.sendToOtherPlayersWithoutCurrentPerson(
-    //             { caption: `Kartu saat ini: ${game.currentCard}` },
-    //             PlayerList,
-    //             currentCardImage
-    //           );
-    //           await game.sendToOtherPlayersWithoutCurrentPerson(
-    //             { caption: `Kartu yang ${game.currentPlayer.userName} miliki` },
-    //             PlayerList,
-    //             backCardsImage
-    //           );
-    //         }
-    //       })(),
-    //     ]);
-    //     break;
-    //   }
+              await game.sendToOtherPlayersWithoutCurrentPerson(
+                `${
+                  chat.message.userName
+                } telah memulai permainan! Sekarang giliran ${
+                  game.currentPlayerIsAuthor ? "dia" : currentPlayer.username
+                } untuk bermain`,
+                PlayerList
+              );
+              await game.sendToOtherPlayersWithoutCurrentPerson(
+                `Urutan Bermain:\n${playersOrder}`,
+                PlayerList
+              );
 
-    //   // It isn't admin turn
-    //   default: {
-    //     await Promise.all([
-    //       // Admin side but it isn't their turn
-    //       (async () => {
-    //         if (isDocument(game.currentPlayer)) {
-    //           await chat.replyToCurrentPerson(
-    //             `Game berhasil dimulai! Sekarang giliran ${game.currentPlayer.userName} untuk bermain`
-    //           );
-    //           await chat.replyToCurrentPerson(
-    //             `Urutan Bermain:\n${playersOrder}`
-    //           );
+              await game.sendToOtherPlayersWithoutCurrentPerson(
+                { caption: `Kartu saat ini: ${game.currentCard}` },
+                PlayerList,
+                currentCardImage
+              );
+              await game.sendToOtherPlayersWithoutCurrentPerson(
+                { caption: `Kartu yang ${currentPlayer.username} miliki` },
+                PlayerList,
+                backCardsImage
+              );
+            }
+          })(),
+        ]);
 
-    //           await chat.sendToCurrentPerson(
-    //             { caption: `Kartu saat ini: ${game.currentCard}` },
-    //             currentCardImage
-    //           );
-    //           await chat.sendToCurrentPerson(
-    //             {
-    //               caption: `Kartu yang ${game.currentPlayer.userName} miliki`,
-    //             },
-    //             backCardsImage
-    //           );
-    //         }
-    //       })(),
+        break;
+      }
 
-    //       // The person who got the first turn
-    //       (async () => {
-    //         if (isDocument(game.currentPlayer)) {
-    //           const currentPlayerNumber = game.currentPlayer.phoneNumber;
+      // It isn't admin turn
+      default: {
+        await Promise.all([
+          // Admin side but it isn't their turn
+          (async () => {
+            if (currentPlayer) {
+              await chat.replyToCurrentPerson(
+                `Game berhasil dimulai! Sekarang giliran ${currentPlayer.username} untuk bermain`
+              );
+              await chat.replyToCurrentPerson(
+                `Urutan Bermain:\n${playersOrder}`
+              );
 
-    //           await chat.sendToOtherPerson(
-    //             currentPlayerNumber,
-    //             "Game berhasil dimulai! Sekarang giliran kamu untuk bermain"
-    //           );
-    //           await chat.sendToOtherPerson(
-    //             currentPlayerNumber,
-    //             `Urutan Bermain:\n${playersOrder}`
-    //           );
+              await chat.sendToCurrentPerson(
+                { caption: `Kartu saat ini: ${game.currentCard}` },
+                currentCardImage
+              );
+              await chat.sendToCurrentPerson(
+                {
+                  caption: `Kartu yang ${currentPlayer.username} miliki`,
+                },
+                backCardsImage
+              );
+            }
+          })(),
 
-    //           await chat.sendToOtherPerson(
-    //             currentPlayerNumber,
-    //             { caption: `Kartu saat ini: ${game.currentCard}` },
-    //             currentCardImage
-    //           );
-    //           await chat.sendToOtherPerson(
-    //             currentPlayerNumber,
-    //             {
-    //               caption: `Kartu kamu: ${currentPlayerCard.cards?.join(
-    //                 ", "
-    //               )}.`,
-    //             },
-    //             frontCardsImage
-    //           );
-    //         }
-    //       })(),
+          // The person who got the first turn
+          (async () => {
+            if (currentPlayer) {
+              const currentPlayerNumber = currentPlayer.phoneNumber;
 
-    //       // The rest of the game player
-    //       (async () => {
-    //         if (
-    //           isDocumentArray(game.players) &&
-    //           isDocument(game.currentPlayer)
-    //         ) {
-    //           const PlayerList = game.players
-    //             .filter(
-    //               (player) =>
-    //                 isDocument(player) &&
-    //                 isDocument(game.currentPlayer) &&
-    //                 player.phoneNumber !== game.currentPlayer.phoneNumber
-    //             )
-    //             .filter(
-    //               (player) =>
-    //                 isDocument(player) &&
-    //                 player.phoneNumber !== chat.message.userNumber
-    //             );
+              await chat.sendToOtherPerson(
+                currentPlayerNumber,
+                "Game berhasil dimulai! Sekarang giliran kamu untuk bermain"
+              );
+              await chat.sendToOtherPerson(
+                currentPlayerNumber,
+                `Urutan Bermain:\n${playersOrder}`
+              );
 
-    //           await game.sendToOtherPlayersWithoutCurrentPerson(
-    //             `${chat.message.userName} telah memulai permainan! Sekarang giliran ${game.currentPlayer.userName} untuk bermain`,
-    //             PlayerList
-    //           );
-    //           await game.sendToOtherPlayersWithoutCurrentPerson(
-    //             `Urutan Bermain:\n${playersOrder}`,
-    //             PlayerList
-    //           );
+              await chat.sendToOtherPerson(
+                currentPlayerNumber,
+                { caption: `Kartu saat ini: ${game.currentCard}` },
+                currentCardImage
+              );
+              await chat.sendToOtherPerson(
+                currentPlayerNumber,
+                {
+                  caption: `Kartu kamu: ${currentPlayerCard?.cards
+                    .map((card) => card.cardName)
+                    .join(", ")}.`,
+                },
+                frontCardsImage
+              );
+            }
+          })(),
 
-    //           await game.sendToOtherPlayersWithoutCurrentPerson(
-    //             { caption: `Kartu saat ini: ${game.currentCard}` },
-    //             PlayerList,
-    //             currentCardImage
-    //           );
-    //           await game.sendToOtherPlayersWithoutCurrentPerson(
-    //             { caption: `Kartu yang ${game.currentPlayer.userName} miliki` },
-    //             PlayerList,
-    //             backCardsImage
-    //           );
-    //         }
-    //       })(),
-    //     ]);
+          // The rest of the game player
+          (async () => {
+            if (currentPlayer) {
+              const PlayerList = game.players
+                .filter((player) => player.playerId !== currentPlayer.id)
+                .filter((player) => player.playerId === chat.user!.id);
 
-    //     break;
-    //   }
-    // }
+              await game.sendToOtherPlayersWithoutCurrentPerson(
+                `${chat.message.userName} telah memulai permainan! Sekarang giliran ${currentPlayer.username} untuk bermain`,
+                PlayerList
+              );
+              await game.sendToOtherPlayersWithoutCurrentPerson(
+                `Urutan Bermain:\n${playersOrder}`,
+                PlayerList
+              );
+
+              await game.sendToOtherPlayersWithoutCurrentPerson(
+                { caption: `Kartu saat ini: ${game.currentCard}` },
+                PlayerList,
+                currentCardImage
+              );
+              await game.sendToOtherPlayersWithoutCurrentPerson(
+                { caption: `Kartu yang ${currentPlayer.username} miliki` },
+                PlayerList,
+                backCardsImage
+              );
+            }
+          })(),
+        ]);
+
+        break;
+      }
+    }
 
     chat.logger.info(`[DB] Game ${game.gameID} dimulai`);
   } else {
