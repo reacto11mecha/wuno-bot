@@ -1,7 +1,7 @@
 import { Chat } from "./Chat";
 import { Game } from "./Game";
 import { PREFIX } from "../config/prefix";
-// import { createAllCardImage } from "../utils";
+import { createAllCardImage } from "../utils";
 
 import {
   cards,
@@ -90,22 +90,28 @@ export class Card {
 
     await prisma.card.delete({
       where: {
-        id: specificCard?.cardId,
+        id: specificCard?.id,
       },
     });
   }
 
-  // /**
-  //  * Function for retrieving user and game specific card
-  //  * @param user User specific id
-  //  * @returns Card document from specific user and current game id
-  //  */
-  // async getCardByUserAndThisGame(user: number) {
-  //   // return await CardModel.findOne({
-  //   //   game: this.game.uid,
-  //   //   user,
-  //   // });
-  // }
+  /**
+   * Function for retrieving user and game specific card
+   * @param user User specific id
+   * @returns Card document from specific user and current game id
+   */
+  async getCardByUserAndThisGame(user: number) {
+    const currentUserCard = await prisma.userCard.findUnique({
+      where: {
+        playerId: user,
+      },
+      include: {
+        cards: true,
+      },
+    });
+
+    return currentUserCard?.cards.map((card) => card.cardName);
+  }
 
   /**
    * Function for draw a card for current player
@@ -326,52 +332,65 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
 
     switch (status) {
       case "STACK": {
-        // const nextPlayer = this.game.getNextPosition();
-        // const playerList = this.game.players!.filter(
-        //   (player) => isDocument(player) && player._id !== nextPlayer!._id
-        // );
-        // await Promise.all([
-        //   this.game.updateCardAndPosition(givenCard, nextPlayer!._id),
-        //   this.removeCardFromPlayer(givenCard),
-        // ]);
-        // const nextUserCard = await this.getCardByUserAndThisGame(
-        //   nextPlayer!._id
-        // );
-        // await this.checkIsWinner(async () => {
-        //   if (
-        //     isDocument(nextPlayer) &&
-        //     isDocument(nextUserCard) &&
-        //     isDocumentArray(playerList)
-        //   ) {
-        //     const [currentCardImage, frontCardsImage, backCardsImage] =
-        //       await createAllCardImage(
-        //         this.game.currentCard as allCard,
-        //         nextUserCard!.cards as allCard[]
-        //       );
-        //     await Promise.all([
-        //       this.sendToCurrentPersonInGame(
-        //         `Berhasil mengeluarkan kartu *${givenCard}*, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
-        //         currentCardImage,
-        //         backCardsImage,
-        //         nextPlayer.userName
-        //       ),
-        //       this.sendToOtherPlayersWithoutCurrentPersonInGame(
-        //         `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`,
-        //         playerList,
-        //         currentCardImage,
-        //         backCardsImage,
-        //         nextPlayer.userName
-        //       ),
-        //       this.sendToOtherPersonInGame(
-        //         `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, Sekarang giliran kamu untuk bermain`,
-        //         `Kartu kamu: ${nextUserCard.cards?.join(", ")}.`,
-        //         nextPlayer.phoneNumber,
-        //         currentCardImage,
-        //         frontCardsImage
-        //       ),
-        //     ]);
-        //   }
-        // });
+        const nextPlayerId = this.game.getNextPosition();
+        const playerList = this.game.players!.filter(
+          (player) => player !== nextPlayerId!
+        );
+
+        await Promise.all([
+          this.game.updateCardAndPosition(givenCard, nextPlayerId!.playerId),
+          this.removeCardFromPlayer(givenCard),
+        ]);
+
+        const nextUserCard = await this.getCardByUserAndThisGame(
+          nextPlayerId!.playerId
+        );
+
+        const nextPlayer = await prisma.user.findUnique({
+          where: {
+            id: nextPlayerId?.playerId,
+          },
+        });
+
+        await this.checkIsWinner(async () => {
+          if (
+            nextPlayer &&
+            nextUserCard &&
+            nextUserCard.length > 0 &&
+            playerList &&
+            playerList.length > 0
+          ) {
+            const [currentCardImage, frontCardsImage, backCardsImage] =
+              await createAllCardImage(
+                this.game.currentCard as allCard,
+                nextUserCard as allCard[]
+              );
+
+            await Promise.all([
+              this.sendToCurrentPersonInGame(
+                `Berhasil mengeluarkan kartu *${givenCard}*, selanjutnya adalah giliran ${nextPlayer.username} untuk bermain`,
+                currentCardImage,
+                backCardsImage,
+                nextPlayer.username
+              ),
+              this.sendToOtherPlayersWithoutCurrentPersonInGame(
+                `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, selanjutnya adalah giliran ${nextPlayer.username} untuk bermain`,
+                playerList,
+                currentCardImage,
+                backCardsImage,
+                nextPlayer.username
+              ),
+              this.sendToOtherPersonInGame(
+                `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, Sekarang giliran kamu untuk bermain`,
+                `Kartu kamu: ${nextUserCard?.join(", ")}.`,
+                nextPlayer.phoneNumber,
+                currentCardImage,
+                frontCardsImage
+              ),
+            ]);
+          }
+        });
+
         break;
       }
 

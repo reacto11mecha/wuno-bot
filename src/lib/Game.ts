@@ -104,20 +104,19 @@ export class Game {
         )
     );
 
-    const playersUserData = await this.getAllPlayerUserObject();
-    const playersOrder = shuffledPlayers
-      .map((playerId) =>
-        playersUserData.find((player) => player?.id === playerId)
-      )
-      .map((player, idx) => `${idx + 1}. ${player?.username}`)
-      .join("\n");
+    const updatedGameState = await prisma.game.findUnique({
+      where: {
+        id: this.game.id,
+      },
+      include: {
+        allPlayers: true,
+        bannedPlayers: true,
+        cards: true,
+        playerOrders: true,
+      },
+    });
 
-    return {
-      currentPositionId: currentPlayer,
-      currentCard: startCard,
-      playersOrder,
-      currentPlayerIsAuthor: this.game.gameCreatorId === currentPlayer,
-    };
+    this.game = updatedGameState!;
   }
 
   /**
@@ -133,6 +132,7 @@ export class Game {
         },
         data: {
           isJoiningGame: true,
+          gameID: this.game.gameID,
         },
       }),
       prisma.game.update({
@@ -302,6 +302,20 @@ export class Game {
         currentPlayerId: position,
       },
     });
+
+    const updatedGameState = await prisma.game.findUnique({
+      where: {
+        id: this.game.id,
+      },
+      include: {
+        allPlayers: true,
+        bannedPlayers: true,
+        cards: true,
+        playerOrders: true,
+      },
+    });
+
+    this.game = updatedGameState!;
   }
 
   /**

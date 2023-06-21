@@ -10,24 +10,28 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       "Sebuah kesalahan, game tidak ditemukan!"
     );
   } else if (game.isGameCreator) {
-    if (game.players?.length === 1) {
-      return await chat.replyToCurrentPerson(
-        "Minimal ada dua pemain yang tergabung!"
-      );
-    } else if (game.state.PLAYING) {
+    // if (game.players?.length === 1) {
+    //   return await chat.replyToCurrentPerson(
+    //     "Minimal ada dua pemain yang tergabung!"
+    //   );
+    // } else
+    if (game.state.PLAYING) {
       return await chat.replyToCurrentPerson("Game ini sedang dimainkan!");
     }
 
-    const {
-      currentPositionId,
-      currentCard,
-      currentPlayerIsAuthor,
-      playersOrder,
-    } = await game.startGame();
+    await game.startGame();
+
+    const playersUserData = await game.getAllPlayerUserObject();
+    const playersOrder = game.playersOrderIds
+      .map((playerId) =>
+        playersUserData.find((player) => player?.id === playerId)
+      )
+      .map((player, idx) => `${idx + 1}. ${player?.username}`)
+      .join("\n");
 
     const currentPlayerCard = await prisma.userCard.findUnique({
       where: {
-        playerId: currentPositionId,
+        playerId: game.currentPositionId!,
       },
       include: {
         cards: true,
@@ -36,14 +40,14 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
     const [currentCardImage, frontCardsImage, backCardsImage] =
       await createAllCardImage(
-        currentCard,
+        game.currentCard as allCard,
         currentPlayerCard?.cards.map((card) => card.cardName) as allCard[]
       );
 
     const currentPlayer = await game.getCurrentPlayerUserData();
 
     switch (true) {
-      case currentPlayerIsAuthor: {
+      case game.currentPlayerIsAuthor: {
         await Promise.all([
           // Admin as current player Side
           (async () => {
@@ -56,7 +60,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
               );
 
               await chat.sendToCurrentPerson(
-                { caption: `Kartu saat ini: ${currentCard}` },
+                { caption: `Kartu saat ini: ${game.currentCard}` },
                 currentCardImage
               );
               await chat.sendToCurrentPerson(
@@ -91,7 +95,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
               );
 
               await game.sendToOtherPlayersWithoutCurrentPerson(
-                { caption: `Kartu saat ini: ${currentCard}` },
+                { caption: `Kartu saat ini: ${game.currentCard}` },
                 PlayerList,
                 currentCardImage
               );
@@ -121,7 +125,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
               );
 
               await chat.sendToCurrentPerson(
-                { caption: `Kartu saat ini: ${currentCard}` },
+                { caption: `Kartu saat ini: ${game.currentCard}` },
                 currentCardImage
               );
               await chat.sendToCurrentPerson(
@@ -149,7 +153,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
               await chat.sendToOtherPerson(
                 currentPlayerNumber,
-                { caption: `Kartu saat ini: ${currentCard}` },
+                { caption: `Kartu saat ini: ${game.currentCard}` },
                 currentCardImage
               );
               await chat.sendToOtherPerson(
@@ -181,7 +185,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
               );
 
               await game.sendToOtherPlayersWithoutCurrentPerson(
-                { caption: `Kartu saat ini: ${currentCard}` },
+                { caption: `Kartu saat ini: ${game.currentCard}` },
                 PlayerList,
                 currentCardImage
               );
