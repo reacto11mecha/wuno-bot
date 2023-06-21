@@ -94,6 +94,6 @@ model UserCard {
 model Card {
   id       Int      @id @default(autoincrement())
   cardName String   @db.Text()
-  card     UserCard @relation(fields: [cardId], references: [id])
+  card     UserCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
   cardId   Int
 }

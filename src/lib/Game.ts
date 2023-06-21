@@ -53,51 +53,71 @@ export class Game {
       .sort(() => random() - 0.5)
       .map((player) => player.playerId);
     const currentPlayer = shuffledPlayers[0];
+    const startCard = CardPicker.getInitialCard();
 
-    await prisma.$transaction(async (tx) => {
-      await tx.game.update({
+    await prisma.$transaction([
+      prisma.game.update({
         where: {
           id: this.game.id,
         },
         data: {
           status: "PLAYING",
           started_at: new Date(),
+          currentCard: startCard,
           currentPlayerId: currentPlayer,
         },
-      });
+      }),
 
-      for (const player of shuffledPlayers.map((id, idx) => ({
-        id,
-        idx: idx + 1,
-      }))) {
-        await prisma.playerOrder.create({
+      ...shuffledPlayers.map((playerId, idx) =>
+        prisma.playerOrder.create({
           data: {
             gameId: this.game.id,
-            playerId: player.id,
-            playerOrder: player.idx,
+            playerId,
+            playerOrder: idx + 1,
           },
-        });
-      }
+        })
+      ),
+    ]);
 
-      for (const player of shuffledPlayers) {
-        const card = await prisma.userCard.create({
+    const userCards = await prisma.$transaction(
+      shuffledPlayers.map((playerId) =>
+        prisma.userCard.create({
           data: {
             gameId: this.game.id,
-            playerId: player,
+            playerId,
           },
-        });
+        })
+      )
+    );
 
-        for (let i = 0; i <= 6; i++)
-          await prisma.card.create({
+    await prisma.$transaction(
+      userCards
+        .map((user) => Array.from({ length: 6 }).map(() => user))
+        .flat()
+        .map((userCard) =>
+          prisma.card.create({
             data: {
-              cardName: CardPicker.pickCardByGivenCard(
-                this.game.currentCard as allCard
-              ),
-              cardId: card.id,
+              cardName: CardPicker.pickCardByGivenCard(startCard),
+              cardId: userCard.id,
             },
-          });
-      }
-    });
+          })
+        )
+    );
+
+    const playersUserData = await this.getAllPlayerUserObject();
+    const playersOrder = shuffledPlayers
+      .map((playerId) =>
+        playersUserData.find((player) => player?.id === playerId)
+      )
+      .map((player, idx) => `${idx + 1}. ${player?.username}`)
+      .join("\n");
+
+    return {
+      currentPositionId: currentPlayer,
+      currentCard: startCard,
+      playersOrder,
+      currentPlayerIsAuthor: this.game.gameCreatorId === currentPlayer,
+    };
   }
 
   /**
@@ -135,6 +155,11 @@ export class Game {
    */
   async endGame() {
     await prisma.$transaction([
+      prisma.userCard.deleteMany({
+        where: {
+          gameId: this.game.id,
+        },
+      }),
       prisma.game.update({
         where: {
           id: this.game.id,
@@ -146,9 +171,6 @@ export class Game {
             deleteMany: {},
           },
           allPlayers: {
-            deleteMany: {},
-          },
-          cards: {
             deleteMany: {},
           },
         },
@@ -360,7 +382,7 @@ export class Game {
     players?: Player[],
     image?: MessageMedia
   ) {
-    if (players) {
+    if (players && players.length > 0) {
       const users = await Promise.all(
         players.map((user) =>
           prisma.user.findUnique({
@@ -416,13 +438,19 @@ export class Game {
    * Get current player user document
    */
   async getCurrentPlayerUserData() {
-    return this.game.currentPlayerId
-      ? await prisma.user.findUnique({
-          where: {
-            id: this.game.currentPlayerId,
-          },
-        })
-      : null;
+    const currentGame = await prisma.game.findUnique({
+      where: {
+        id: this.game.id,
+      },
+    });
+
+    if (!currentGame?.currentPlayerId) return null;
+
+    return await prisma.user.findUnique({
+      where: {
+        id: currentGame.currentPlayerId,
+      },
+    });
   }
 
   /**
