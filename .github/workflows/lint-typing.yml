@@ -1,17 +1,17 @@
-name: ES Lint
+name: ES Lint & Typing test
 on: [pull_request, push]
 
 jobs:
   lint:
     runs-on: ubuntu-latest
-    name: Mengecek apakah file aman lint eslint
+    name: Mengecek apakah file aman lint eslint dan typescript
 
     steps:
       - uses: actions/checkout@v3
-      - name: Setup NodeJS 16
+      - name: Setup NodeJS 18
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Cache pnpm modules
         uses: actions/cache@v2
@@ -22,8 +22,14 @@ jobs:
             ${{ runner.os }}-
       - uses: pnpm/action-setup@v2.1.0
         with:
-          version: 7.x.x
+          version: latest
           run_install: true
+
+      - name: Test Prettier
+        run: pnpm format:check
 
       - name: Test Code Linting
         run: pnpm lint
+
+      - name: Test Code Typing
+        run: pnpm typecheck

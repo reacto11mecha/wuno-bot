@@ -125,7 +125,7 @@ export class Game {
   async joinGame() {
     const id = this.chat.user!.id;
 
-    await prisma.$transaction([
+    const [, updatedGameState] = await prisma.$transaction([
       prisma.userGameProperty.update({
         where: {
           userId: id,
@@ -146,15 +146,23 @@ export class Game {
             },
           },
         },
+        include: {
+          allPlayers: true,
+          bannedPlayers: true,
+          cards: true,
+          playerOrders: true,
+        },
       }),
     ]);
+
+    this.game = updatedGameState;
   }
 
   /**
    * Function for end current game
    */
   async endGame() {
-    await prisma.$transaction([
+    const [, updatedGameState] = await prisma.$transaction([
       prisma.userCard.deleteMany({
         where: {
           gameId: this.game.id,
@@ -174,6 +182,12 @@ export class Game {
             deleteMany: {},
           },
         },
+        include: {
+          allPlayers: true,
+          bannedPlayers: true,
+          cards: true,
+          playerOrders: true,
+        },
       }),
       ...this.players.map((player) =>
         prisma.userGameProperty.update({
@@ -187,6 +201,8 @@ export class Game {
         })
       ),
     ]);
+
+    this.game = updatedGameState;
 
     this.chat.logger.info(`[DB] Game ${this.game.gameID} selesai`);
   }
@@ -293,19 +309,13 @@ export class Game {
    * @param position User specific id
    */
   async updateCardAndPosition(card: allCard, position: number) {
-    await prisma.game.update({
+    const updatedGameState = await prisma.game.update({
       where: {
         id: this.game.id,
       },
       data: {
         currentCard: card,
         currentPlayerId: position,
-      },
-    });
-
-    const updatedGameState = await prisma.game.findUnique({
-      where: {
-        id: this.game.id,
       },
       include: {
         allPlayers: true,
@@ -315,7 +325,7 @@ export class Game {
       },
     });
 
-    this.game = updatedGameState!;
+    this.game = updatedGameState;
   }
 
   /**
@@ -348,6 +358,20 @@ export class Game {
           })
         )
       );
+
+      const updatedGameState = await prisma.game.findUnique({
+        where: {
+          id: this.game.id,
+        },
+        include: {
+          allPlayers: true,
+          bannedPlayers: true,
+          cards: true,
+          playerOrders: true,
+        },
+      });
+
+      this.game = updatedGameState!;
     }
   }
 
@@ -400,7 +424,7 @@ export class Game {
       const users = await Promise.all(
         players.map((user) =>
           prisma.user.findUnique({
-            where: { id: user.id },
+            where: { id: user.playerId },
           })
         )
       );
@@ -417,7 +441,26 @@ export class Game {
               );
           })
       );
+
+      return;
     }
+
+    const users = await Promise.all(
+      this.players.map((user) =>
+        prisma.user.findUnique({
+          where: { id: user.playerId },
+        })
+      )
+    );
+
+    await Promise.all(
+      users
+        .filter((user) => user?.phoneNumber !== this.chat.message.userNumber)
+        .map(async (user) => {
+          if (user)
+            await this.chat.sendToOtherPerson(user.phoneNumber, message, image);
+        })
+    );
   }
 
   /**
@@ -438,14 +481,22 @@ export class Game {
    * Function for set game winner
    */
   async setWinner(id: number) {
-    await prisma.game.update({
+    const updatedGame = await prisma.game.update({
       where: {
         id: this.game.id,
       },
       data: {
         winnerId: id,
       },
+      include: {
+        allPlayers: true,
+        bannedPlayers: true,
+        cards: true,
+        playerOrders: true,
+      },
     });
+
+    this.game = updatedGame;
   }
 
   /**
@@ -504,7 +555,7 @@ export class Game {
       const currentPlayer = this.game.currentPlayerId;
 
       const currentIndex = playersOrder.findIndex(
-        (player) => player.id === currentPlayer
+        (player) => player.playerId === currentPlayer
       );
 
       const nextPlayerID =
