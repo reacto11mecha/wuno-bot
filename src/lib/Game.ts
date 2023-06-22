@@ -181,6 +181,9 @@ export class Game {
           allPlayers: {
             deleteMany: {},
           },
+          bannedPlayers: {
+            deleteMany: {},
+          },
         },
         include: {
           allPlayers: true,
@@ -397,14 +400,14 @@ export class Game {
         users
           .filter((user) => user?.phoneNumber !== this.chat.message.userNumber)
           .filter((user) => user?.id !== this.game.currentPlayerId)
-          .map(
-            async (user) =>
+          .map(async (user) => {
+            if (user)
               await this.chat.sendToOtherPerson(
-                user!.phoneNumber,
+                user.phoneNumber,
                 message,
                 image
-              )
-          )
+              );
+          })
       );
     }
   }
@@ -577,11 +580,11 @@ export class Game {
 
   /**
    * Function for retrieve if given player was already banned
-   * @param _id Specific user id
+   * @param id Specific user id
    * @returns True or false boolean
    */
   isPlayerGotBanned(id: number) {
-    return !!this.game.bannedPlayers?.find((player) => player.id === id);
+    return !!this.game.bannedPlayers?.find((player) => player.playerId === id);
   }
 
   /**
