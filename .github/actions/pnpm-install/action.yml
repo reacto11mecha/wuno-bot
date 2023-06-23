@@ -20,9 +20,8 @@ runs:
 
     - uses: pnpm/action-setup@v2.2.4
       if: ${{ inputs.enable-corepack }} == 'false'
-      # If you're not setting the packageManager field in package.json, add the version here
-      # with:
-      #   version: 8.5.1
+      with:
+        version: 8.5.1
 
     - name: Expose pnpm config(s) through "$GITHUB_OUTPUT"
       id: pnpm-config
