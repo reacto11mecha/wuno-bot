@@ -21,7 +21,7 @@ runs:
     - uses: pnpm/action-setup@v2.2.4
       if: ${{ inputs.enable-corepack }} == 'false'
       with:
-        version: 8.5.1
+        version: 8.6.3
 
     - name: Expose pnpm config(s) through "$GITHUB_OUTPUT"
       id: pnpm-config
