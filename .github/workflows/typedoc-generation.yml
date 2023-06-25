@@ -1,8 +1,6 @@
 name: Typedoc Generation
 on:
   push:
-    branches:
-      - main
 
 jobs:
   docs:
@@ -22,7 +20,7 @@ jobs:
         run: pnpm build:doc
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+        uses: JamesIves/github-pages-deploy-action@4
         with:
           branch: gh-pages
           folder: docs
