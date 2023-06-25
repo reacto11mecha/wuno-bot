@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: 18
 
-      - name: Pnpm install
+      - name: PNPM Install
         uses: ./.github/actions/pnpm-install
 
       - name: Test Prettier

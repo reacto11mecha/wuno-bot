@@ -6,6 +6,7 @@ import { createAllCardImage } from "../utils";
 import {
   CardPicker,
   cards,
+  compareTwoCard,
   regexValidWildColorOnly,
   regexValidWildColorPlus4Only,
 } from "../config/cards";
@@ -14,11 +15,6 @@ import { prisma, type FullUserCardType, type Player } from "./database";
 
 import { MessageMedia } from "whatsapp-web.js";
 import type { allCard } from "../config/cards";
-
-import {
-  //  CardPicker,
-  compareTwoCard,
-} from "../config/cards";
 
 /**
  * Class for handling user card
@@ -401,6 +397,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
                   `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, Sekarang giliran kamu untuk bermain`,
                   `Kartu kamu: ${nextUserCard?.join(", ")}.`,
                   nextPlayer.phoneNumber,
+                  // It isn't admin turn
                   currentCardImage,
                   frontCardsImage
                 ),

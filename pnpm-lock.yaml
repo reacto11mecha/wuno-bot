@@ -103,9 +103,6 @@ devDependencies:
   typedoc:
     specifier: ^0.24.8
     version: 0.24.8(typescript@5.1.3)
-  typedoc-plugin-missing-exports:
-    specifier: ^2.0.0
-    version: 2.0.0(typedoc@0.24.8)
   typescript:
     specifier: ^5.1.3
     version: 5.1.3
@@ -4939,14 +4936,6 @@ packages:
   /type-fest@0.8.1:
     resolution: {integrity: sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==}
     engines: {node: '>=8'}
-    dev: true
-
-  /typedoc-plugin-missing-exports@2.0.0(typedoc@0.24.8):
-    resolution: {integrity: sha512-t0QlKCm27/8DaheJkLo/gInSNjzBXgSciGhoLpL6sLyXZibm7SuwJtHvg4qXI2IjJfFBgW9mJvvszpoxMyB0TA==}
-    peerDependencies:
-      typedoc: 0.24.x
-    dependencies:
-      typedoc: 0.24.8(typescript@5.1.3)
     dev: true
 
   /typedoc@0.24.8(typescript@5.1.3):
