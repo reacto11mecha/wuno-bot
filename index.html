@@ -1,0 +1,240 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>wuno-bot</title><meta name="description" content="Documentation for wuno-bot"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container">
+<div class="table-cell" id="tsd-search" data-base=".">
+<div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
+<div class="field">
+<div id="tsd-toolbar-links"></div></div>
+<ul class="results">
+<li class="state loading">Preparing search index...</li>
+<li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">wuno-bot</a></div>
+<div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="7" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="11" width="14" height="2" fill="var(--color-text)"></rect></svg></a></div></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<h2>wuno-bot</h2></div>
+<div class="tsd-panel tsd-typography"><p align="center">
+    <h2 align="center">WUNO (Whatsapp UNO) Bot</h2>
+    <span><p align="center">Bot whatsapp yang berguna untuk bermain UNO.</p></span>
+</p>
+
+<blockquote>
+<p>Project ini terinspirasi dari <a href="https://github.com/Exium1/UnoBot">Exium1/UnoBot</a> dan <a href="https://github.com/mjsalerno/UnoBot">mjsalerno/UnoBot</a> yang beberapa asset dan logika pemrograman juga terdapat dalam project ini.</p>
+</blockquote>
+<p>Bot ini adalah bot whatsapp yang memungkinkan pengguna untuk bermain UNO langsung di whatsapp. Dengan menjapri bot, mengirimkan kode permainan ke teman anda, dan memulai permainan kamu bisa bermain UNO seperti kamu bermain dengan teman langsung.</p>
+<a id="md:sebelum-menggunakan" class="tsd-anchor"></a><h2><a href="#md:sebelum-menggunakan">Sebelum Menggunakan</a></h2><p>Bot ini menyimpan data <strong>nomor telepon</strong> serta <strong>username</strong> pemain untuk keperluan mekanisme permainan.</p>
+<p>Jika kamu adalah orang yang menjalankan bot ini, kamu <strong>wajib</strong> bertanggung jawab atas data-data pemain yang tersimpan. <strong>Jangan</strong> melimpahkan data pribadi ke pihak yang tidak bertanggung jawab. Jika mereka ingin menghapus data pribadi mereka, kamu <strong>wajib</strong> menghapusnya.</p>
+<p>Jika kamu adalah pemain, kamu berarti telah <strong>mengetahui</strong> serta <strong>menyetujui</strong> bahwa kamu <strong>mengizinkan</strong> datamu untuk disimpan ke bot lawan bicara. Jika ingin <strong>menghapus</strong> data, silahkan <strong>hubungi operator bot</strong> yang bertanggung jawab.</p>
+<a id="md:pesan-untuk-administrator" class="tsd-anchor"></a><h3><a href="#md:pesan-untuk-administrator">Pesan untuk Administrator</a></h3><p>Untuk menghindari kejadian yang tidak diinginkan, lebih baik menggunakan Database MongoDB yang di host secara local. Kemudian, disarankan untuk tidak menghosting bot secara 24 jam, host bot secara local memang pada saat dibutuhkan.</p>
+<a id="md:pesan-untuk-pemain" class="tsd-anchor"></a><h3><a href="#md:pesan-untuk-pemain">Pesan untuk Pemain</a></h3><p>Pilihlah bot dengan administrator yang bertanggung jawab dan dapat dipercaya. Lebih dari itu, pilihlah administrator yang mengerti dan teman dekatmu.</p>
+<a id="md:prerequisites" class="tsd-anchor"></a><h2><a href="#md:prerequisites">Prerequisites</a></h2><p>Anda butuh</p>
+<ul>
+<li>Node.js dan NPM (atau Package Manager lainnya)</li>
+<li>MongoDB untuk menyimpan data</li>
+<li>Handphone tak terpakai (opsional)</li>
+</ul>
+<a id="md:pemakaian" class="tsd-anchor"></a><h2><a href="#md:pemakaian">Pemakaian</a></h2><a id="md:penjelasan-awal" class="tsd-anchor"></a><h3><a href="#md:penjelasan-awal">Penjelasan Awal</a></h3><p>Bot ini adalah bot yang digunakan untuk bermain uno di whatsapp. Cara kerjanya dengan mengirimkan perintah lewat DM pribadi ke bot ini, tapi masih bisa digunakan di grup semisal untuk membuat permainan.</p>
+<p>Untuk membuat permainan caranya dengan menjalankan <code>U#creategame</code> (atau <code>U#cg</code>) dan akan membuat kode yang bisa diteruskan ke orang lain.</p>
+<p>Orang yang diberikan meneruskan kembali kode itu ke bot dan akan masuk ke sesi permainan sesuai dengan kode yang sudah diberikan sebelumnya.</p>
+<p>Setelah dirasa sudah cukup orang, permainan bisa dimulai menggunakan <code>U#startgame</code> (atau <code>U#sg</code>) kartu akan diberikan dan permainan dimulai.</p>
+<p>Untuk bermain, gunakan <code>U#play &lt;kartu kamu&gt;</code>
+(atau <code>U#p &lt;kartu kamu&gt;</code>) untuk menaruh kartu yang sesuai dengan apa yang ada di deck. Jika valid, kartu akan ditaruh dan giliran bermain akan beralih ke pemain selanjutnya.</p>
+<p>Jika kamu tidak memiliki kartu ambilah kartu baru dengan menggunakan <code>U#draw</code> (atau <code>U#d</code>) maka kartu baru akan diambil dan giliran bermain akan beralih ke pemain selanjutnya.</p>
+<p>Untuk berkomunikasi dengan pemain lain di game, gunakan <code>U#say &lt;pesan mu&gt;</code>.</p>
+<p>Untuk melihat lebih jelas apa maksud dari perintah, gunakan <code>U#help &lt;nama lengkap perintah&gt;</code>.</p>
+<a id="md:daftar-perintah" class="tsd-anchor"></a><h3><a href="#md:daftar-perintah">Daftar Perintah</a></h3><p>Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka prefix akan mengikuti konfigurasi yang sudah ada.</p>
+<ul>
+<li><p><code>ban</code></p>
+<p>Perintah ini digunakan untuk menge-ban seseorang, semisal ada orang yang tidak dikenali masuk ke permainan.</p>
+<p>Contoh penggunaan:</p>
+<p><em><code>U# ban &lt;nama yang ingin di ban&gt;</code></em></p>
+<p>Alias: <em><code>b</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-0">Berhasil</span><span class="hl-1"> </span><span class="hl-0">menge</span><span class="hl-1">-</span><span class="hl-0">ban</span><span class="hl-1"> </span><span class="hl-2">E</span><span class="hl-1">. </span><span class="hl-0">Sekarang</span><span class="hl-1"> </span><span class="hl-0">dia</span><span class="hl-1"> </span><span class="hl-0">tidak</span><span class="hl-1"> </span><span class="hl-0">ada</span><span class="hl-1"> </span><span class="hl-0">dalam</span><span class="hl-1"> </span><span class="hl-0">permainan</span><span class="hl-1">.</span>
+</code><button>Copy</button></pre>
+</li>
+<li><p><code>cards</code></p>
+<p>Perintah ini digunakan untuk mengecek kartu yang ada pada saat kamu bermain.</p>
+<p>Contoh penggunaan:</p>
+<p><em><code>U# cards</code></em></p>
+<p>Alias: <em><code>c</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-0">Kartu</span><span class="hl-1"> </span><span class="hl-3">kamu</span><span class="hl-1">: </span><span class="hl-0">greenskip</span><span class="hl-1">, </span><span class="hl-0">yellow4</span><span class="hl-1">, </span><span class="hl-0">red6</span><span class="hl-1">, </span><span class="hl-0">blue1</span>
+</code><button>Copy</button></pre>
+</li>
+<li><p><code>creategame</code></p>
+<p>Perintah ini digunakan untuk membuat permainan baru.</p>
+<p>Setelah kode berhasil dibuat, bot akan mengirimkan kode yang bisa diteruskan ke pemain lain agar bisa bergabung ke dalam permainan.</p>
+<p>Contoh penggunaan:</p>
+<p><code>U# creategame</code></p>
+<p>Alias: <em><code>cg</code></em>, <em><code>create</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-0">Game</span><span class="hl-1"> </span><span class="hl-0">berhasil</span><span class="hl-1"> </span><span class="hl-0">dibuat</span><span class="hl-1">.</span><br/><br/><span class="hl-0">Ajak</span><span class="hl-1"> </span><span class="hl-0">teman</span><span class="hl-1"> </span><span class="hl-0">kamu</span><span class="hl-1"> </span><span class="hl-0">untuk</span><span class="hl-1"> </span><span class="hl-0">bermain</span><span class="hl-1">...</span>
+</code><button>Copy</button></pre>
+</li>
+<li><p><code>draw</code></p>
+<p>Perintah ini digunakan untuk mengambil kartu baru pada saat giliranmu.</p>
+<p>Terkadang kamu tidak memiliki kartu yang pas pada saat bermain, perintah ini bertujuan untuk mengambil kartu baru. ke dalam permainan.</p>
+<p>Contoh penggunaan:</p>
+<p><em><code>U# draw</code></em></p>
+<p>Alias: <em><code>d</code></em>, <em><code>pickup</code></em>, <em><code>newcard</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-0">Berhasil</span><span class="hl-1"> </span><span class="hl-0">mengambil</span><span class="hl-1"> </span><span class="hl-0">kartu</span><span class="hl-1"> </span><span class="hl-0">baru</span><span class="hl-1">, </span><span class="hl-0">red6</span><span class="hl-1">. </span><span class="hl-0">Selanjutnya</span><span class="hl-1"> </span><span class="hl-0">adalah</span><span class="hl-1"> </span><span class="hl-0">giliran</span><span class="hl-1"> </span><span class="hl-2">A</span><span class="hl-1"> </span><span class="hl-0">untuk</span><span class="hl-1"> </span><span class="hl-0">bermain</span>
+</code><button>Copy</button></pre>
+</li>
+<li><p><code>endgame</code></p>
+<p>Perintah ini digunakan untuk menghentikan permainan yang belum/sedang berjalan.</p>
+<p>Perintah ini hanya bisa digunakan oleh orang yang membuat permainan.</p>
+<p>Contoh penggunaan:</p>
+<p><em><code>U# endgame</code></em></p>
+<p>Alias: <em><code>eg</code></em>, <em><code>end</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-2">A</span><span class="hl-1"> </span><span class="hl-0">telah</span><span class="hl-1"> </span><span class="hl-0">menghentikan</span><span class="hl-1"> </span><span class="hl-0">permainan</span><span class="hl-1">. </span><span class="hl-0">Terimakasih</span><span class="hl-1"> </span><span class="hl-0">sudah</span><span class="hl-1"> </span><span class="hl-0">bermain</span><span class="hl-1">!</span>
+</code><button>Copy</button></pre>
+</li>
+<li><p><code>infogame</code></p>
+<p>Perintah ini digunakan untuk mengetahui informasi dari sebuah permainan.</p>
+<p>Jika kamu sudah memasuki sebuah permainan, tidak perlu memasukan id game, tetapi kalau belum diperlukan id game tersebut.</p>
+<p>Contoh penggunaan:</p>
+<p><em><code>U# infogame &lt;id game&gt;</code></em></p>
+<p>Alias: <em><code>i</code></em>, <em><code>ig</code></em>, <em><code>info</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-2">A</span><span class="hl-1"> </span><span class="hl-0">telah</span><span class="hl-1"> </span><span class="hl-0">menghentikan</span><span class="hl-1"> </span><span class="hl-0">permainan</span><span class="hl-1">. </span><span class="hl-0">Terimakasih</span><span class="hl-1"> </span><span class="hl-0">sudah</span><span class="hl-1"> </span><span class="hl-0">bermain</span><span class="hl-1">!</span>
+</code><button>Copy</button></pre>
+</li>
+<li><p><code>joingame</code></p>
+<p>Perintah ini digunakan untuk masuk ke sebuah permainan.</p>
+<p>Diperlukan id dari game yang sudah dibuat, biasanya tidak perlu mengetikkan lagi karena sudah diberikan oleh pembuat gamenya langsung.</p>
+<p>Contoh penggunaan:</p>
+<p><em><code>U# joingame &lt;id game&gt;</code></em></p>
+<p>Alias: <em><code>j</code></em>, <em><code>jg</code></em>, <em><code>join</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-0">Berhasil</span><span class="hl-1"> </span><span class="hl-0">join</span><span class="hl-1"> </span><span class="hl-0">ke</span><span class="hl-1"> </span><span class="hl-0">game</span><span class="hl-1"> </span><span class="hl-4">&quot;XXXX&quot;</span><span class="hl-1">, </span><span class="hl-0">tunggu</span><span class="hl-1"> </span><span class="hl-0">pembuat</span><span class="hl-1"> </span><span class="hl-0">ruang</span><span class="hl-1"> </span><span class="hl-0">game</span><span class="hl-1"> </span><span class="hl-0">ini</span><span class="hl-1"> </span><span class="hl-0">memulai</span><span class="hl-1"> </span><span class="hl-0">permainannya</span><span class="hl-1">!</span>
+</code><button>Copy</button></pre>
+</li>
+<li><p><code>kick</code></p>
+<p>Perintah ini digunakan untuk kick seseorang, semisal ada teman yang AFK pada saat permainan.</p>
+<p>Contoh penggunaan:</p>
+<p><em><code>U# kick &lt;nama yang ingin di kick&gt;</code></em></p>
+<p>Alias: <em><code>k</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-0">Berhasil</span><span class="hl-1"> </span><span class="hl-0">mengkick</span><span class="hl-1"> </span><span class="hl-2">E</span><span class="hl-1">. </span><span class="hl-0">Sekarang</span><span class="hl-1"> </span><span class="hl-0">dia</span><span class="hl-1"> </span><span class="hl-0">tidak</span><span class="hl-1"> </span><span class="hl-0">ada</span><span class="hl-1"> </span><span class="hl-0">dalam</span><span class="hl-1"> </span><span class="hl-0">permainan</span><span class="hl-1">.</span>
+</code><button>Copy</button></pre>
+</li>
+<li><p><code>leavegame</code></p>
+<p>Perintah ini digunakan untuk keluar dari sebuah permainan.</p>
+<p>Perintah ini bisa digunakan pada saat permainan atau saat menunggu.</p>
+<p>Contoh penggunaan:</p>
+<p><em><code>U# leavegame</code></em></p>
+<p>Alias: <em><code>l</code></em>, <em><code>lg</code></em>, <em><code>quit</code></em>, <em><code>leave</code></em>, <em><code>leavegame</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-0">Anda</span><span class="hl-1"> </span><span class="hl-0">berhasil</span><span class="hl-1"> </span><span class="hl-0">keluar</span><span class="hl-1"> </span><span class="hl-0">dari</span><span class="hl-1"> </span><span class="hl-0">game</span><span class="hl-1">. </span><span class="hl-0">Terimakasih</span><span class="hl-1"> </span><span class="hl-0">telah</span><span class="hl-1"> </span><span class="hl-0">bermain</span><span class="hl-1">!</span>
+</code><button>Copy</button></pre>
+</li>
+<li><p><code>play</code></p>
+<p>Perintah ini digunakan untuk mengeluarkan kartu dalam sebuah permainan.</p>
+<p>Jika kartu cocok akan ditaruh ke deck dan pemain selanjutnya akan mendapatkan giliran.</p>
+<p>Contoh penggunaan:</p>
+<p><em><code>U# play &lt;kartu&gt;</code></em></p>
+<p>Alias: <em><code>p</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-0">Berhasil</span><span class="hl-1"> </span><span class="hl-0">mengeluarkan</span><span class="hl-1"> </span><span class="hl-0">kartu</span><span class="hl-1"> *</span><span class="hl-0">red9</span><span class="hl-1">*, </span><span class="hl-0">selanjutnya</span><span class="hl-1"> </span><span class="hl-0">adalah</span><span class="hl-1"> </span><span class="hl-0">giliran</span><span class="hl-1"> </span><span class="hl-2">B</span><span class="hl-1"> </span><span class="hl-0">untuk</span><span class="hl-1"> </span><span class="hl-0">bermain</span>
+</code><button>Copy</button></pre>
+</li>
+<li><p><code>say</code></p>
+<p>Perintah ini digunakan untuk mengatakan sesuatu dalam sebuah permainan.</p>
+<p>Isi pesan sesuai yang kamu inginkan, tapi perlu di ingat, bercakaplah dengan bahasa yang sopan.</p>
+<p>Contoh penggunaan:</p>
+<p><em><code>U# say &lt;pesan&gt;</code></em></p>
+<p>Alias: <em><code>s</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-3">USERNAME</span><span class="hl-1">: </span><span class="hl-0">pesan</span><span class="hl-1"> </span><span class="hl-0">disini</span>
+</code><button>Copy</button></pre>
+</li>
+<li><p><code>startgame</code></p>
+<p>Perintah ini digunakan untuk memulai permainan yang belum berjalan.</p>
+<p>Perintah ini hanya bisa digunakan oleh orang yang membuat permainan.</p>
+<p>Contoh penggunaan:</p>
+<p><em><code>U# startgame</code></em></p>
+<p>Alias: <em><code>sg</code></em>, <em><code>start</code></em></p>
+<p>Contoh balasan:</p>
+<pre><code><span class="hl-0">Game</span><span class="hl-1"> </span><span class="hl-0">berhasil</span><span class="hl-1"> </span><span class="hl-0">dimulai</span><span class="hl-1">! </span><span class="hl-0">Sekarang</span><span class="hl-1"> </span><span class="hl-0">giliran</span><span class="hl-1"> </span><span class="hl-2">C</span><span class="hl-1"> </span><span class="hl-0">untuk</span><span class="hl-1"> </span><span class="hl-0">bermain</span>
+</code><button>Copy</button></pre>
+</li>
+</ul>
+<a id="md:cloning-dari-github" class="tsd-anchor"></a><h3><a href="#md:cloning-dari-github">Cloning Dari Github</a></h3><p>Jalankan perintah ini Command Line.</p>
+<pre><code class="language-sh"><span class="hl-5"># HTTPS</span><br/><span class="hl-6">git</span><span class="hl-1"> </span><span class="hl-4">clone</span><span class="hl-1"> </span><span class="hl-4">https://github.com/reacto11mecha/wuno-bot.git</span><br/><br/><span class="hl-5"># SSH</span><br/><span class="hl-6">git</span><span class="hl-1"> </span><span class="hl-4">clone</span><span class="hl-1"> </span><span class="hl-4">git@github.com:reacto11mecha/wuno-bot.git</span>
+</code><button>Copy</button></pre>
+<a id="md:menginstall-package" class="tsd-anchor"></a><h3><a href="#md:menginstall-package">Menginstall package</a></h3><p>Anda ke root directory project dan menginstall package yang diperlukan.</p>
+<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">install</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">install</span>
+</code><button>Copy</button></pre>
+<a id="md:menjalankan-bot" class="tsd-anchor"></a><h3><a href="#md:menjalankan-bot">Menjalankan Bot</a></h3><p>Pertama-tama, copy file <code>env.example</code> menjadi <code>.env</code> dan isikan value yang sesuai.</p>
+<p>Keterangan <code>.env</code>:</p>
+<ul>
+<li><code>MONGO_URI</code>: URL Database MongoDB yang akan dijadikan penyimpanan data (WAJIB)</li>
+<li><code>PREFIX</code>: Prefix bot agar bisa dipanggil dan digunakan, default <code>U#</code> (TIDAK WAJIB)</li>
+</ul>
+<p>Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.</p>
+<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">build</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">build</span>
+</code><button>Copy</button></pre>
+<p>Selesai mem-build bot, <strong>jangan lupa menjalankan MongoDB</strong>. Jika sudah berjalan baru bisa menggunakan bot dengan mengetikkan</p>
+<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">start</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">start</span>
+</code><button>Copy</button></pre>
+<p>Jika baru pertama kali menjalankan, scan barcode di terminal untuk dihubungkan ke whatsapp di handphone.</p>
+<p>Atau ingin dijalankan seperti mode production menggunakan <code>pm2</code> bisa menjalankan perintah di bawah ini, jangan lupa autentikasi terlebih dahulu menggunakan <code>pnpm start</code> karena lebih mudah dan menginstall <code>pm2</code> secara global.</p>
+<pre><code class="language-sh"><span class="hl-6">pm2</span><span class="hl-1"> </span><span class="hl-4">start</span><span class="hl-1"> </span><span class="hl-4">ecosystem.config.js</span>
+</code><button>Copy</button></pre>
+<a id="md:lisensi" class="tsd-anchor"></a><h3><a href="#md:lisensi">Lisensi</a></h3><p>Semua kode yang ada di repositori ini bernaung dibawah <a href="LICENSE">MIT License</a>.</p>
+</div></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)" id="icon-chevronDown"></path></svg>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility">
+<h4 class="uppercase">Member Visibility</h4><form>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-private" name="private"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Private</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></form></div>
+<div class="tsd-theme-toggle">
+<h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<ul>
+<li>
+<ul>
+<li><a href="#md:sebelum-menggunakan"><span>Sebelum <wbr/>Menggunakan</span></a></li>
+<li>
+<ul>
+<li><a href="#md:pesan-untuk-administrator"><span>Pesan untuk <wbr/>Administrator</span></a></li>
+<li>
+<ul>
+<li><a href="#md:pesan-untuk-pemain"><span>Pesan untuk <wbr/>Pemain</span></a></li></ul></li>
+<li><a href="#md:prerequisites"><span>Prerequisites</span></a></li>
+<li><a href="#md:pemakaian"><span>Pemakaian</span></a></li>
+<li>
+<ul>
+<li><a href="#md:penjelasan-awal"><span>Penjelasan <wbr/>Awal</span></a></li>
+<li><a href="#md:daftar-perintah"><span>Daftar <wbr/>Perintah</span></a></li>
+<li><a href="#md:cloning-dari-github"><span>Cloning <wbr/>Dari <wbr/>Github</span></a></li>
+<li><a href="#md:menginstall-package"><span>Menginstall package</span></a></li>
+<li><a href="#md:menjalankan-bot"><span>Menjalankan <wbr/>Bot</span></a></li>
+<li><a href="#md:lisensi"><span>Lisensi</span></a></li></ul></li></ul></li></ul></li></ul></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="index.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>wuno-<wbr/>bot</span></a>
+<ul class="tsd-small-nested-navigation">
+<li><a href="modules/bot.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>bot</span></a></li>
+<li><a href="modules/config_cards.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>config/cards</span></a></li>
+<li><a href="modules/config_messages.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>config/messages</span></a></li>
+<li><a href="modules/config_prefix.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>config/prefix</span></a></li>
+<li><a href="modules/handler_controller.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>handler/controller</span></a></li>
+<li><a href="modules/handler_emitter.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>handler/emitter</span></a></li>
+<li><a href="modules/handler_help.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>handler/help</span></a></li>
+<li><a href="modules/handler_message.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>handler/message</span></a></li>
+<li><a href="modules/lib.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>lib</span></a></li>
+<li><a href="modules/utils.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>utils</span></a></li></ul></nav></div></div></div>
+<div class="tsd-generator">
+<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
+<div class="overlay"></div></body></html>
