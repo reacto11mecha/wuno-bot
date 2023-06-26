@@ -418,8 +418,10 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
         const actualNextPlayerId = this.game.getNextPosition(2);
 
         const playerList = this.game
-          .players!.filter((player) => player !== nextPlayerId!)
-          .filter((player) => player !== actualNextPlayerId);
+          .players!.filter(
+            (player) => player.playerId !== nextPlayerId!.playerId
+          )
+          .filter((player) => player.playerId !== actualNextPlayerId!.playerId);
 
         const newCards = Array.from({ length: 2 }).map(() =>
           CardPicker.pickCardByGivenCard(this.game.currentCard as allCard)
@@ -468,48 +470,67 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
               nextUserCard &&
               nextUserCard.length > 0
             ) {
-              // await Promise.all([
-              //   this.sendToCurrentPersonInGame(
-              //     `Berhasil menambahkan dua kartu ke ${
-              //       nextPlayer.username
-              //     } dengan kartu *${givenCard}*. Sekarang giliran ${
-              //       actualNextPlayer.phoneNumber ===
-              //       this.chat.message.userNumber
-              //         ? "kamu"
-              //         : actualNextPlayer.username
-              //     } untuk bermain.`,
-              //     currentCardImage,
-              //     backCardsImage,
-              //     actualNextPlayer.username
-              //   ),
-              //   this.sendToOtherPersonInGame(
-              //     `Anda ditambahkan dua kartu oleh ${
-              //       this.chat.message.userName
-              //     } dengan kartu ${givenCard}. Anda mendapatkan kartu ${newCards
-              //       .map((card) => `*${card}*`)
-              //       .join(" dan ")}. Sekarang giliran ${
-              //       actualNextPlayer.username
-              //     } untuk bermain.`,
-              //     `Kartu yang ${actualNextPlayer.username} miliki`,
-              //     nextPlayer.phoneNumber,
-              //     currentCardImage,
-              //     backCardsImage
-              //   ),
-              //   this.sendToOtherPersonInGame(
-              //     `${nextPlayer.username} telah ditambahkan dua kartu oleh ${this.chat.message.userName} dengan kartu ${givenCard}. Sekarang giliran kamu untuk bermain.`,
-              //     `Kartu kamu: ${nextUserCard?.join(", ")}.`,
-              //     actualNextPlayer.phoneNumber,
-              //     currentCardImage,
-              //     frontCardsImage
-              //   ),
-              //   this.sendToOtherPlayersWithoutCurrentPersonInGame(
-              //     `${nextPlayer.username} telah ditambahkan dua kartu oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
-              //     playerList,
-              //     currentCardImage,
-              //     backCardsImage,
-              //     actualNextPlayer.username
-              //   ),
-              // ]);
+              // There are only two players
+              if (this.game.players.length === 2) {
+                await Promise.all([
+                  this.sendToCurrentPersonInGame(
+                    `Berhasil menambahkan dua kartu ke ${nextPlayer.username} dengan kartu *${givenCard}*. Sekarang giliran kamu untuk bermain.`,
+                    currentCardImage,
+                    frontCardsImage,
+                    "kamu"
+                  ),
+                  this.sendToOtherPersonInGame(
+                    `Anda ditambahkan dua kartu oleh ${
+                      this.chat.message.userName
+                    } dengan kartu ${givenCard}. Anda mendapatkan kartu ${newCards
+                      .map((card) => `*${card}*`)
+                      .join(" dan ")}. Sekarang giliran dia untuk bermain.`,
+                    `Kartu yang ${actualNextPlayer.username} miliki`,
+                    nextPlayer.phoneNumber,
+                    currentCardImage,
+                    backCardsImage
+                  ),
+                ]);
+
+                return;
+              }
+
+              // More than two players
+              await Promise.all([
+                this.sendToCurrentPersonInGame(
+                  `Berhasil menambahkan dua kartu ke ${nextPlayer.username} dengan kartu *${givenCard}*. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
+                  currentCardImage,
+                  backCardsImage,
+                  actualNextPlayer.username
+                ),
+                this.sendToOtherPersonInGame(
+                  `Anda ditambahkan dua kartu oleh ${
+                    this.chat.message.userName
+                  } dengan kartu ${givenCard}. Anda mendapatkan kartu ${newCards
+                    .map((card) => `*${card}*`)
+                    .join(" dan ")}. Sekarang giliran ${
+                    actualNextPlayer.username
+                  } untuk bermain.`,
+                  `Kartu yang ${actualNextPlayer.username} miliki`,
+                  nextPlayer.phoneNumber,
+                  currentCardImage,
+                  backCardsImage
+                ),
+                this.sendToOtherPersonInGame(
+                  `${nextPlayer.username} telah ditambahkan dua kartu oleh ${this.chat.message.userName} dengan kartu ${givenCard}. Sekarang giliran kamu untuk bermain.`,
+                  `Kartu kamu: ${nextUserCard?.join(", ")}.`,
+                  actualNextPlayer.phoneNumber,
+                  currentCardImage,
+                  frontCardsImage
+                ),
+                this.sendToOtherPlayersWithoutCurrentPersonInGame(
+                  `${nextPlayer.username} telah ditambahkan dua kartu oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
+                  playerList,
+                  currentCardImage,
+                  backCardsImage,
+                  actualNextPlayer.username
+                ),
+              ]);
             }
           }
         );
@@ -584,8 +605,10 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
         const actualNextPlayerId = this.game.getNextPosition(2);
 
         const playerList = this.game
-          .players!.filter((player) => player !== nextPlayerId!)
-          .filter((player) => player !== actualNextPlayerId);
+          .players!.filter(
+            (player) => player.playerId !== nextPlayerId!.playerId
+          )
+          .filter((player) => player.playerId !== actualNextPlayerId!.playerId);
 
         await Promise.all([
           this.game.updateCardAndPosition(
@@ -607,7 +630,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           }),
           prisma.user.findUnique({
             where: {
-              id: nextPlayerId?.playerId,
+              id: actualNextPlayerId?.playerId,
             },
           }),
         ]);
@@ -621,35 +644,57 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
               nextUserCard &&
               nextUserCard.length > 0
             ) {
-              // await Promise.all([
-              //   this.sendToCurrentPersonInGame(
-              //     `Berhasil menyekip pemain ${nextPlayer.username} dengan kartu *${givenCard}*. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
-              //     currentCardImage,
-              //     backCardsImage,
-              //     actualNextPlayer.username
-              //   ),
-              //   this.sendToOtherPersonInGame(
-              //     `Anda telah di skip oleh ${this.chat.message.userName} dengan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
-              //     `Kartu yang ${actualNextPlayer.username} miliki`,
-              //     nextPlayer.phoneNumber,
-              //     currentCardImage,
-              //     backCardsImage
-              //   ),
-              //   this.sendToOtherPersonInGame(
-              //     `${nextPlayer.username} telah di skip oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran kamu untuk bermain.`,
-              //     `Kartu kamu: ${nextUserCard?.join(", ")}.`,
-              //     actualNextPlayer.phoneNumber,
-              //     currentCardImage,
-              //     frontCardsImage
-              //   ),
-              //   this.sendToOtherPlayersWithoutCurrentPersonInGame(
-              //     `${nextPlayer.username} telah di skip oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
-              //     playerList,
-              //     currentCardImage,
-              //     backCardsImage,
-              //     actualNextPlayer.username
-              //   ),
-              // ]);
+              // There are only two players
+              if (this.game.players.length === 2) {
+                await Promise.all([
+                  this.sendToCurrentPersonInGame(
+                    `Berhasil skip pemain ${nextPlayer.username} dengan kartu *${givenCard}*. Sekarang giliran kamu untuk bermain.`,
+                    currentCardImage,
+                    frontCardsImage,
+                    "kamu"
+                  ),
+                  this.sendToOtherPersonInGame(
+                    `Anda telah di skip oleh ${this.chat.message.userName} dengan kartu ${givenCard}. Sekarang giliran dia untuk bermain.`,
+                    `Kartu yang ${actualNextPlayer.username} miliki`,
+                    nextPlayer.phoneNumber,
+                    currentCardImage,
+                    backCardsImage
+                  ),
+                ]);
+
+                return;
+              }
+
+              // More than two players
+              await Promise.all([
+                this.sendToCurrentPersonInGame(
+                  `Berhasil menyekip pemain ${nextPlayer.username} dengan kartu *${givenCard}*. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
+                  currentCardImage,
+                  backCardsImage,
+                  actualNextPlayer.username
+                ),
+                this.sendToOtherPersonInGame(
+                  `Anda telah di skip oleh ${this.chat.message.userName} dengan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
+                  `Kartu yang ${actualNextPlayer.username} miliki`,
+                  nextPlayer.phoneNumber,
+                  currentCardImage,
+                  backCardsImage
+                ),
+                this.sendToOtherPersonInGame(
+                  `${nextPlayer.username} telah di skip oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran kamu untuk bermain.`,
+                  `Kartu kamu: ${nextUserCard?.join(", ")}.`,
+                  actualNextPlayer.phoneNumber,
+                  currentCardImage,
+                  frontCardsImage
+                ),
+                this.sendToOtherPlayersWithoutCurrentPersonInGame(
+                  `${nextPlayer.username} telah di skip oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
+                  playerList,
+                  currentCardImage,
+                  backCardsImage,
+                  actualNextPlayer.username
+                ),
+              ]);
             }
           }
         );
@@ -662,14 +707,16 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
         const actualNextPlayerId = this.game.getNextPosition(2);
 
         const playerList = this.game
-          .players!.filter((player) => player !== nextPlayerId!)
-          .filter((player) => player !== actualNextPlayerId);
+          .players!.filter(
+            (player) => player.playerId !== nextPlayerId!.playerId
+          )
+          .filter((player) => player.playerId !== actualNextPlayerId!.playerId);
 
         const newCards = Array.from({ length: 4 }).map(() =>
           CardPicker.pickCardByGivenCard(this.game.currentCard as allCard)
         );
 
-        await this.removeCardFromPlayer(givenCard);
+        await this.removeCardFromPlayer("wilddraw4");
 
         const nextPlayerCard = await prisma.userCard.findUnique({
           where: {
@@ -712,41 +759,69 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
               nextUserCard &&
               nextUserCard.length > 0
             ) {
-              // await Promise.all([
-              //   this.sendToCurrentPersonInGame(
-              //     `Berhasil menambahkan empat kartu ke ${nextPlayer.username} dengan kartu *${givenCard}*. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
-              //     currentCardImage,
-              //     backCardsImage,
-              //     actualNextPlayer.username
-              //   ),
-              //   this.sendToOtherPersonInGame(
-              //     `Anda ditambahkan empat kartu oleh ${
-              //       this.chat.message.userName
-              //     } dengan kartu ${givenCard}. Anda mendapatkan kartu ${newCards
-              //       .map((card, idx) => `${idx === 3 ? " dan " : ""}*${card}*`)
-              //       .join(", ")}. Sekarang giliran ${
-              //       actualNextPlayer.username
-              //     } untuk bermain.`,
-              //     `Kartu yang ${actualNextPlayer.username} miliki`,
-              //     nextPlayer.phoneNumber,
-              //     currentCardImage,
-              //     backCardsImage
-              //   ),
-              //   this.sendToOtherPersonInGame(
-              //     `${nextPlayer.username} telah ditambahkan empat kartu oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran kamu untuk bermain.`,
-              //     `Kartu kamu: ${nextUserCard?.join(", ")}.`,
-              //     actualNextPlayer.phoneNumber,
-              //     currentCardImage,
-              //     frontCardsImage
-              //   ),
-              //   this.sendToOtherPlayersWithoutCurrentPersonInGame(
-              //     `${nextPlayer.username} telah ditambahkan empat kartu oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
-              //     playerList,
-              //     currentCardImage,
-              //     backCardsImage,
-              //     actualNextPlayer.username
-              //   ),
-              // ]);
+              // There are only two players
+              if (this.game.players.length === 2) {
+                await Promise.all([
+                  this.sendToCurrentPersonInGame(
+                    `Berhasil menambahkan empat kartu ke ${nextPlayer.username} dengan kartu *${givenCard}*. Sekarang giliran kamu untuk bermain.`,
+                    currentCardImage,
+                    frontCardsImage,
+                    "kamu"
+                  ),
+                  this.sendToOtherPersonInGame(
+                    `Anda ditambahkan empat kartu oleh ${
+                      this.chat.message.userName
+                    } dengan kartu ${givenCard}. Anda mendapatkan kartu ${newCards
+                      .map(
+                        (card, idx) => `${idx === 3 ? " dan " : ""}*${card}*`
+                      )
+                      .join(", ")}. Sekarang giliran dia untuk bermain.`,
+                    `Kartu yang ${actualNextPlayer.username} miliki`,
+                    nextPlayer.phoneNumber,
+                    currentCardImage,
+                    backCardsImage
+                  ),
+                ]);
+
+                return;
+              }
+
+              // More than two players
+              await Promise.all([
+                this.sendToCurrentPersonInGame(
+                  `Berhasil menambahkan empat kartu ke ${nextPlayer.username} dengan kartu *${givenCard}*. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
+                  currentCardImage,
+                  backCardsImage,
+                  actualNextPlayer.username
+                ),
+                this.sendToOtherPersonInGame(
+                  `Anda ditambahkan empat kartu oleh ${
+                    this.chat.message.userName
+                  } dengan kartu ${givenCard}. Anda mendapatkan kartu ${newCards
+                    .map((card, idx) => `${idx === 3 ? " dan " : ""}*${card}*`)
+                    .join(", ")}. Sekarang giliran ${
+                    actualNextPlayer.username
+                  } untuk bermain.`,
+                  `Kartu yang ${actualNextPlayer.username} miliki`,
+                  nextPlayer.phoneNumber,
+                  currentCardImage,
+                  backCardsImage
+                ),
+                this.sendToOtherPersonInGame(
+                  `${nextPlayer.username} telah ditambahkan empat kartu oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran kamu untuk bermain.`,
+                  `Kartu kamu: ${nextUserCard?.join(", ")}.`,
+                  actualNextPlayer.phoneNumber,
+                  currentCardImage,
+                  frontCardsImage
+                ),
+                this.sendToOtherPlayersWithoutCurrentPersonInGame(
+                  `${nextPlayer.username} telah ditambahkan empat kartu oleh ${this.chat.message.userName} dengan menggunakan kartu ${givenCard}. Sekarang giliran ${actualNextPlayer.username} untuk bermain.`,
+                  playerList,
+                  currentCardImage,
+                  backCardsImage,
+                  actualNextPlayer.username
+                ),
+              ]);
             }
           }
         );
