@@ -17,6 +17,7 @@
     <span><p align="center">Bot whatsapp yang berguna untuk bermain UNO.</p></span>
 </p>
 
+<p><a href="https://github.com/reacto11mecha/wuno-bot/actions/workflows/lint-typing.yml"><img src="https://github.com/reacto11mecha/wuno-bot/actions/workflows/lint-typing.yml/badge.svg" alt="ES Lint &amp; Typing test"></a> <a href="https://github.com/reacto11mecha/wuno-bot/actions/workflows/unit-test.yml"><img src="https://github.com/reacto11mecha/wuno-bot/actions/workflows/unit-test.yml/badge.svg" alt="Unit test"></a></p>
 <blockquote>
 <p>Project ini terinspirasi dari <a href="https://github.com/Exium1/UnoBot">Exium1/UnoBot</a> dan <a href="https://github.com/mjsalerno/UnoBot">mjsalerno/UnoBot</a> yang beberapa asset dan logika pemrograman juga terdapat dalam project ini.</p>
 </blockquote>
@@ -24,15 +25,15 @@
 <a id="md:sebelum-menggunakan" class="tsd-anchor"></a><h2><a href="#md:sebelum-menggunakan">Sebelum Menggunakan</a></h2><p>Bot ini menyimpan data <strong>nomor telepon</strong> serta <strong>username</strong> pemain untuk keperluan mekanisme permainan.</p>
 <p>Jika kamu adalah orang yang menjalankan bot ini, kamu <strong>wajib</strong> bertanggung jawab atas data-data pemain yang tersimpan. <strong>Jangan</strong> melimpahkan data pribadi ke pihak yang tidak bertanggung jawab. Jika mereka ingin menghapus data pribadi mereka, kamu <strong>wajib</strong> menghapusnya.</p>
 <p>Jika kamu adalah pemain, kamu berarti telah <strong>mengetahui</strong> serta <strong>menyetujui</strong> bahwa kamu <strong>mengizinkan</strong> datamu untuk disimpan ke bot lawan bicara. Jika ingin <strong>menghapus</strong> data, silahkan <strong>hubungi operator bot</strong> yang bertanggung jawab.</p>
-<a id="md:pesan-untuk-administrator" class="tsd-anchor"></a><h3><a href="#md:pesan-untuk-administrator">Pesan untuk Administrator</a></h3><p>Untuk menghindari kejadian yang tidak diinginkan, lebih baik menggunakan Database MongoDB yang di host secara local. Kemudian, disarankan untuk tidak menghosting bot secara 24 jam, host bot secara local memang pada saat dibutuhkan.</p>
+<a id="md:pesan-untuk-administrator" class="tsd-anchor"></a><h3><a href="#md:pesan-untuk-administrator">Pesan untuk Administrator</a></h3><p>Untuk menghindari kejadian yang tidak diinginkan, lebih baik menggunakan Database MySQL yang di host secara local. Kemudian, disarankan untuk tidak menghosting bot secara 24 jam, host bot secara local memang pada saat dibutuhkan.</p>
 <a id="md:pesan-untuk-pemain" class="tsd-anchor"></a><h3><a href="#md:pesan-untuk-pemain">Pesan untuk Pemain</a></h3><p>Pilihlah bot dengan administrator yang bertanggung jawab dan dapat dipercaya. Lebih dari itu, pilihlah administrator yang mengerti dan teman dekatmu.</p>
 <a id="md:prerequisites" class="tsd-anchor"></a><h2><a href="#md:prerequisites">Prerequisites</a></h2><p>Anda butuh</p>
 <ul>
-<li>Node.js dan NPM (atau Package Manager lainnya)</li>
-<li>MongoDB untuk menyimpan data</li>
-<li>Handphone tak terpakai (opsional)</li>
+<li>Node.js LTS dan NPM (atau Package Manager lainnya)</li>
+<li>Database MySQL atau MariaDB</li>
+<li>Akun whatsapp tak terpakai</li>
 </ul>
-<a id="md:pemakaian" class="tsd-anchor"></a><h2><a href="#md:pemakaian">Pemakaian</a></h2><a id="md:penjelasan-awal" class="tsd-anchor"></a><h3><a href="#md:penjelasan-awal">Penjelasan Awal</a></h3><p>Bot ini adalah bot yang digunakan untuk bermain uno di whatsapp. Cara kerjanya dengan mengirimkan perintah lewat DM pribadi ke bot ini, tapi masih bisa digunakan di grup semisal untuk membuat permainan.</p>
+<a id="md:pemakaian" class="tsd-anchor"></a><h2><a href="#md:pemakaian">Pemakaian</a></h2><a id="md:penjelasan-awal" class="tsd-anchor"></a><h3><a href="#md:penjelasan-awal">Penjelasan Awal</a></h3><p>Bot ini adalah bot yang digunakan untuk bermain uno di whatsapp. Cara kerjanya dengan mengirimkan perintah lewat DM pribadi ke bot ini, tapi juga bisa digunakan di grup namun terbatas untuk membuat dan bergabung dalam permainan.</p>
 <p>Untuk membuat permainan caranya dengan menjalankan <code>U#creategame</code> (atau <code>U#cg</code>) dan akan membuat kode yang bisa diteruskan ke orang lain.</p>
 <p>Orang yang diberikan meneruskan kembali kode itu ke bot dan akan masuk ke sesi permainan sesuai dengan kode yang sudah diberikan sebelumnya.</p>
 <p>Setelah dirasa sudah cukup orang, permainan bisa dimulai menggunakan <code>U#startgame</code> (atau <code>U#sg</code>) kartu akan diberikan dan permainan dimulai.</p>
@@ -167,20 +168,27 @@
 <a id="md:menginstall-package" class="tsd-anchor"></a><h3><a href="#md:menginstall-package">Menginstall package</a></h3><p>Anda ke root directory project dan menginstall package yang diperlukan.</p>
 <pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">install</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">install</span>
 </code><button>Copy</button></pre>
+<a id="md:mengenerate-dan-push-schema-ke-database" class="tsd-anchor"></a><h3><a href="#md:mengenerate-dan-push-schema-ke-database">Mengenerate dan push schema ke database</a></h3><p>Karena menggunakan database yang SQL-Based dan prisma, diperlukan untuk mengenerate dan push schema ke database. Di bawah ini adalah perintah-perintah yang harus dilaksanakan.</p>
+<p>Generate schema prisma:</p>
+<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">db:generate</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">db:generate</span>
+</code><button>Copy</button></pre>
+<p>Push schema prisma ke database:</p>
+<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">db:push</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">db:push</span>
+</code><button>Copy</button></pre>
 <a id="md:menjalankan-bot" class="tsd-anchor"></a><h3><a href="#md:menjalankan-bot">Menjalankan Bot</a></h3><p>Pertama-tama, copy file <code>env.example</code> menjadi <code>.env</code> dan isikan value yang sesuai.</p>
 <p>Keterangan <code>.env</code>:</p>
 <ul>
-<li><code>MONGO_URI</code>: URL Database MongoDB yang akan dijadikan penyimpanan data (WAJIB)</li>
-<li><code>PREFIX</code>: Prefix bot agar bisa dipanggil dan digunakan, default <code>U#</code> (TIDAK WAJIB)</li>
+<li><code>DATABASE_URL</code>: URL Database MySQL yang akan dijadikan penyimpanan data (<strong>WAJIB</strong>)</li>
+<li><code>PREFIX</code>: Prefix bot agar bisa dipanggil dan digunakan, default <code>U#</code> (Opsional)</li>
 </ul>
 <p>Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.</p>
 <pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">build</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">build</span>
 </code><button>Copy</button></pre>
-<p>Selesai mem-build bot, <strong>jangan lupa menjalankan MongoDB</strong>. Jika sudah berjalan baru bisa menggunakan bot dengan mengetikkan</p>
+<p>Selesai mem-build bot, <strong>jangan lupa menjalankan database MySQL/MariaDB</strong>. Jika sudah berjalan baru bisa menggunakan bot dengan mengetikkan</p>
 <pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">start</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">start</span>
 </code><button>Copy</button></pre>
 <p>Jika baru pertama kali menjalankan, scan barcode di terminal untuk dihubungkan ke whatsapp di handphone.</p>
-<p>Atau ingin dijalankan seperti mode production menggunakan <code>pm2</code> bisa menjalankan perintah di bawah ini, jangan lupa autentikasi terlebih dahulu menggunakan <code>pnpm start</code> karena lebih mudah dan menginstall <code>pm2</code> secara global.</p>
+<p>Jika ingin dijalankan seperti mode production menggunakan <code>pm2</code> bisa menjalankan perintah di bawah ini, jangan lupa autentikasi terlebih dahulu mengikuti langkah di atas karena lebih mudah. Jangan lupa untuk menginstall <code>pm2</code> secara global.</p>
 <pre><code class="language-sh"><span class="hl-6">pm2</span><span class="hl-1"> </span><span class="hl-4">start</span><span class="hl-1"> </span><span class="hl-4">ecosystem.config.js</span>
 </code><button>Copy</button></pre>
 <a id="md:lisensi" class="tsd-anchor"></a><h3><a href="#md:lisensi">Lisensi</a></h3><p>Semua kode yang ada di repositori ini bernaung dibawah <a href="LICENSE">MIT License</a>.</p>
@@ -220,6 +228,7 @@
 <li><a href="#md:daftar-perintah"><span>Daftar <wbr/>Perintah</span></a></li>
 <li><a href="#md:cloning-dari-github"><span>Cloning <wbr/>Dari <wbr/>Github</span></a></li>
 <li><a href="#md:menginstall-package"><span>Menginstall package</span></a></li>
+<li><a href="#md:mengenerate-dan-push-schema-ke-database"><span>Mengenerate dan push schema ke database</span></a></li>
 <li><a href="#md:menjalankan-bot"><span>Menjalankan <wbr/>Bot</span></a></li>
 <li><a href="#md:lisensi"><span>Lisensi</span></a></li></ul></li></ul></li></ul></li></ul></div></details></div>
 <div class="site-menu">
@@ -228,8 +237,8 @@
 <li><a href="modules/bot.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>bot</span></a></li>
 <li><a href="modules/config_cards.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>config/cards</span></a></li>
 <li><a href="modules/config_messages.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>config/messages</span></a></li>
-<li><a href="modules/config_prefix.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>config/prefix</span></a></li>
 <li><a href="modules/handler_controller.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>handler/controller</span></a></li>
+<li><a href="modules/handler_database.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>handler/database</span></a></li>
 <li><a href="modules/handler_emitter.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>handler/emitter</span></a></li>
 <li><a href="modules/handler_help.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>handler/help</span></a></li>
 <li><a href="modules/handler_message.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-4"></use></svg><span>handler/message</span></a></li>
