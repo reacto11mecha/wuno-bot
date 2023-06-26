@@ -1,5 +1,5 @@
 import { Chat } from "../lib/Chat";
-import { prisma } from "../lib/database";
+import { prisma } from "../handler/database";
 
 /**
  * Util for finding or create user if it doesn't exist

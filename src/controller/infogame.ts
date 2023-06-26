@@ -1,7 +1,7 @@
 import { atLeastGameID, df, type commonCb } from "../utils";
 import { Game } from "../lib";
 
-import { prisma } from "../lib/database";
+import { prisma } from "../handler/database";
 
 const getReplied = async (game: Game) => {
   const players = await game.getAllPlayerUserObject();

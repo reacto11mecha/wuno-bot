@@ -2,7 +2,7 @@ import { Chat } from "./Chat";
 
 import { calcElapsedTime, random } from "../utils";
 
-import { prisma, FullGameType, User, Player } from "../lib/database";
+import { prisma, FullGameType, User, Player } from "../handler/database";
 
 import type { allCard } from "../config/cards";
 import { CardPicker } from "../config/cards";

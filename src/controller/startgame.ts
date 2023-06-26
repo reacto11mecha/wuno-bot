@@ -2,7 +2,7 @@ import { requiredJoinGameSession, createAllCardImage } from "../utils";
 
 import type { allCard } from "../config/cards";
 
-import { prisma } from "../lib/database";
+import { prisma } from "../handler/database";
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.NotFound) {

@@ -10,7 +10,7 @@ import { Logger } from "pino";
 import pLimit from "p-limit";
 
 import { env } from "../env";
-import type { UserGameProperty, User } from "./database";
+import type { UserGameProperty, User } from "../handler/database";
 
 /**
  * Interface for accessible Chat's message property

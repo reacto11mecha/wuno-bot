@@ -7,7 +7,7 @@ import P from "pino";
 
 import { messageHandler } from "./handler/message";
 import { df as formatTime } from "./utils/index";
-import { prisma } from "./lib/database";
+import { prisma } from "./handler/database";
 import { env } from "./env";
 
 export default class Bot {

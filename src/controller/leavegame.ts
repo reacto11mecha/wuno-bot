@@ -1,7 +1,7 @@
 import { requiredJoinGameSession } from "../utils";
 
 import { Game, Chat } from "../lib";
-import { prisma } from "../lib/database";
+import { prisma } from "../handler/database";
 
 async function removeGameAuthorAndSetToNextPlayer(chat: Chat, game: Game) {
   if (game.players.length > 0) {

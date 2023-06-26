@@ -1,6 +1,6 @@
 import { requiredJoinGameSession } from "../utils";
 
-import { prisma } from "../lib/database";
+import { prisma } from "../handler/database";
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
   if (game.NotFound) {

@@ -11,7 +11,11 @@ import {
   regexValidWildColorPlus4Only,
 } from "../config/cards";
 
-import { prisma, type FullUserCardType, type Player } from "./database";
+import {
+  prisma,
+  type FullUserCardType,
+  type Player,
+} from "../handler/database";
 
 import { MessageMedia } from "whatsapp-web.js";
 import type { allCard } from "../config/cards";

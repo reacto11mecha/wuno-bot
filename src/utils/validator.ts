@@ -1,6 +1,6 @@
 import { Chat, Game, Card } from "../lib";
 
-import { prisma } from "../lib/database";
+import { prisma } from "../handler/database";
 
 /**
  * "requiredJoinGameSession" util callback controller type

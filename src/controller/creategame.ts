@@ -1,5 +1,5 @@
 import { Chat } from "../lib";
-import { prisma } from "../lib/database";
+import { prisma } from "../handler/database";
 import { nanoid } from "nanoid";
 
 import { env } from "../env";
