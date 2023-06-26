@@ -25,7 +25,7 @@ model UserGameProperty {
   gameID        String? // Marker
 
   userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   PlayerOrder   PlayerOrder?
   BannedPlayers BannedPlayer?
