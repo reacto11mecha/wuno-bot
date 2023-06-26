@@ -425,9 +425,9 @@ export class Game {
   ) {
     if (players && players.length > 0) {
       const users = await Promise.all(
-        players.map((user) =>
+        players.map((player) =>
           prisma.user.findUnique({
-            where: { id: user.playerId },
+            where: { id: player.playerId },
           })
         )
       );
@@ -435,9 +435,9 @@ export class Game {
       await Promise.all(
         users
           .filter((user) => user?.phoneNumber !== this.chat.message.userNumber)
-          .map(async (user) => {
+          .map((user) => {
             if (user)
-              await this.chat.sendToOtherPerson(
+              return this.chat.sendToOtherPerson(
                 user.phoneNumber,
                 message,
                 image
@@ -459,9 +459,13 @@ export class Game {
     await Promise.all(
       users
         .filter((user) => user?.phoneNumber !== this.chat.message.userNumber)
-        .map(async (user) => {
+        .map((user) => {
           if (user)
-            await this.chat.sendToOtherPerson(user.phoneNumber, message, image);
+            return this.chat.sendToOtherPerson(
+              user.phoneNumber,
+              message,
+              image
+            );
         })
     );
   }

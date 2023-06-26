@@ -76,31 +76,25 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           // Other player side
           (async () => {
             if (currentPlayer) {
-              const PlayerList = game.players.filter(
-                (player) => player.playerId !== currentPlayer.id
-              );
-
               await game.sendToOtherPlayersWithoutCurrentPerson(
                 `${
                   chat.message.userName
                 } telah memulai permainan! Sekarang giliran ${
                   game.currentPlayerIsAuthor ? "dia" : currentPlayer.username
-                } untuk bermain`,
-                PlayerList
+                } untuk bermain`
               );
               await game.sendToOtherPlayersWithoutCurrentPerson(
-                `Urutan Bermain:\n${playersOrder}`,
-                PlayerList
+                `Urutan Bermain:\n${playersOrder}`
               );
 
               await game.sendToOtherPlayersWithoutCurrentPerson(
                 { caption: `Kartu saat ini: ${game.currentCard}` },
-                PlayerList,
+                undefined,
                 currentCardImage
               );
               await game.sendToOtherPlayersWithoutCurrentPerson(
                 { caption: `Kartu yang ${currentPlayer.username} miliki` },
-                PlayerList,
+                undefined,
                 backCardsImage
               );
             }
@@ -172,7 +166,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             if (currentPlayer) {
               const PlayerList = game.players
                 .filter((player) => player.playerId !== currentPlayer.id)
-                .filter((player) => player.playerId === chat.user!.id);
+                .filter((player) => player.playerId !== chat.user!.id);
 
               await game.sendToOtherPlayersWithoutCurrentPerson(
                 `${chat.message.userName} telah memulai permainan! Sekarang giliran ${currentPlayer.username} untuk bermain`,
