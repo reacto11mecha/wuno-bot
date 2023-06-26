@@ -3,6 +3,8 @@
     <span><p align="center">Bot whatsapp yang berguna untuk bermain UNO.</p></span>
 </p>
 
+[![ES Lint & Typing test](https://github.com/reacto11mecha/wuno-bot/actions/workflows/lint-typing.yml/badge.svg)](https://github.com/reacto11mecha/wuno-bot/actions/workflows/lint-typing.yml) [![Unit test](https://github.com/reacto11mecha/wuno-bot/actions/workflows/unit-test.yml/badge.svg)](https://github.com/reacto11mecha/wuno-bot/actions/workflows/unit-test.yml)
+
 > Project ini terinspirasi dari [Exium1/UnoBot](https://github.com/Exium1/UnoBot) dan [mjsalerno/UnoBot](https://github.com/mjsalerno/UnoBot) yang beberapa asset dan logika pemrograman juga terdapat dalam project ini.
 
 Bot ini adalah bot whatsapp yang memungkinkan pengguna untuk bermain UNO langsung di whatsapp. Dengan menjapri bot, mengirimkan kode permainan ke teman anda, dan memulai permainan kamu bisa bermain UNO seperti kamu bermain dengan teman langsung.
