@@ -1,6 +1,9 @@
 name: Unit test
 on: [pull_request, push]
 
+env:
+  DATABASE_URL: "mysql://root:password@localhost:3306/random-name"
+
 jobs:
   lint:
     runs-on: ubuntu-latest
