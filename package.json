@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@prisma/client": "^4.16.0",
-    "dotenv": "^16.3.1",
+    "@t3-oss/env-core": "^0.6.0",
     "libphonenumber-js": "^1.10.36",
     "luxon": "^3.3.0",
     "nanoid": "3.x.x",
@@ -71,7 +71,8 @@
     "pino-pretty": "^10.0.0",
     "qrcode-terminal": "^0.12.0",
     "sharp": "^0.32.1",
-    "whatsapp-web.js": "^1.21.0"
+    "whatsapp-web.js": "^1.21.0",
+    "zod": "^3.21.4"
   },
   "lint-staged": {
     "*.{ts,js}": "eslint --cache --fix",

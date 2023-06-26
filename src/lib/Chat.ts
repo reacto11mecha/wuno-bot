@@ -9,7 +9,7 @@ import type {
 import { Logger } from "pino";
 import pLimit from "p-limit";
 
-import { PREFIX } from "../config/prefix";
+import { env } from "../env";
 import type { UserGameProperty, User } from "./database";
 
 /**
@@ -115,7 +115,7 @@ export class Chat {
     };
 
     this.args = IncomingMessage.body
-      .slice(PREFIX.length)
+      .slice(env.PREFIX.length)
       .trim()
       .split(/ +/)
       .slice(1);

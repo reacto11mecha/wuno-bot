@@ -2,7 +2,7 @@ import { Chat } from "../lib";
 import { prisma } from "../lib/database";
 import { nanoid } from "nanoid";
 
-import { PREFIX } from "../config/prefix";
+import { env } from "../env";
 
 export default async function creategame(chat: Chat) {
   if (!chat.isJoiningGame) {
@@ -50,7 +50,7 @@ export default async function creategame(chat: Chat) {
         "Ayo semua yang berada di grup ini untuk bermain UNO bersama-sama! Teruskan pesan di bawah ke saya dan tunggu permainan untuk dimulai!"
       );
 
-      await chat.sendToCurrentPerson(`${PREFIX}j ${newGame.gameID}`);
+      await chat.sendToCurrentPerson(`${env.PREFIX}j ${newGame.gameID}`);
 
       return;
     }
@@ -60,7 +60,7 @@ export default async function creategame(chat: Chat) {
         chat.user!.username
       }\n\nKode: ${newGame.gameID}`
     );
-    await chat.replyToCurrentPerson(`${PREFIX}j ${newGame.gameID}`);
+    await chat.replyToCurrentPerson(`${env.PREFIX}j ${newGame.gameID}`);
   } else {
     await chat.replyToCurrentPerson(
       `Kamu sudah masuk ke sesi game: ${

@@ -1,6 +1,6 @@
 import { Chat } from "./Chat";
 import { Game } from "./Game";
-import { PREFIX } from "../config/prefix";
+import { env } from "../env";
 import { createAllCardImage } from "../utils";
 
 import {
@@ -812,7 +812,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
 
       case "UNMATCH": {
         await this.chat.sendToCurrentPerson(
-          `Kartu *${givenCard}* tidak valid jika disandingkan dengan kartu *${this.game.currentCard}*! Jika tidak memiliki kartu lagi, ambil dengan '${PREFIX}d' untuk mengambil kartu baru.`
+          `Kartu *${givenCard}* tidak valid jika disandingkan dengan kartu *${this.game.currentCard}*! Jika tidak memiliki kartu lagi, ambil dengan '${env.PREFIX}d' untuk mengambil kartu baru.`
         );
       }
     }

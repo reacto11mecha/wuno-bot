@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-import { PREFIX } from "./prefix";
+import { env } from "../env";
 
 const packageInfo = JSON.parse(
   fs.readFileSync(path.resolve("package.json"), "utf-8")
@@ -10,7 +10,7 @@ const packageInfo = JSON.parse(
 /**
  * Main github repository for this project
  */
-export const GITHUB_URL = packageInfo.repository.url
+export const GITHUB_URL: string = packageInfo.repository.url
   .replace("git+", "")
   .replace(".git", "");
 
@@ -18,7 +18,7 @@ export const GITHUB_URL = packageInfo.repository.url
  * Greeting template for all help message
  */
 export const greeting = `Halo, saya bot untuk bermain uno.
-Prefix: \`\`\`${PREFIX}\`\`\``;
+Prefix: \`\`\`${env.PREFIX}\`\`\``;
 
 /**
  * Footer template for all help message
@@ -33,7 +33,7 @@ Dibuat oleh ${packageInfo.author} di bawah lisensi MIT.`;
 export const botInfo = `${greeting}
 
 Untuk perintah lengkap ketik:
-\`\`\`${PREFIX}help\`\`\`
+\`\`\`${env.PREFIX}help\`\`\`
 
 ${footer}`;
 
@@ -68,7 +68,7 @@ Bot ini adalah bot yang digunakan untuk bermain uno di whatsapp. Cara kerjanya d
 
 Untuk membuat permainan caranya dengan menjalankan 
 
-\`\`\`${PREFIX}creategame\`\`\` (atau \`\`\`${PREFIX}cg\`\`\`) 
+\`\`\`${env.PREFIX}creategame\`\`\` (atau \`\`\`${env.PREFIX}cg\`\`\`) 
 
 dan akan membuat kode yang bisa diteruskan ke orang lain.
 
@@ -76,15 +76,15 @@ Orang yang diberikan meneruskan kembali kode itu ke bot dan akan masuk ke sesi p
 
 Setelah dirasa sudah cukup orang, permainan bisa dimulai menggunakan 
 
-\`\`\`${PREFIX}startgame\`\`\` (atau \`\`\`${PREFIX}sg\`\`\`)
+\`\`\`${env.PREFIX}startgame\`\`\` (atau \`\`\`${env.PREFIX}sg\`\`\`)
 
 kartu akan diberikan dan permainan dimulai.
 
 
 Untuk bermain, gunakan 
 
-\`\`\`${PREFIX}play <kartu kamu>\`\`\`
-(atau \`\`\`${PREFIX}p <kartu kamu>\`\`\`) 
+\`\`\`${env.PREFIX}play <kartu kamu>\`\`\`
+(atau \`\`\`${env.PREFIX}p <kartu kamu>\`\`\`) 
 
 untuk menaruh kartu yang sesuai dengan apa yang ada di deck. 
 
@@ -93,18 +93,18 @@ Jika valid, kartu akan ditaruh dan giliran bermain akan beralih ke pemain selanj
 
 Jika kamu tidak memiliki kartu ambilah kartu baru dengan menggunakan 
 
-\`\`\`${PREFIX}draw\`\`\` (atau \`\`\`${PREFIX}d\`\`\`) 
+\`\`\`${env.PREFIX}draw\`\`\` (atau \`\`\`${env.PREFIX}d\`\`\`) 
 
 maka kartu baru akan diambil dan giliran bermain akan beralih ke pemain selanjutnya.
 
 Untuk berkomunikasi dengan pemain lain di game, gunakan 
 
-\`\`\`${PREFIX}say <pesan mu>\`\`\`
+\`\`\`${env.PREFIX}say <pesan mu>\`\`\`
 
 
 Untuk melihat lebih jelas apa maksud dari perintah, gunakan
 
-\`\`\`${PREFIX}help <nama lengkap perintah>\`\`\`
+\`\`\`${env.PREFIX}help <nama lengkap perintah>\`\`\`
 
 
 ${footer}`;
@@ -133,7 +133,7 @@ const replyBuilder = (
   ${explanation}
   
   Contoh penggunaan:
-  \`\`\`${PREFIX}${command}${param ? ` ${param}` : ""}\`\`\`
+  \`\`\`${env.PREFIX}${command}${param ? ` ${param}` : ""}\`\`\`
 
   Alias: ${alias.map((a) => `\`\`\`${a}\`\`\``).join(", ")}
 
