@@ -17,7 +17,7 @@ Jika kamu adalah pemain, kamu berarti telah **mengetahui** serta **menyetujui** 
 
 ### Pesan untuk Administrator
 
-Untuk menghindari kejadian yang tidak diinginkan, lebih baik menggunakan Database MongoDB yang di host secara local. Kemudian, disarankan untuk tidak menghosting bot secara 24 jam, host bot secara local memang pada saat dibutuhkan.
+Untuk menghindari kejadian yang tidak diinginkan, lebih baik menggunakan Database MySQL yang di host secara local. Kemudian, disarankan untuk tidak menghosting bot secara 24 jam, host bot secara local memang pada saat dibutuhkan.
 
 ### Pesan untuk Pemain
 
@@ -27,15 +27,15 @@ Pilihlah bot dengan administrator yang bertanggung jawab dan dapat dipercaya. Le
 
 Anda butuh
 
-- Node.js dan NPM (atau Package Manager lainnya)
-- MongoDB untuk menyimpan data
-- Handphone tak terpakai (opsional)
+- Node.js LTS dan NPM (atau Package Manager lainnya)
+- Database MySQL atau MariaDB
+- Akun whatsapp tak terpakai
 
 ## Pemakaian
 
 ### Penjelasan Awal
 
-Bot ini adalah bot yang digunakan untuk bermain uno di whatsapp. Cara kerjanya dengan mengirimkan perintah lewat DM pribadi ke bot ini, tapi masih bisa digunakan di grup semisal untuk membuat permainan.
+Bot ini adalah bot yang digunakan untuk bermain uno di whatsapp. Cara kerjanya dengan mengirimkan perintah lewat DM pribadi ke bot ini, tapi juga bisa digunakan di grup namun terbatas untuk membuat dan bergabung dalam permainan.
 
 Untuk membuat permainan caranya dengan menjalankan `U#creategame` (atau `U#cg`) dan akan membuat kode yang bisa diteruskan ke orang lain.
 
@@ -291,14 +291,36 @@ npm install
 pnpm install
 ```
 
+### Mengenerate dan push schema ke database
+
+Karena menggunakan database yang SQL-Based dan prisma, diperlukan untuk mengenerate dan push schema ke database. Di bawah ini adalah perintah-perintah yang harus dilaksanakan.
+
+Generate schema prisma:
+
+```sh
+npm run db:generate
+
+# atau menggunakan pnpm
+pnpm db:generate
+```
+
+Push schema prisma ke database:
+
+```sh
+npm run db:push
+
+# atau menggunakan pnpm
+pnpm db:push
+```
+
 ### Menjalankan Bot
 
 Pertama-tama, copy file `env.example` menjadi `.env` dan isikan value yang sesuai.
 
 Keterangan `.env`:
 
-- `MONGO_URI`: URL Database MongoDB yang akan dijadikan penyimpanan data (WAJIB)
-- `PREFIX`: Prefix bot agar bisa dipanggil dan digunakan, default `U#` (TIDAK WAJIB)
+- `DATABASE_URL`: URL Database MySQL yang akan dijadikan penyimpanan data (**WAJIB**)
+- `PREFIX`: Prefix bot agar bisa dipanggil dan digunakan, default `U#` (Opsional)
 
 Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.
 
@@ -309,7 +331,7 @@ npm run build
 pnpm build
 ```
 
-Selesai mem-build bot, **jangan lupa menjalankan MongoDB**. Jika sudah berjalan baru bisa menggunakan bot dengan mengetikkan
+Selesai mem-build bot, **jangan lupa menjalankan database MySQL/MariaDB**. Jika sudah berjalan baru bisa menggunakan bot dengan mengetikkan
 
 ```sh
 npm start
@@ -320,7 +342,7 @@ pnpm start
 
 Jika baru pertama kali menjalankan, scan barcode di terminal untuk dihubungkan ke whatsapp di handphone.
 
-Atau ingin dijalankan seperti mode production menggunakan `pm2` bisa menjalankan perintah di bawah ini, jangan lupa autentikasi terlebih dahulu menggunakan `pnpm start` karena lebih mudah dan menginstall `pm2` secara global.
+Jika ingin dijalankan seperti mode production menggunakan `pm2` bisa menjalankan perintah di bawah ini, jangan lupa autentikasi terlebih dahulu mengikuti langkah di atas karena lebih mudah. Jangan lupa untuk menginstall `pm2` secara global.
 
 ```sh
 pm2 start ecosystem.config.js
