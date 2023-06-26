@@ -1,6 +1,6 @@
 import { Chat, Game, Card } from "../lib";
 
-import { GameModel, CardModel } from "../models";
+import { prisma } from "../handler/database";
 
 /**
  * "requiredJoinGameSession" util callback controller type
@@ -19,14 +19,30 @@ export type TypeReqJGS = (cb: {
 export const requiredJoinGameSession =
   (cb: TypeReqJGS) => async (chat: Chat) => {
     try {
-      if (chat.isJoiningGame) {
-        const gameData = await GameModel.findById(chat.gameProperty!.gameUID);
+      if (chat.isJoiningGame && chat.gameProperty?.gameID) {
+        const gameData = await prisma.game.findUnique({
+          where: {
+            gameID: chat.gameProperty.gameID,
+          },
+          include: {
+            allPlayers: true,
+            bannedPlayers: true,
+            cards: true,
+            playerOrders: true,
+          },
+        });
+
         const game = new Game(gameData!, chat);
 
-        const cardData = await CardModel.findOne({
-          game: gameData!._id,
-          user: chat.user!._id,
+        const cardData = await prisma.userCard.findUnique({
+          where: {
+            playerId: chat.user?.id,
+          },
+          include: {
+            cards: true,
+          },
         });
+
         const card = new Card(cardData!, chat, game);
 
         return await cb({ chat, game, card });
@@ -66,8 +82,16 @@ export const atLeastGameID =
           );
         }
 
-        const searchedGame = await GameModel.findOne({
-          gameID,
+        const searchedGame = await prisma.game.findUnique({
+          where: {
+            gameID,
+          },
+          include: {
+            allPlayers: true,
+            bannedPlayers: true,
+            cards: true,
+            playerOrders: true,
+          },
         });
 
         if (!searchedGame)
@@ -81,9 +105,16 @@ export const atLeastGameID =
         });
       }
 
-      const gameData = await GameModel.findOne({
-        _id: chat.gameProperty!.gameUID,
-        gameID: chat.gameProperty!.gameID,
+      const gameData = await prisma.game.findUnique({
+        where: {
+          gameID: chat.gameProperty!.gameID!,
+        },
+        include: {
+          allPlayers: true,
+          bannedPlayers: true,
+          cards: true,
+          playerOrders: true,
+        },
       });
       const game = new Game(gameData!, chat);
 
@@ -94,7 +125,8 @@ export const atLeastGameID =
     } catch (error) {
       const timeReference = Date.now();
 
-      chat.logger.error({ error, timeReference });
+      chat.logger.error(error);
+      chat.logger.error({ timeReference });
 
       await chat.sendToCurrentPerson(
         `Terjadi sebuah kesalahan internal. Laporkan kesalahan ini kepada administrator bot.\n\n\`\`\`timeReference\`\`\`: ${timeReference}.`

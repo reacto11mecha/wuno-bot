@@ -2,9 +2,9 @@ import type { Client, Contact, Message } from "whatsapp-web.js";
 import pLimit from "p-limit";
 import { Logger } from "pino";
 
+import { env } from "../env";
 import { Chat } from "../lib/Chat";
 import { emitHandler } from "./emitter";
-import { PREFIX } from "../config/prefix";
 import { getController } from "./controller";
 
 import { botInfo } from "../config/messages";
@@ -26,7 +26,7 @@ export const messageHandler = async (
 
   return async (message: Message, contact: Contact) => {
     const command = message.body
-      .slice(PREFIX.length)!
+      .slice(env.PREFIX.length)!
       .trim()!
       .split(/ +/)!
       .shift()!

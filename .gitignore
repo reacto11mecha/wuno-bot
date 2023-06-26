@@ -107,14 +107,13 @@ dist
 auth_info_baileys/
 baileys_store_multi.json
 
-# whatsapp web js authentication info
+# whatsapp web js stuff
 .wwebjs_auth/
+.wwebjs_cache
 
 # typedoc
 docs/
 
-# managed by open-wa
-**.data.json
-**.node-persist**
-**_IGNORE_**
-# end managed by open-wa
+# pnpmn't lockfile
+package-lock.json
+yarn.lock

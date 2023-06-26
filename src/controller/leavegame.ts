@@ -1,26 +1,25 @@
-import { isDocument, isDocumentArray } from "@typegoose/typegoose";
-
 import { requiredJoinGameSession } from "../utils";
-import { CardModel, UserModel } from "../models";
 
 import { Game, Chat } from "../lib";
+import { prisma } from "../handler/database";
 
 async function removeGameAuthorAndSetToNextPlayer(chat: Chat, game: Game) {
-  if (isDocumentArray(game.players)) {
-    const { _id: id } = game.players[0];
-    const player = game.players.find(
-      (player) => isDocument(player) && player._id.equals(id)
-    );
+  if (game.players.length > 0) {
+    const { id } = game.players[0];
+
+    const players = await game.getAllPlayerUserObject();
+
+    const player = players.find((player) => player?.id === id);
 
     await game.setCreatorId(id);
 
-    if (isDocument(player)) {
+    if (player) {
       await Promise.all([
         chat.replyToCurrentPerson(
-          `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${player.userName}`
+          `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${player.username}`
         ),
         game.sendToOtherPlayersWithoutCurrentPlayer(
-          `${chat.message.userName} telah keluar dari game, dan posisi host sekarang berpindah ke ${player.userName}`
+          `${chat.message.userName} telah keluar dari game, dan posisi host sekarang berpindah ke ${player.username}`
         ),
       ]);
     }
@@ -28,15 +27,23 @@ async function removeGameAuthorAndSetToNextPlayer(chat: Chat, game: Game) {
 }
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
-  const creator = await UserModel.findOne({
-    _id: isDocument(game.creator) && game.creator._id,
-  });
-  await game.removeUserFromArray(chat.user!._id);
+  const creator = await game.getCreatorUser();
+  await game.removeUserFromArray(chat.user!.id);
 
-  const nextPlayer = game.getNextPosition();
+  const nextPlayerMetadata = game.getNextPosition();
+
+  const nextPlayer = nextPlayerMetadata
+    ? await prisma.user.findUnique({
+        where: { id: nextPlayerMetadata.playerId },
+      })
+    : null;
 
   if (game.state.PLAYING) {
-    const currentPlayer = game.currentPlayer;
+    const currentPlayer = await prisma.user.findUnique({
+      where: {
+        id: game.currentPositionId!,
+      },
+    });
 
     // Check if players is less than two person
     if (game.players!.length < 2) {
@@ -55,16 +62,20 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     }
 
     // Typeguard playing state start
-    if (isDocument(currentPlayer) && isDocument(nextPlayer)) {
+    if (currentPlayer && nextPlayer) {
       if (game.currentPlayerIsAuthor) {
         // Is current chatter the author and it's turn
-        await game.setCreatorId(nextPlayer._id);
+        await game.setCreatorId(nextPlayer.id);
 
-        await game.updatePosition(nextPlayer._id);
+        await game.updatePosition(nextPlayer.id);
 
-        const card = await CardModel.findOne({
-          game: game.uid,
-          user: nextPlayer._id,
+        const userCard = await prisma.userCard.findUnique({
+          where: {
+            playerId: nextPlayer.id,
+          },
+          include: {
+            cards: true,
+          },
         });
 
         await Promise.all([
@@ -81,14 +92,16 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             );
             await chat.sendToOtherPerson(
               otherPlayer,
-              `Kartu kamu: ${card?.cards?.join(", ")}.`
+              `Kartu kamu: ${userCard?.cards
+                .map((card) => card.cardName)
+                .join(", ")}.`
             );
           })(),
           chat.replyToCurrentPerson(
-            `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${nextPlayer.userName}`
+            `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${nextPlayer.username}`
           ),
           game.sendToOtherPlayersWithoutCurrentPlayer(
-            `${chat.message.userName} telah keluar dari game, dan posisi host sekarang berpindah ke ${nextPlayer.userName}, saat ini giliran dia juga untuk bermain`
+            `${chat.message.userName} telah keluar dari game, dan posisi host sekarang berpindah ke ${nextPlayer.username}, saat ini giliran dia juga untuk bermain`
           ),
         ]);
       } else if (game.isGameCreator) {
@@ -96,11 +109,15 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
         await removeGameAuthorAndSetToNextPlayer(chat, game);
       } else if (game.isCurrentChatTurn) {
         // Is current chatter not the author and it's turn
-        await game.updatePosition(nextPlayer._id);
+        await game.updatePosition(nextPlayer.id);
 
-        const card = await CardModel.findOne({
-          game: game.uid,
-          user: nextPlayer._id,
+        const userCard = await prisma.userCard.findUnique({
+          where: {
+            playerId: nextPlayer.id,
+          },
+          include: {
+            cards: true,
+          },
         });
 
         await Promise.all([
@@ -117,14 +134,16 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             );
             await chat.sendToOtherPerson(
               otherPlayer,
-              `Kartu kamu: ${card?.cards?.join(", ")}.`
+              `Kartu kamu: ${userCard?.cards
+                .map((card) => card.cardName)
+                .join(", ")}.`
             );
           })(),
           chat.replyToCurrentPerson(
-            `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${nextPlayer.userName}`
+            `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${nextPlayer.username}`
           ),
           game.sendToOtherPlayersWithoutCurrentPlayer(
-            `${chat.message.userName} telah keluar dari game, selanjutnya adalah giliran ${nextPlayer.userName} untuk bermain`
+            `${chat.message.userName} telah keluar dari game, selanjutnya adalah giliran ${nextPlayer.username} untuk bermain`
           ),
         ]);
       } else {
@@ -144,14 +163,11 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     // WAITING STATE
 
     // Typeguard waiting state start
-    if (isDocument(creator)) {
-      if (creator._id.equals(chat.user!._id) && game.players!.length > 1) {
+    if (creator) {
+      if (creator.id === chat.user!.id && game.players!.length > 1) {
         // Is current chatter is author and it's more than one player waiting
         await removeGameAuthorAndSetToNextPlayer(chat, game);
-      } else if (
-        creator._id.equals(chat.user!._id) &&
-        game.players!.length < 2
-      ) {
+      } else if (creator.id === chat.user!.id && game.players!.length < 2) {
         // Is current chatter is author and less than two players waiting
         await game.endGame();
 

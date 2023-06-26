@@ -1,0 +1,26 @@
+name: ES Lint & Typing test
+on: [pull_request, push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Mengecek apakah file aman lint eslint dan typescript
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup NodeJS 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: PNPM Install
+        uses: ./.github/actions/pnpm-install
+
+      - name: Test Prettier
+        run: pnpm format:check
+
+      - name: Test Code Linting
+        run: pnpm lint
+
+      - name: Test Code Typing
+        run: pnpm typecheck

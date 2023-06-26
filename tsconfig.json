@@ -109,10 +109,9 @@
       "./src/lib",
       "./src/utils",
       "./src/config/*.ts",
-      "./src/models",
       "./src/handler/*.ts"
     ],
     "out": "docs",
     "excludeExternals": true
- }
+  }
 }

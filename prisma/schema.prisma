@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String
+  phoneNumber String
+  created_at  DateTime @default(now())
+
+  gameProperty UserGameProperty?
+}
+
+model UserGameProperty {
+  id            Int     @id @default(autoincrement())
+  isJoiningGame Boolean @default(false)
+  gameID        String? // Marker
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  PlayerOrder   PlayerOrder?
+  BannedPlayers BannedPlayer?
+  UserCard      UserCard?
+  Player        Player?
+}
+
+enum GameStatus {
+  WAITING
+  PLAYING
+  ENDED
+}
+
+model Game {
+  id              Int            @id @default(autoincrement())
+  gameID          String         @unique @db.Char(11)
+  status          GameStatus     @default(WAITING)
+  created_at      DateTime       @default(now())
+  currentCard     String?        @db.Text()
+  allPlayers      Player[]
+  playerOrders    PlayerOrder[]
+  bannedPlayers   BannedPlayer[]
+  currentPlayerId Int?
+  gameCreatorId   Int
+  winnerId        Int?
+  cards           UserCard[]
+  started_at      DateTime?
+  ended_at        DateTime?
+}
+
+model Player {
+  id       Int              @id @default(autoincrement())
+  game     Game             @relation(fields: [gameId], references: [id])
+  gameId   Int
+  player   UserGameProperty @relation(fields: [playerId], references: [id])
+  playerId Int              @unique
+}
+
+model PlayerOrder {
+  id          Int              @id @default(autoincrement())
+  game        Game             @relation(fields: [gameId], references: [id])
+  gameId      Int
+  playerOrder Int
+  player      UserGameProperty @relation(fields: [playerId], references: [id])
+  playerId    Int              @unique
+}
+
+model BannedPlayer {
+  id       Int              @id @default(autoincrement())
+  game     Game             @relation(fields: [gameId], references: [id])
+  gameId   Int
+  player   UserGameProperty @relation(fields: [playerId], references: [id])
+  playerId Int              @unique
+}
+
+model UserCard {
+  id       Int              @id @default(autoincrement())
+  game     Game             @relation(fields: [gameId], references: [id])
+  gameId   Int
+  player   UserGameProperty @relation(fields: [playerId], references: [id])
+  playerId Int              @unique
+
+  cards Card[]
+}
+
+model Card {
+  id       Int      @id @default(autoincrement())
+  cardName String   @db.Text()
+  card     UserCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  cardId   Int
+}

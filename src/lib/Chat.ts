@@ -6,12 +6,11 @@ import type {
   MessageContent,
   MessageMedia,
 } from "whatsapp-web.js";
-import { DocumentType, isDocument } from "@typegoose/typegoose";
 import { Logger } from "pino";
 import pLimit from "p-limit";
 
-import { PREFIX } from "../config/prefix";
-import { User, GameProperty } from "../models";
+import { env } from "../env";
+import type { UserGameProperty, User } from "../handler/database";
 
 /**
  * Interface for accessible Chat's message property
@@ -75,7 +74,12 @@ export class Chat {
   /**
    * Accessible user document by phone number
    */
-  user?: DocumentType<User>;
+  user?: User;
+
+  /**
+   * Accessible user game property by phone number
+   */
+  gameProperty?: UserGameProperty;
 
   /**
    * Args list from user command
@@ -111,7 +115,7 @@ export class Chat {
     };
 
     this.args = IncomingMessage.body
-      .slice(PREFIX.length)
+      .slice(env.PREFIX.length)
       .trim()
       .split(/ +/)
       .slice(1);
@@ -196,22 +200,12 @@ export class Chat {
   }
 
   /**
-   * Function for set user game property
-   * @param gameProperty Game property of the user
-   */
-  async setUserGameProperty(gameProperty: GameProperty) {
-    if (isDocument(this.user)) {
-      this.user.gameProperty = gameProperty;
-      await this.user.save();
-    }
-  }
-
-  /**
    * User property setter
    * @param user An user document by phone number
    */
-  setUser(user: DocumentType<User>) {
+  setUserAndGameProperty(user: User, gameProperty: UserGameProperty) {
     this.user = user;
+    this.gameProperty = gameProperty;
   }
 
   /**
@@ -233,12 +227,5 @@ export class Chat {
    */
   get isJoiningGame() {
     return this.gameProperty?.isJoiningGame;
-  }
-
-  /**
-   * Retrieve game property from current chatter
-   */
-  get gameProperty() {
-    return this.user?.gameProperty;
   }
 }

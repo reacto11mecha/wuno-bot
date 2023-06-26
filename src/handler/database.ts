@@ -1,19 +1,31 @@
-import mongoose from "mongoose";
-import type { Logger } from "pino";
+import { Prisma, PrismaClient } from "@prisma/client";
 
-mongoose.set("strictQuery", false);
+export * from "@prisma/client";
 
-/**
- * Function that handle database connectivity
- * @param mongoUri Valid MongoDB URI
- * @param logger Pino logger instance
- * @returns void
- */
-export const connectDatabase = (mongoUri: string, logger: Logger) =>
-  mongoose
-    .connect(mongoUri)
-    .then(() => logger.info("[DB] Connected"))
-    .catch((error) => {
-      logger.error({ error });
-      process.exit();
-    });
+const globalForPrisma = globalThis as { prisma?: PrismaClient };
+
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
+  });
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+export type FullGameType = Prisma.GameGetPayload<{
+  include: {
+    cards: true;
+    bannedPlayers: true;
+    playerOrders: true;
+    allPlayers: true;
+  };
+}>;
+
+export type FullUserCardType = Prisma.UserCardGetPayload<{
+  include: {
+    cards: true;
+  };
+}>;

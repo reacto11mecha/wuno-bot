@@ -1,19 +1,38 @@
 import { Chat } from "../lib";
-import { GameModel, Game } from "../models";
+import { prisma } from "../handler/database";
+import { nanoid } from "nanoid";
 
-import { PREFIX } from "../config/prefix";
+import { env } from "../env";
 
 export default async function creategame(chat: Chat) {
   if (!chat.isJoiningGame) {
-    const newGame = await GameModel.create({
-      gameCreatorID: chat.user!._id,
-      players: [chat.user!._id],
-    } as Game);
+    const newGame = await prisma.$transaction(async (tx) => {
+      const userId = chat.user!.id;
+      const gameID = nanoid(11);
 
-    await chat.setUserGameProperty({
-      isJoiningGame: true,
-      gameUID: newGame._id,
-      gameID: newGame.gameID,
+      const game = await tx.game.create({
+        data: {
+          gameID,
+          gameCreatorId: userId,
+          allPlayers: {
+            create: {
+              playerId: userId,
+            },
+          },
+        },
+      });
+
+      await tx.userGameProperty.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          gameID,
+          isJoiningGame: true,
+        },
+      });
+
+      return game;
     });
 
     chat.logger.info(
@@ -23,7 +42,7 @@ export default async function creategame(chat: Chat) {
     if (chat.isGroupChat) {
       await chat.replyToCurrentPerson(
         `Game berhasil dibuat.\n\nPemain yang sudah tergabung\n- ${
-          chat.user!.userName
+          chat.user!.username
         }\n\nKode: ${newGame.gameID}`
       );
 
@@ -31,21 +50,21 @@ export default async function creategame(chat: Chat) {
         "Ayo semua yang berada di grup ini untuk bermain UNO bersama-sama! Teruskan pesan di bawah ke saya dan tunggu permainan untuk dimulai!"
       );
 
-      await chat.sendToCurrentPerson(`${PREFIX}j ${newGame.gameID}`);
+      await chat.sendToCurrentPerson(`${env.PREFIX}j ${newGame.gameID}`);
 
       return;
     }
 
     await chat.replyToCurrentPerson(
       `Game berhasil dibuat.\nAjak teman kamu untuk bermain.\n\nPemain yang sudah tergabung\n- ${
-        chat.user!.userName
+        chat.user!.username
       }\n\nKode: ${newGame.gameID}`
     );
-    await chat.replyToCurrentPerson(`${PREFIX}j ${newGame.gameID}`);
+    await chat.replyToCurrentPerson(`${env.PREFIX}j ${newGame.gameID}`);
   } else {
     await chat.replyToCurrentPerson(
       `Kamu sudah masuk ke sesi game: ${
-        chat.isGroupChat ? "[REDACTED]" : chat.user!.gameProperty?.gameID
+        chat.isGroupChat ? "[REDACTED]" : chat.gameProperty?.gameID
       }`
     );
   }
