@@ -8,7 +8,7 @@
     "test:watch": "jest --watch",
     "dev": "nodemon src/index.ts",
     "start": "node .",
-    "build": "tsc",
+    "build": "tsup",
     "build:doc": "typedoc",
     "build:all": "tsc && typedoc",
     "typecheck": "tsc --noEmit",
@@ -55,6 +55,7 @@
     "prisma": "^4.16.0",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
+    "tsup": "^7.1.0",
     "typedoc": "^0.24.8",
     "typescript": "^5.1.3"
   },

@@ -1,7 +1,13 @@
 import fs from "fs";
 import path from "path";
 
-const dirPath = path.join(__dirname, "..", "controller");
+let dirPath = path.join(__dirname, "..", "controller");
+
+// This is for compiled file in production mode
+if (!fs.existsSync(dirPath)) {
+  dirPath = path.join(__dirname, "controller");
+}
+
 const files = fs
   .readdirSync(dirPath)
   .filter((file) => file.endsWith(".js") || !file.includes(".d.ts"))
