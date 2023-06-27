@@ -10,29 +10,10 @@ import { df as formatTime } from "./utils/index";
 import { prisma } from "./handler/database";
 import { env } from "./env";
 
+import type { Logger } from "pino";
+
 export default class Bot {
-  private logger = P({
-    transport: {
-      targets: [
-        {
-          target: "pino-pretty",
-          level: "debug",
-          options: {
-            colorize: true,
-            ignore: "pid,hostname",
-            translateTime: "SYS:standard",
-          },
-        },
-        {
-          target: "pino/file",
-          level: "debug",
-          options: {
-            destination: path.join(__dirname, "..", "bot.log"),
-          },
-        },
-      ],
-    },
-  });
+  private logger: Logger;
 
   private queue = new PQueue({
     concurrency: 4,
@@ -44,6 +25,29 @@ export default class Bot {
   constructor(clientId: string) {
     this.waClient = new Client({
       authStrategy: new LocalAuth({ clientId }),
+    });
+
+    this.logger = P({
+      transport: {
+        targets: [
+          {
+            target: "pino-pretty",
+            level: "debug",
+            options: {
+              colorize: true,
+              ignore: "pid,hostname",
+              translateTime: "SYS:standard",
+            },
+          },
+          {
+            target: "pino/file",
+            level: "debug",
+            options: {
+              destination: path.join(__dirname, "..", `${clientId}-bot.log`),
+            },
+          },
+        ],
+      },
     });
 
     this.waClient.on("qr", (qr) => qrcode.generate(qr, { small: true }));
