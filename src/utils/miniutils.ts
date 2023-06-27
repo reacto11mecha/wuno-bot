@@ -62,10 +62,8 @@ export const calcElapsedTime = (start: Date, end: Date) => {
  *
  * Credit: https://www.geeksforgeeks.org/random-number-generator-in-arbitrary-probability-distribution-fashion/
  */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-function findCeil(arr, r, l, h) {
-  let mid;
+function findCeil(arr: number[], r: number, l: number, h: number): number {
+  let mid: number;
 
   while (l < h) {
     mid = l + ((h - l) >> 1);
@@ -80,17 +78,16 @@ function findCeil(arr, r, l, h) {
  *
  * Credit: https://www.geeksforgeeks.org/random-number-generator-in-arbitrary-probability-distribution-fashion/
  */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-export function randomWithBias(arr, freq, n) {
-  const prefix = [];
-
+export function randomWithBias<T>(arr: T[], freq: number[], n: number): T {
+  const prefix: number[] = [];
   prefix[0] = freq[0];
 
-  for (let i = 1; i < n; ++i) prefix[i] = prefix[i - 1] + freq[i];
+  for (let i = 1; i < n; ++i) {
+    prefix[i] = prefix[i - 1] + freq[i];
+  }
 
-  const r = Math.floor(Math.random() * prefix[n - 1]) + 1;
+  const random = Math.floor(Math.random() * prefix[n - 1]) + 1;
 
-  const indexc = findCeil(prefix, r, 0, n - 1);
+  const indexc = findCeil(prefix, random, 0, n - 1);
   return arr[indexc];
 }
