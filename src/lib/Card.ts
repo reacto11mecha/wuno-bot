@@ -610,13 +610,12 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           )
           .filter((player) => player.playerId !== actualNextPlayerId!.playerId);
 
-        await Promise.all([
-          this.game.updateCardAndPosition(
-            givenCard,
-            actualNextPlayerId!.playerId
-          ),
-          this.removeCardFromPlayer(givenCard),
-        ]);
+        await this.removeCardFromPlayer(givenCard);
+
+        await this.game.updateCardAndPosition(
+          givenCard,
+          actualNextPlayerId!.playerId
+        );
 
         const nextUserCard = await this.getCardByPlayerAndThisGame(
           actualNextPlayerId!

@@ -4,11 +4,14 @@ import { Game } from "../lib";
 import { prisma } from "../handler/database";
 
 const getReplied = async (game: Game) => {
+  const creator = await game.getCreatorUser();
   const players = await game.getAllPlayerUserObject();
   const currentPlayer = await game.getCurrentPlayerUserData();
 
   const mainTemplate = `Pemain yang sudah tergabung:
-${players!.map((player) => `- ${player?.username}`).join("\n")}`;
+${players!.map((player) => `- ${player?.username}`).join("\n")}
+
+Pembuat game: ${creator?.username}`;
 
   switch (true) {
     case game.state.PLAYING: {

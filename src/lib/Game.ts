@@ -233,7 +233,7 @@ export class Game {
     const playerOrdersExist = this.game.playerOrders.length > 0;
     const cardsExist = this.game.cards.length > 0;
 
-    await prisma.$transaction([
+    const [updatedGameState] = await prisma.$transaction([
       prisma.game.update({
         where: {
           id: this.game.id,
@@ -259,6 +259,12 @@ export class Game {
               }
             : {},
         },
+        include: {
+          allPlayers: true,
+          bannedPlayers: true,
+          cards: true,
+          playerOrders: true,
+        },
       }),
       prisma.userGameProperty.update({
         where: {
@@ -270,6 +276,8 @@ export class Game {
         },
       }),
     ]);
+
+    this.game = updatedGameState;
   }
 
   /**
@@ -296,14 +304,22 @@ export class Game {
    * @param position User specific id
    */
   async updatePosition(position: number) {
-    await prisma.game.update({
+    const updatedGameState = await prisma.game.update({
       where: {
         id: this.game.id,
       },
       data: {
         currentPlayerId: position,
       },
+      include: {
+        allPlayers: true,
+        bannedPlayers: true,
+        cards: true,
+        playerOrders: true,
+      },
     });
+
+    this.game = updatedGameState;
   }
 
   /**
@@ -389,9 +405,9 @@ export class Game {
   ) {
     if (this.players.length > 0) {
       const users = await Promise.all(
-        this.players.map((user) =>
+        this.players.map((player) =>
           prisma.user.findUnique({
-            where: { id: user.id },
+            where: { id: player.playerId },
           })
         )
       );
@@ -474,14 +490,22 @@ export class Game {
    * Function for set game creator
    */
   async setCreatorId(id: number) {
-    await prisma.game.update({
+    const updatedGameState = await prisma.game.update({
       where: {
         id: this.game.id,
       },
       data: {
         gameCreatorId: id,
       },
+      include: {
+        allPlayers: true,
+        bannedPlayers: true,
+        cards: true,
+        playerOrders: true,
+      },
     });
+
+    this.game = updatedGameState;
   }
 
   /**

@@ -1,17 +1,19 @@
-import { requiredJoinGameSession } from "../utils";
+import { requiredJoinGameSession, createAllCardImage } from "../utils";
 
 import { Game, Chat } from "../lib";
 import { prisma } from "../handler/database";
 
+import type { allCard } from "../config/cards";
+
 async function removeGameAuthorAndSetToNextPlayer(chat: Chat, game: Game) {
   if (game.players.length > 0) {
-    const { id } = game.players[0];
+    const { playerId } = game.players[0];
 
     const players = await game.getAllPlayerUserObject();
 
-    const player = players.find((player) => player?.id === id);
+    const player = players.find((player) => player?.id === playerId);
 
-    await game.setCreatorId(id);
+    await game.setCreatorId(playerId);
 
     if (player) {
       await Promise.all([
@@ -28,9 +30,10 @@ async function removeGameAuthorAndSetToNextPlayer(chat: Chat, game: Game) {
 
 export default requiredJoinGameSession(async ({ chat, game }) => {
   const creator = await game.getCreatorUser();
-  await game.removeUserFromArray(chat.user!.id);
 
   const nextPlayerMetadata = game.getNextPosition();
+
+  await game.removeUserFromArray(chat.user!.id);
 
   const nextPlayer = nextPlayerMetadata
     ? await prisma.user.findUnique({
@@ -78,31 +81,47 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           },
         });
 
+        const [currentCardImage, frontCardsImage, backCardsImage] =
+          await createAllCardImage(
+            game.currentCard as allCard,
+            userCard?.cards.map((card) => card.cardName) as allCard[]
+          );
+
         await Promise.all([
           (async () => {
-            const otherPlayer = nextPlayer.phoneNumber;
-
             await chat.sendToOtherPerson(
-              otherPlayer,
+              nextPlayer.phoneNumber,
               "Kamu sekarang adalah host dari game ini, kamu juga yang saat ini dapat giliran main"
             );
             await chat.sendToOtherPerson(
-              otherPlayer,
-              `Kartu saat ini: ${game.currentCard}`
+              nextPlayer.phoneNumber,
+              `Kartu saat ini: ${game.currentCard}`,
+              currentCardImage
             );
             await chat.sendToOtherPerson(
-              otherPlayer,
+              nextPlayer.phoneNumber,
               `Kartu kamu: ${userCard?.cards
                 .map((card) => card.cardName)
-                .join(", ")}.`
+                .join(", ")}.`,
+              frontCardsImage
             );
           })(),
           chat.replyToCurrentPerson(
-            `Anda berhasil keluar dari game. Pembuat game sudah berpindah posisi ke ${nextPlayer.username}`
+            `Anda berhasil keluar dari game. Pembuat game dan giliran main sudah berpindah posisi ke ${nextPlayer.username}`
           ),
-          game.sendToOtherPlayersWithoutCurrentPlayer(
-            `${chat.message.userName} telah keluar dari game, dan posisi host sekarang berpindah ke ${nextPlayer.username}, saat ini giliran dia juga untuk bermain`
-          ),
+          (async () => {
+            await game.sendToOtherPlayersWithoutCurrentPlayer(
+              `${chat.message.userName} telah keluar dari game, dan posisi host sekarang berpindah ke ${nextPlayer.username}, saat ini giliran dia juga untuk bermain`
+            );
+            await game.sendToOtherPlayersWithoutCurrentPlayer(
+              `Kartu saat ini: ${game.currentCard}`,
+              currentCardImage
+            );
+            await game.sendToOtherPlayersWithoutCurrentPlayer(
+              `Kartu yang ${nextPlayer.username} miliki`,
+              backCardsImage
+            );
+          })(),
         ]);
       } else if (game.isGameCreator) {
         // Is current chatter the author and not it's turn
@@ -122,18 +141,16 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
         await Promise.all([
           (async () => {
-            const otherPlayer = nextPlayer.phoneNumber;
-
             await chat.sendToOtherPerson(
-              otherPlayer,
+              nextPlayer.phoneNumber,
               `${chat.message.userName} telah keluar dari game, selanjutnya adalah giliran kamu untuk bermain`
             );
             await chat.sendToOtherPerson(
-              otherPlayer,
+              nextPlayer.phoneNumber,
               `Kartu saat ini: ${game.currentCard}`
             );
             await chat.sendToOtherPerson(
-              otherPlayer,
+              nextPlayer.phoneNumber,
               `Kartu kamu: ${userCard?.cards
                 .map((card) => card.cardName)
                 .join(", ")}.`
