@@ -1,6 +1,6 @@
 {
-    "execMap": {
-        "ts": "ts-node"
-    },
-    "ignore": ["_IGNORE_WUNO_BOT", "WUNO_BOT.data.json", "dist"]
+  "execMap": {
+    "ts": "node --require ts-node/register"
+  },
+  "ignore": ["_IGNORE_WUNO_BOT", "WUNO_BOT.data.json", "dist"]
 }

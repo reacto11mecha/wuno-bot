@@ -7,6 +7,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "dev": "nodemon src/index.ts",
+    "debug": "nodemon --inspect src/index.ts",
     "start": "node .",
     "build": "tsup",
     "build:doc": "typedoc",
