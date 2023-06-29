@@ -429,6 +429,35 @@ export class Game {
   }
 
   /**
+   * Send message or message with image caption to desired players list
+   */
+  async sendToSpecificPlayerList(
+    message: MessageContent | MessageSendOptions,
+    players: Player[],
+    image?: MessageMedia
+  ) {
+    if (players.length > 0) {
+      const users = await Promise.all(
+        players.map((player) =>
+          prisma.user.findUnique({
+            where: { id: player.playerId },
+          })
+        )
+      );
+
+      await Promise.all(
+        users.map((user) => {
+          if (user)
+            return this.chat.sendToOtherPerson(
+              user.phoneNumber,
+              message,
+              image
+            );
+        })
+      );
+    }
+  }
+  /**
    * Send message or image with caption to all players without current person
    * @param message Text that will sended
    * @param players Players list (optional)
