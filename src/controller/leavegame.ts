@@ -130,14 +130,16 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                 );
                 await chat.sendToOtherPerson(
                   nextPlayer!.phoneNumber,
-                  `Kartu saat ini: ${game.currentCard}`,
+                  { caption: `Kartu saat ini: ${game.currentCard}` },
                   currentCardImage
                 );
                 await chat.sendToOtherPerson(
                   nextPlayer!.phoneNumber,
-                  `Kartu kamu: ${nextPlayerCards?.cards
-                    .map((card) => card.cardName)
-                    .join(", ")}.`,
+                  {
+                    caption: `Kartu kamu: ${nextPlayerCards?.cards
+                      .map((card) => card.cardName)
+                      .join(", ")}.`,
+                  },
                   frontCardsImage
                 );
               } else {
@@ -154,12 +156,12 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                     );
                     await chat.sendToOtherPerson(
                       nextAuthor!.phoneNumber,
-                      `Kartu saat ini: ${game.currentCard}`,
+                      { caption: `Kartu saat ini: ${game.currentCard}` },
                       currentCardImage
                     );
                     await chat.sendToOtherPerson(
                       nextAuthor!.phoneNumber,
-                      `Kartu yang ${nextPlayer!.username} miliki`,
+                      { caption: `Kartu yang ${nextPlayer!.username} miliki` },
                       backCardsImage
                     );
                   })(),
@@ -176,14 +178,16 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                     );
                     await chat.sendToOtherPerson(
                       nextPlayer!.phoneNumber,
-                      `Kartu saat ini: ${game.currentCard}`,
+                      { caption: `Kartu saat ini: ${game.currentCard}` },
                       currentCardImage
                     );
                     await chat.sendToOtherPerson(
                       nextPlayer!.phoneNumber,
-                      `Kartu kamu: ${nextPlayerCards?.cards
-                        .map((card) => card.cardName)
-                        .join(", ")}.`,
+                      {
+                        caption: `Kartu kamu: ${nextPlayerCards?.cards
+                          .map((card) => card.cardName)
+                          .join(", ")}.`,
+                      },
                       frontCardsImage
                     );
                   })(),
@@ -206,12 +210,12 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
               await game.sendToSpecificPlayerList(initialText, playerList);
               await game.sendToSpecificPlayerList(
-                `Kartu saat ini: ${game.currentCard}`,
+                { caption: `Kartu saat ini: ${game.currentCard}` },
                 playerList,
                 currentCardImage
               );
               await game.sendToSpecificPlayerList(
-                `Kartu yang ${nextPlayer!.username} miliki`,
+                { caption: `Kartu yang ${nextPlayer!.username} miliki` },
                 playerList,
                 backCardsImage
               );
@@ -263,14 +267,16 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                 );
                 await chat.sendToOtherPerson(
                   nextPlayer!.phoneNumber,
-                  `Kartu saat ini: ${game.currentCard}`,
+                  { caption: `Kartu saat ini: ${game.currentCard}` },
                   currentCardImage
                 );
                 await chat.sendToOtherPerson(
                   nextPlayer!.phoneNumber,
-                  `Kartu kamu: ${nextPlayerCards?.cards
-                    .map((card) => card.cardName)
-                    .join(", ")}.`,
+                  {
+                    caption: `Kartu kamu: ${nextPlayerCards?.cards
+                      .map((card) => card.cardName)
+                      .join(", ")}.`,
+                  },
                   frontCardsImage
                 );
               })(),
@@ -286,12 +292,12 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                   playerList
                 );
                 await game.sendToSpecificPlayerList(
-                  `Kartu saat ini: ${game.currentCard}`,
+                  { caption: `Kartu saat ini: ${game.currentCard}` },
                   playerList,
                   currentCardImage
                 );
                 await game.sendToSpecificPlayerList(
-                  `Kartu yang ${nextPlayer!.username} miliki`,
+                  { caption: `Kartu yang ${nextPlayer!.username} miliki` },
                   playerList,
                   backCardsImage
                 );
