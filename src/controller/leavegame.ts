@@ -122,7 +122,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
               }. Terima kasih sudah bermain!`
             ),
             (async () => {
-              // If the next author is also the next author
+              // If the next author is also the next player
               if (nextAuthor!.id === nextPlayer!.id) {
                 await chat.sendToOtherPerson(
                   nextPlayer!.phoneNumber,
@@ -194,6 +194,8 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                 ]);
               }
             })(),
+
+            // Rest of the players
             (async () => {
               const initialText =
                 nextAuthor!.id === nextPlayer!.id

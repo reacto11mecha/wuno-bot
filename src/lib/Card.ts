@@ -228,7 +228,9 @@ export class Card {
     const winnerProfilePictUrl = await this.chat.getContactProfilePicture();
     const profilePict = await MessageMedia.fromUrl(winnerProfilePictUrl);
 
-    const playerList = this.game.players;
+    const playerList = this.game.players.filter(
+      (player) => player.playerId !== this.chat.user!.id
+    );
     await this.game.endGame();
 
     await this.game.setWinner(this.chat.user!.id);
@@ -236,6 +238,7 @@ export class Card {
     const gameDuration = this.game.getElapsedTime();
 
     await Promise.all([
+      // Send message to the winner
       this.chat.sendToCurrentPerson(
         {
           caption: `Selamat! Kamu memenangkan kesempatan permainan kali ini.
@@ -246,7 +249,9 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
         },
         profilePict
       ),
-      this.game.sendToOtherPlayersWithoutCurrentPerson(
+
+      // Send message to the rest of the player
+      this.game.sendToSpecificPlayerList(
         {
           caption: `${this.chat.message.userName} memenangkan kesempatan permainan kali ini.
 
@@ -254,7 +259,6 @@ Dia telah memanangkan permainan ini dengan durasi ${gameDuration}.
 
 Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
         },
-
         playerList,
         profilePict
       ),
@@ -301,16 +305,20 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     backCardsImage: MessageMedia,
     nextPlayerName: string
   ) {
-    await this.game.sendToOtherPlayersWithoutCurrentPerson(text, playerList);
+    const actualPlayerList = playerList.filter(
+      (player) => player.playerId !== this.chat.user!.id
+    );
 
-    await this.game.sendToOtherPlayersWithoutCurrentPerson(
+    await this.game.sendToSpecificPlayerList(text, actualPlayerList);
+
+    await this.game.sendToSpecificPlayerList(
       { caption: `Kartu saat ini: ${this.game.currentCard}` },
-      playerList,
+      actualPlayerList,
       currentCardImage
     );
-    await this.game.sendToOtherPlayersWithoutCurrentPerson(
+    await this.game.sendToSpecificPlayerList(
       { caption: `Kartu yang ${nextPlayerName} miliki` },
-      playerList,
+      actualPlayerList,
       backCardsImage
     );
   }
@@ -355,7 +363,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
       case "STACK": {
         const nextPlayerId = this.game.getNextPosition();
         const playerList = this.game.players!.filter(
-          (player) => player !== nextPlayerId!
+          (player) => player.playerId !== nextPlayerId!.playerId
         );
 
         await Promise.all([
@@ -390,20 +398,19 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
                   backCardsImage,
                   nextPlayer.username
                 ),
+                this.sendToOtherPersonInGame(
+                  `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, Sekarang giliran kamu untuk bermain`,
+                  `Kartu kamu: ${nextUserCard?.join(", ")}.`,
+                  nextPlayer.phoneNumber,
+                  currentCardImage,
+                  frontCardsImage
+                ),
                 this.sendToOtherPlayersWithoutCurrentPersonInGame(
                   `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, selanjutnya adalah giliran ${nextPlayer.username} untuk bermain`,
                   playerList,
                   currentCardImage,
                   backCardsImage,
                   nextPlayer.username
-                ),
-                this.sendToOtherPersonInGame(
-                  `${this.chat.message.userName} telah mengeluarkan kartu *${givenCard}*, Sekarang giliran kamu untuk bermain`,
-                  `Kartu kamu: ${nextUserCard?.join(", ")}.`,
-                  nextPlayer.phoneNumber,
-                  // It isn't admin turn
-                  currentCardImage,
-                  frontCardsImage
                 ),
               ]);
             }

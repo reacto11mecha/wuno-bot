@@ -17,14 +17,18 @@ export default atLeastGameID(
         "Kamu sudah di banned dari permainan ini!"
       );
 
+    // Copy all available players before new player join in
+    const playerList = [...game.players];
+
     await game.joinGame();
 
     await Promise.all([
       await chat.replyToCurrentPerson(
         `Berhasil join ke game "${game.gameID}", tunggu pembuat ruang game ini memulai permainannya!`
       ),
-      await game.sendToOtherPlayersWithoutCurrentPerson(
-        `Pemain dengan username "${chat.message.userName}" memasuki ruang permainan! Sapa dia dengan menggunakan "${env.PREFIX}say Halo ${chat.message.userName}!"`
+      await game.sendToSpecificPlayerList(
+        `Pemain dengan username "${chat.message.userName}" memasuki ruang permainan! Sapa dia dengan menggunakan "${env.PREFIX}say Halo ${chat.message.userName}!"`,
+        playerList
       ),
     ]);
   },

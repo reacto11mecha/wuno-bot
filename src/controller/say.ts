@@ -19,8 +19,10 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     return await chat.replyToCurrentPerson("Pesan tidak boleh kosong!");
   }
 
-  await game.sendToOtherPlayersWithoutCurrentPerson(
-    `${chat.message.userName}: ${message}`
+  await game.sendToSpecificPlayerList(
+    `${chat.message.userName}: ${message}`,
+    game.players.filter((player) => player.playerId !== chat.user!.id)
   );
+
   await chat.reactToCurrentPerson("👍");
 });

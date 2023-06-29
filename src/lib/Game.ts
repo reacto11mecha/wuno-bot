@@ -212,7 +212,7 @@ export class Game {
 
   /**
    * Function for updating user gameProperty for not joining game session anymore
-   * @param _id Specific user id
+   * @param id Specific user id
    */
   async leaveGameForUser(id: number) {
     await prisma.userGameProperty.update({
@@ -227,7 +227,7 @@ export class Game {
 
   /**
    * Function for removing user from player array (leaving, get kicked)
-   * @param _id Specific user id
+   * @param id Specific user id
    */
   async removeUserFromArray(id: number) {
     const playerOrdersExist = this.game.playerOrders.length > 0;
@@ -285,7 +285,7 @@ export class Game {
    * @param id Specific user id
    */
   async addUserToBannedList(id: number) {
-    await prisma.game.update({
+    const updatedGameState = await prisma.game.update({
       where: {
         id: this.game.id,
       },
@@ -296,7 +296,15 @@ export class Game {
           },
         },
       },
+      include: {
+        allPlayers: true,
+        bannedPlayers: true,
+        cards: true,
+        playerOrders: true,
+      },
     });
+
+    this.game = updatedGameState;
   }
 
   /**
@@ -395,41 +403,10 @@ export class Game {
   }
 
   /**
-   * Send message or image with caption to all players without current player
-   * @param message Text that will sended
-   * @param image Image that will sended (Optional)
-   */
-  async sendToOtherPlayersWithoutCurrentPlayer(
-    message: MessageContent | MessageSendOptions,
-    image?: MessageMedia
-  ) {
-    if (this.players.length > 0) {
-      const users = await Promise.all(
-        this.players.map((player) =>
-          prisma.user.findUnique({
-            where: { id: player.playerId },
-          })
-        )
-      );
-
-      await Promise.all(
-        users
-          .filter((user) => user?.phoneNumber !== this.chat.message.userNumber)
-          .filter((user) => user?.id !== this.game.currentPlayerId)
-          .map(async (user) => {
-            if (user)
-              await this.chat.sendToOtherPerson(
-                user.phoneNumber,
-                message,
-                image
-              );
-          })
-      );
-    }
-  }
-
-  /**
    * Send message or message with image caption to desired players list
+   * @param message Text that will sended
+   * @param players Desired player list
+   * @param image Image that will send (optional)
    */
   async sendToSpecificPlayerList(
     message: MessageContent | MessageSendOptions,
@@ -456,63 +433,6 @@ export class Game {
         })
       );
     }
-  }
-  /**
-   * Send message or image with caption to all players without current person
-   * @param message Text that will sended
-   * @param players Players list (optional)
-   * @param image Image that will send (optional)
-   */
-  async sendToOtherPlayersWithoutCurrentPerson(
-    message: MessageContent | MessageSendOptions,
-    players?: Player[],
-    image?: MessageMedia
-  ) {
-    if (players && players.length > 0) {
-      const users = await Promise.all(
-        players.map((player) =>
-          prisma.user.findUnique({
-            where: { id: player.playerId },
-          })
-        )
-      );
-
-      await Promise.all(
-        users
-          .filter((user) => user?.phoneNumber !== this.chat.message.userNumber)
-          .map((user) => {
-            if (user)
-              return this.chat.sendToOtherPerson(
-                user.phoneNumber,
-                message,
-                image
-              );
-          })
-      );
-
-      return;
-    }
-
-    const users = await Promise.all(
-      this.players.map((user) =>
-        prisma.user.findUnique({
-          where: { id: user.playerId },
-        })
-      )
-    );
-
-    await Promise.all(
-      users
-        .filter((user) => user?.phoneNumber !== this.chat.message.userNumber)
-        .map((user) => {
-          if (user)
-            return this.chat.sendToOtherPerson(
-              user.phoneNumber,
-              message,
-              image
-            );
-        })
-    );
   }
 
   /**

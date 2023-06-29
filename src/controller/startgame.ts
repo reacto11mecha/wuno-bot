@@ -134,24 +134,22 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       // The person who got the first turn
       (async () => {
         if (currentPlayer) {
-          const currentPlayerNumber = currentPlayer.phoneNumber;
-
           await chat.sendToOtherPerson(
-            currentPlayerNumber,
+            currentPlayer.phoneNumber,
             "Game berhasil dimulai! Sekarang giliran kamu untuk bermain"
           );
           await chat.sendToOtherPerson(
-            currentPlayerNumber,
+            currentPlayer.phoneNumber,
             `Urutan Bermain:\n${playersOrder}`
           );
 
           await chat.sendToOtherPerson(
-            currentPlayerNumber,
+            currentPlayer.phoneNumber,
             { caption: `Kartu saat ini: ${game.currentCard}` },
             currentCardImage
           );
           await chat.sendToOtherPerson(
-            currentPlayerNumber,
+            currentPlayer.phoneNumber,
             {
               caption: `Kartu kamu: ${currentPlayerCard?.cards
                 .map((card) => card.cardName)
