@@ -124,8 +124,7 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
             })
           )
       )
-      .map((data) => data.reduce((curr, acc) => curr.concat(acc)))
-      .reduce((curr, acc) => curr.concat(acc));
+      .flat(2);
 
     expect(allPossibleCombination.length).toEqual(36);
     expect(
@@ -184,7 +183,7 @@ describe("Card comparer unit test [UNMATCH]", () => {
             return compareTwoCard(deckCard, givenCard);
           })
       )
-      .reduce((curr, acc) => curr.concat(acc));
+      .flat();
 
     expect(allPossibleCombination.length).toEqual(12);
     expect(
