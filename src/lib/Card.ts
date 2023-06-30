@@ -366,10 +366,11 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           (player) => player.playerId !== nextPlayerId!.playerId
         );
 
-        await Promise.all([
-          this.game.updateCardAndPosition(givenCard, nextPlayerId!.playerId),
-          this.removeCardFromPlayer(givenCard),
-        ]);
+        await this.game.updateCardAndPosition(
+          givenCard,
+          nextPlayerId!.playerId
+        );
+        await this.removeCardFromPlayer(givenCard);
 
         const nextUserCard = await this.getCardByPlayerAndThisGame(
           nextPlayerId!
@@ -553,10 +554,11 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           (player) => player !== nextPlayerId!
         );
 
-        await Promise.all([
-          this.game.updateCardAndPosition(givenCard, nextPlayerId!.playerId),
-          this.removeCardFromPlayer(givenCard),
-        ]);
+        await this.game.updateCardAndPosition(
+          givenCard,
+          nextPlayerId!.playerId
+        );
+        await this.removeCardFromPlayer(givenCard);
 
         const nextUserCard = await this.getCardByPlayerAndThisGame(
           nextPlayerId!
@@ -841,10 +843,11 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
           (player) => player !== nextPlayerId!
         );
 
-        await Promise.all([
-          this.game.updateCardAndPosition(givenCard, nextPlayerId!.playerId),
-          this.removeCardFromPlayer("wild"),
-        ]);
+        await this.game.updateCardAndPosition(
+          givenCard,
+          nextPlayerId!.playerId
+        );
+        await this.removeCardFromPlayer("wild");
 
         const nextUserCard = await this.getCardByPlayerAndThisGame(
           nextPlayerId!
