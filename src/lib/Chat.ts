@@ -222,6 +222,24 @@ export class Chat {
   }
 
   /**
+   * Current chatter have message media in it
+   */
+  async hasMediaInCurrentChat() {
+    const hasMedia = this.incomingMessage.hasMedia;
+
+    if (hasMedia) {
+      const currentMedia = await this.incomingMessage.downloadMedia();
+
+      return {
+        hasMedia,
+        currentMedia,
+      };
+    }
+
+    return { hasMedia };
+  }
+
+  /**
    * User property setter
    * @param user An user document by phone number
    */

@@ -17,6 +17,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     (player) => player.playerId !== chat.user!.id
   );
 
+  // Media handler
   const { hasQuotedMessage, quotedMessage, quotedMessageMedia } =
     await chat.hasQuotedMessageMedia();
 
@@ -28,7 +29,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           sendVideoAsGif: true,
           caption:
             message === ""
-              ? `${chat.message.userName} telah mengirim sticker`
+              ? `GIF dari ${chat.message.userName}`
               : `${chat.message.userName}: ${message}`,
         },
         playerList,
@@ -40,10 +41,10 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       return;
     }
 
+    // Check if it's not an image
     if (!quotedMessageMedia.mimetype.startsWith("image/")) {
-      // Check if it's not an image
       await chat.replyToCurrentPerson(
-        "Pesan yang di kutip bukan sebuah gambar!"
+        "Pesan yang bisa dikutip hanya berupa gambar, gif, dan sticker!"
       );
 
       return;
@@ -62,7 +63,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
       await game.sendToSpecificPlayerList(
         message === ""
-          ? `${chat.message.userName} telah mengirim sticker`
+          ? `Sticker dari ${chat.message.userName}`
           : `${chat.message.userName}: ${message}`,
         playerList
       );
@@ -87,6 +88,35 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
     return;
   }
+
+  const { hasMedia, currentMedia } = await chat.hasMediaInCurrentChat();
+
+  if (hasMedia && currentMedia) {
+    // Check if it's not an image
+    if (!currentMedia.mimetype.startsWith("image/")) {
+      await chat.replyToCurrentPerson(
+        "Pesan yang bisa dikutip hanya berupa gambar, gif, dan sticker!"
+      );
+
+      return;
+    }
+
+    await game.sendToSpecificPlayerList(
+      {
+        caption:
+          message === ""
+            ? `Gambar dari ${chat.message.userName}`
+            : `${chat.message.userName}: ${message}`,
+      },
+      playerList,
+      quotedMessageMedia
+    );
+
+    await chat.reactToCurrentPerson("👍");
+
+    return;
+  }
+  // End of media handler
 
   if (message === "") {
     await chat.replyToCurrentPerson("Pesan tidak boleh kosong!");
