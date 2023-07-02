@@ -194,7 +194,8 @@ export class Card {
 
   /**
    * Function for checking if the user is a winner or not
-   * @param notAWinnerCallback If the user not a winner (still in game session)
+   * @param upcomingUserCards Array of cards string
+   * @param notAWinnerCallback Callback for handling the game if the card isn't zero
    * @returns void
    */
   private async checkIsWinner(

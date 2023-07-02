@@ -200,6 +200,28 @@ export class Chat {
   }
 
   /**
+   * Current chatter have quoted message that have media in it
+   */
+  async hasQuotedMessageMedia() {
+    const hasQuotedMessage = this.incomingMessage.hasQuotedMsg;
+
+    if (hasQuotedMessage) {
+      const quotedMessage = await this.incomingMessage.getQuotedMessage();
+      const quotedMessageMedia = await quotedMessage.downloadMedia();
+
+      return {
+        quotedMessage,
+        hasQuotedMessage,
+        quotedMessageMedia,
+      };
+    }
+
+    return {
+      hasQuotedMessage,
+    };
+  }
+
+  /**
    * User property setter
    * @param user An user document by phone number
    */
