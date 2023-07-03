@@ -32,6 +32,7 @@ Anda butuh
 - Node.js LTS dan NPM (atau Package Manager lainnya)
 - Database MySQL atau MariaDB
 - Akun whatsapp tak terpakai
+- Google chrome
 
 ## Pemakaian
 
@@ -322,7 +323,10 @@ Pertama-tama, copy file `env.example` menjadi `.env` dan isikan value yang sesua
 Keterangan `.env`:
 
 - `DATABASE_URL`: URL Database MySQL yang akan dijadikan penyimpanan data (**WAJIB**)
+- `CHROME_PATH`: Path ke executable google chrome yang terinstall (**WAJIB**)
 - `PREFIX`: Prefix bot agar bisa dipanggil dan digunakan, default `U#` (Opsional)
+
+> Di perlukan google chrome supaya bisa menerima dan mengirim gif, sticker, dan gambar secara konsisten. Penjelasan lebih lanjut, cek dokumentasi [wwebjs](https://wwebjs.dev/guide/handling-attachments.html#caveat-for-sending-videos-and-gifs).
 
 Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.
 
