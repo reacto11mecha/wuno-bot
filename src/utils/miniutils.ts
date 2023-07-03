@@ -48,40 +48,8 @@ export const calcElapsedTime = (start: Date, end: Date) => {
 };
 
 /**
- * Find ceiling from array
- *
- * Credit: https://www.geeksforgeeks.org/random-number-generator-in-arbitrary-probability-distribution-fashion/
+ * Get a weighted value from array
  */
-function findCeil(arr: number[], r: number, l: number, h: number): number {
-  let mid: number;
-
-  while (l < h) {
-    mid = l + ((h - l) >> 1);
-    r > arr[mid] ? (l = mid + 1) : (h = mid);
-  }
-
-  return arr[l] >= r ? l : -1;
-}
-
-/**
- * Get random value with certain bias
- *
- * Credit: https://www.geeksforgeeks.org/random-number-generator-in-arbitrary-probability-distribution-fashion/
- */
-export function randomWithBias<T>(arr: T[], freq: number[], n: number): T {
-  const prefix: number[] = [];
-  prefix[0] = freq[0];
-
-  for (let i = 1; i < n; ++i) {
-    prefix[i] = prefix[i - 1] + freq[i];
-  }
-
-  const random = Math.floor(Math.random() * prefix[n - 1]) + 1;
-
-  const indexc = findCeil(prefix, random, 0, n - 1);
-  return arr[indexc];
-}
-
 export function weightedRandom<T>(values: T[], weights: number[]): T {
   const totalWeight = weights.reduce((a, b) => a + b, 0);
   let random = Math.random() * totalWeight;
