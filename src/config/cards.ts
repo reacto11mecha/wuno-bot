@@ -249,7 +249,7 @@ export class CardPicker {
         givenCardCondition.ByMagicCard,
         givenCardCondition.ByRandomPick,
       ],
-      [80, 11, 9]
+      [50, 20, 10]
     );
 
     switch (status) {
