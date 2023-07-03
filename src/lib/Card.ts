@@ -226,42 +226,70 @@ export class Card {
       return;
     }
 
-    const winnerProfilePictUrl = await this.chat.getContactProfilePicture();
-    const profilePict = await MessageMedia.fromUrl(winnerProfilePictUrl);
-
     const playerList = this.game.players.filter(
       (player) => player.playerId !== this.chat.user!.id
     );
+
     await this.game.endGame();
 
     await this.game.setWinner(this.chat.user!.id);
 
     const gameDuration = this.game.getElapsedTime();
 
-    await Promise.all([
-      // Send message to the winner
-      this.chat.sendToCurrentPerson(
-        {
-          caption: `Selamat! Kamu memenangkan kesempatan permainan kali ini.
+    const winnerProfilePictUrl = await this.chat.getContactProfilePicture();
+
+    if (winnerProfilePictUrl) {
+      const profilePict = await MessageMedia.fromUrl(winnerProfilePictUrl);
+
+      await Promise.all([
+        // Send message to the winner
+        this.chat.sendToCurrentPerson(
+          {
+            caption: `Selamat! Kamu memenangkan kesempatan permainan kali ini.
 
 Kamu telah memanangkan permainan ini dengan durasi ${gameDuration}.
 
 Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
-        },
-        profilePict
-      ),
+          },
+          profilePict
+        ),
 
-      // Send message to the rest of the player
-      this.game.sendToSpecificPlayerList(
-        {
-          caption: `${this.chat.message.userName} memenangkan kesempatan permainan kali ini.
+        // Send message to the rest of the player
+        this.game.sendToSpecificPlayerList(
+          {
+            caption: `${this.chat.message.userName} memenangkan kesempatan permainan kali ini.
 
 Dia telah memanangkan permainan ini dengan durasi ${gameDuration}.
 
 Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
-        },
-        playerList,
-        profilePict
+          },
+          playerList,
+          profilePict
+        ),
+      ]);
+
+      return;
+    }
+
+    // If there isn't any available profile picture
+    await Promise.all([
+      // Send message to the winner
+      this.chat.sendToCurrentPerson(
+        `Selamat! Kamu memenangkan kesempatan permainan kali ini.
+
+Kamu telah memanangkan permainan ini dengan durasi ${gameDuration}.
+
+Game otomatis telah dihentikan. Terimakasih sudah bermain!`
+      ),
+
+      // Send message to the rest of the player
+      this.game.sendToSpecificPlayerList(
+        `${this.chat.message.userName} memenangkan kesempatan permainan kali ini.
+
+Dia telah memanangkan permainan ini dengan durasi ${gameDuration}.
+
+Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
+        playerList
       ),
     ]);
   }
