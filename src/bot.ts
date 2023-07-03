@@ -25,6 +25,9 @@ export default class Bot {
   constructor(clientId: string) {
     this.waClient = new Client({
       authStrategy: new LocalAuth({ clientId }),
+      puppeteer: {
+        executablePath: env.CHROME_PATH,
+      },
     });
 
     this.logger = P({
@@ -73,11 +76,6 @@ export default class Bot {
    * The main entrance gate for this bot is working
    */
   async init() {
-    if (!env.DATABASE_URL)
-      throw new Error(
-        "[DB] Diperlukan sebuah URL Database MySQL | DATABASE_URL"
-      );
-
     this.logger.info("[INIT] Inisialisasi bot");
 
     const onMessageQueue = await messageHandler(

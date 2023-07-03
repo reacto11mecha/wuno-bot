@@ -13,6 +13,7 @@ export const env = createEnv({
   server: {
     PREFIX: z.preprocess((value) => value ?? "U#", z.string().min(1)),
     DATABASE_URL: z.string().url(),
+    CHROME_PATH: z.string().min(1),
   },
   client: {},
   runtimeEnv: process.env,
