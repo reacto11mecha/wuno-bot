@@ -226,12 +226,14 @@ export class Chat {
    */
   async hasMediaInCurrentChat() {
     const hasMedia = this.incomingMessage.hasMedia;
+    const currentChat = this.incomingMessage;
 
     if (hasMedia) {
       const currentMedia = await this.incomingMessage.downloadMedia();
 
       return {
         hasMedia,
+        currentChat,
         currentMedia,
       };
     }

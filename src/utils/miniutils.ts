@@ -27,16 +27,6 @@ export const df = (date: Date) =>
     .replace(/\./g, ":");
 
 /**
- * Get biased random value beetween Math.random or webcrypto getRandomValues
- * @returns Random number value
- */
-export const getRandom = () => {
-  const choice = [random(), Math.random()];
-
-  return choice[Math.floor(Math.random() * choice.length)];
-};
-
-/**
  * Util for calculating elapsed time from the given start time to the end time and format it to human readable time
  * @param start Start time js date object
  * @param end End time js date object
@@ -90,4 +80,18 @@ export function randomWithBias<T>(arr: T[], freq: number[], n: number): T {
 
   const indexc = findCeil(prefix, random, 0, n - 1);
   return arr[indexc];
+}
+
+export function weightedRandom<T>(values: T[], weights: number[]): T {
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  let random = Math.random() * totalWeight;
+
+  for (let i = 0; i < weights.length; i++) {
+    random -= weights[i];
+    if (random < 0) {
+      return values[i];
+    }
+  }
+
+  return values[0];
 }
