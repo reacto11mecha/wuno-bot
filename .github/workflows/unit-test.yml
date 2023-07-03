@@ -3,6 +3,7 @@ on: [pull_request, push]
 
 env:
   DATABASE_URL: "mysql://root:password@localhost:3306/random-name"
+  CHROME_PATH: "/usr/bin/google-chrome-stable"
 
 jobs:
   lint:
@@ -16,7 +17,7 @@ jobs:
         with:
           node-version: 18
 
-      - name: Pnpm install
+      - name: PNPM install
         uses: ./.github/actions/pnpm-install
 
       - name: Run unit test

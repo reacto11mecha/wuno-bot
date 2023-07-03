@@ -1,4 +1,4 @@
-import { random, getRandom, randomWithBias } from "../utils";
+import { random, weightedRandom } from "../utils";
 
 /**
  * Typing for all possible UNO card color
@@ -134,7 +134,7 @@ export const regexValidWildColorOnly = /^(wild)(red|green|blue|yellow)$/;
 export const regexValidWildColorPlus4Only =
   /^(wilddraw4)(red|green|blue|yellow)$/;
 
-const reducedByNumbers = [...new Array(14)].map((_, idx) => idx);
+const reducedByNumbers = Array.from({ length: 14 }).map((_, idx) => idx);
 const filteredWildColor = cards
   .filter((card) => !regexValidWildColorOnly.test(card))
   .filter((card) => !regexValidWildColorPlus4Only.test(card));
@@ -153,12 +153,17 @@ export class filterCardByGivenCard {
     color: color,
     number: possibleNumber
   ): allCard[] {
-    const sameByColor = [...filteredWildColor].filter((card) =>
-      card.includes(color)
-    );
-    const sameByNumber = [...filteredWildColor].filter((card) =>
-      card.includes(number as unknown as string)
-    );
+    const sameByColor = [...filteredWildColor]
+      .filter((card) => card.includes(color))
+      .filter((card) => !card.includes("draw2"))
+      .filter((card) => !card.includes("reverse"))
+      .filter((card) => !card.includes("skip"));
+
+    const sameByNumber = [...filteredWildColor]
+      .filter((card) => card.includes(number as unknown as string))
+      .filter((card) => !card.includes("draw2"))
+      .filter((card) => !card.includes("reverse"))
+      .filter((card) => !card.includes("skip"));
 
     return [...new Set([...sameByColor, ...sameByNumber])].filter(
       (card) => !card.includes(actualCard)
@@ -173,21 +178,16 @@ export class filterCardByGivenCard {
 const reusableGetCardByColor = (color: color) => {
   const filteredCard = filterCardByGivenCard.GetCardByColor(color);
 
-  const idxCard = Math.floor(getRandom() * filteredCard.length);
+  const idxCard = Math.floor(random() * filteredCard.length);
   const choosenCard = filteredCard[idxCard];
 
   return choosenCard;
 };
 
-enum randomCardCondition {
-  randomCard,
-  wild,
-}
-
 enum givenCardCondition {
   ByGivenCard,
+  ByMagicCard,
   ByRandomPick,
-  ByInitialCard,
 }
 
 /**
@@ -195,34 +195,36 @@ enum givenCardCondition {
  */
 export class CardPicker {
   /**
-   * Pick a random card or wild card in ratio 16:1
-   * @returns Defined random card or wild card in ratio 16:1
+   * Pick a straight up random card
+   * @returns A random card that doesn't biased by anything
    */
   static pickRandomCard(): allCard {
-    const status: randomCardCondition = randomWithBias(
-      [randomCardCondition.randomCard, randomCardCondition.wild],
-      [16, 1],
-      2
-    );
+    const idxReduced = Math.floor(random() * reducedByNumbers.length);
+    const reducedNumber = reducedByNumbers[idxReduced];
 
-    switch (status) {
-      case randomCardCondition.randomCard: {
-        const idxReduced = Math.floor(getRandom() * reducedByNumbers.length);
-        const reducedNumber = reducedByNumbers[idxReduced];
+    const idxCard = Math.floor(random() * (cards.length - reducedNumber));
+    const card = filteredWildColor[idxCard];
 
-        const idxCard = Math.floor(
-          getRandom() * (cards.length - reducedNumber)
-        );
-        const card = filteredWildColor[idxCard];
+    if (!card) return CardPicker.pickRandomCard();
 
-        if (!card) return CardPicker.pickRandomCard();
+    return card;
+  }
 
-        return card;
-      }
+  static pickByMagicCardBasedOnColor(color: color) {
+    const cards = [
+      `${color}draw2`,
+      `${color}reverse`,
+      `${color}skip`,
+      "wild",
+      "wilddraw4",
+    ] as allCard[];
 
-      case randomCardCondition.wild:
-        return "wild";
-    }
+    const idxCard = Math.floor(random() * cards.length);
+    const card = cards[idxCard];
+
+    if (!card) return CardPicker.pickRandomCard();
+
+    return card;
   }
 
   /**
@@ -241,14 +243,13 @@ export class CardPicker {
    * @returns Biased card by given card, random card, or initial card in ratio 13:5:1
    */
   static pickCardByGivenCard(card: allCard): allCard {
-    const status: givenCardCondition = randomWithBias(
+    const status = weightedRandom<givenCardCondition>(
       [
         givenCardCondition.ByGivenCard,
+        givenCardCondition.ByMagicCard,
         givenCardCondition.ByRandomPick,
-        givenCardCondition.ByInitialCard,
       ],
-      [13, 5, 1],
-      3
+      [50, 20, 10]
     );
 
     switch (status) {
@@ -263,7 +264,7 @@ export class CardPicker {
               state.number!
             );
 
-            const idxCard = Math.floor(getRandom() * filteredCard.length);
+            const idxCard = Math.floor(random() * filteredCard.length);
             const choosenCard = filteredCard[idxCard];
 
             return choosenCard;
@@ -278,11 +279,15 @@ export class CardPicker {
         }
       }
 
-      case givenCardCondition.ByRandomPick:
-        return CardPicker.pickRandomCard();
+      case givenCardCondition.ByMagicCard: {
+        const state = CardPicker.getCardState(card);
 
-      case givenCardCondition.ByInitialCard:
-        return CardPicker.getInitialCard() as allCard;
+        return CardPicker.pickByMagicCardBasedOnColor(state.color!);
+      }
+
+      case givenCardCondition.ByRandomPick:
+      default:
+        return CardPicker.pickRandomCard();
     }
   }
 

@@ -89,9 +89,29 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     return;
   }
 
-  const { hasMedia, currentMedia } = await chat.hasMediaInCurrentChat();
+  const { hasMedia, currentChat, currentMedia } =
+    await chat.hasMediaInCurrentChat();
 
   if (hasMedia && currentMedia) {
+    // If the quoted message is a gif
+    if (currentChat.isGif) {
+      await game.sendToSpecificPlayerList(
+        {
+          sendVideoAsGif: true,
+          caption:
+            message === ""
+              ? `GIF dari ${chat.message.userName}`
+              : `${chat.message.userName}: ${message}`,
+        },
+        playerList,
+        currentMedia
+      );
+
+      await chat.reactToCurrentPerson("👍");
+
+      return;
+    }
+
     // Check if it's not an image
     if (!currentMedia.mimetype.startsWith("image/")) {
       await chat.replyToCurrentPerson(
