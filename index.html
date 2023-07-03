@@ -32,6 +32,7 @@
 <li>Node.js LTS dan NPM (atau Package Manager lainnya)</li>
 <li>Database MySQL atau MariaDB</li>
 <li>Akun whatsapp tak terpakai</li>
+<li>Google chrome</li>
 </ul>
 <a id="md:pemakaian" class="tsd-anchor"></a><h2><a href="#md:pemakaian">Pemakaian</a></h2><a id="md:penjelasan-awal" class="tsd-anchor"></a><h3><a href="#md:penjelasan-awal">Penjelasan Awal</a></h3><p>Bot ini adalah bot yang digunakan untuk bermain uno di whatsapp. Cara kerjanya dengan mengirimkan perintah lewat DM pribadi ke bot ini, tapi juga bisa digunakan di grup namun terbatas untuk membuat dan bergabung dalam permainan.</p>
 <p>Untuk membuat permainan caranya dengan menjalankan <code>U#creategame</code> (atau <code>U#cg</code>) dan akan membuat kode yang bisa diteruskan ke orang lain.</p>
@@ -179,8 +180,12 @@
 <p>Keterangan <code>.env</code>:</p>
 <ul>
 <li><code>DATABASE_URL</code>: URL Database MySQL yang akan dijadikan penyimpanan data (<strong>WAJIB</strong>)</li>
+<li><code>CHROME_PATH</code>: Path ke executable google chrome yang terinstall (<strong>WAJIB</strong>)</li>
 <li><code>PREFIX</code>: Prefix bot agar bisa dipanggil dan digunakan, default <code>U#</code> (Opsional)</li>
 </ul>
+<blockquote>
+<p>Di perlukan google chrome supaya bisa menerima dan mengirim gif, sticker, dan gambar secara konsisten. Penjelasan lebih lanjut, cek dokumentasi <a href="https://wwebjs.dev/guide/handling-attachments.html#caveat-for-sending-videos-and-gifs">wwebjs</a>.</p>
+</blockquote>
 <p>Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.</p>
 <pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">build</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">build</span>
 </code><button>Copy</button></pre>
