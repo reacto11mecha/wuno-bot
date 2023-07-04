@@ -1,8 +1,20 @@
 import { CardPicker, EGetCardState } from "../../src/config/cards";
 import type { allCard } from "../../src/config/cards";
 
-const allColor = ["red", "green", "blue", "yellow"];
-const allSpecialCard = ["reverse", "skip", "draw2"];
+const allColor = [
+  { color: "red" },
+  { color: "green" },
+  { color: "blue" },
+  { color: "yellow" },
+];
+const allSpecialCard = [
+  { type: "reverse" },
+  { type: "skip" },
+  { type: "draw2" },
+];
+const allValidNumbers = Array.from({ length: 10 }).map((_, number) => ({
+  number,
+}));
 
 describe("Get card state unit test", () => {
   it("Function should return invalid state", () => {
@@ -11,58 +23,60 @@ describe("Get card state unit test", () => {
     expect(state).toBe(EGetCardState.INVALID);
   });
 
-  it("Function should return normal card state", () => {
-    const allCardState = allColor.map((color) =>
-      CardPicker.getCardState(`${color}1` as allCard)
-    );
+  describe.each(allColor)(
+    "Check normal number card with $color color is VALID_NORMAL",
+    ({ color }) => {
+      test.each(allValidNumbers)(
+        `The card ${color}$number should be a VALID_NORMAL`,
+        ({ number }) => {
+          const cardState = CardPicker.getCardState(
+            `${color}${number}` as allCard
+          );
 
-    expect(allCardState.length).toBe(4);
-    expect(
-      allCardState.every((card) => card.state === EGetCardState.VALID_NORMAL)
-    ).toBe(true);
-    expect(allCardState.every((card) => card.number === 1)).toBe(true);
-  });
+          expect(cardState.state).toBe(EGetCardState.VALID_NORMAL);
+        }
+      );
+    }
+  );
 
-  it("Function should return wilddraw4 card state", () => {
-    const allCardState = allColor.map((color) =>
-      CardPicker.getCardState(`wilddraw4${color}` as allCard)
-    );
+  describe.each(allColor)(
+    "Check plus 4 card with specific $color color is VALID_WILD_PLUS4",
+    ({ color }) => {
+      it(`Card wilddraw4${color} is VALID_WILD`, () => {
+        const cardState = CardPicker.getCardState(
+          `wilddraw4${color}` as allCard
+        );
 
-    expect(allCardState.length).toBe(4);
-    expect(
-      allCardState.every(
-        (card) => card.state === EGetCardState.VALID_WILD_PLUS4
-      )
-    ).toBe(true);
-  });
+        expect(cardState.state).toBe(EGetCardState.VALID_WILD_PLUS4);
+      });
+    }
+  );
 
-  it("Function should return wild card state", () => {
-    const allCardState = allColor.map((color) =>
-      CardPicker.getCardState(`wild${color}` as allCard)
-    );
+  describe.each(allColor)(
+    "Check wild card with $color color is VALID_WILD",
+    ({ color }) => {
+      it(`Card wild${color} is VALID_WILD`, () => {
+        const cardState = CardPicker.getCardState(`wild${color}` as allCard);
 
-    expect(allCardState.length).toBe(4);
-    expect(
-      allCardState.every((card) => card.state === EGetCardState.VALID_WILD)
-    ).toBe(true);
-  });
+        expect(cardState.state).toBe(EGetCardState.VALID_WILD);
+      });
+    }
+  );
 
-  it("Function should return special card state", () => {
-    const allCardState = allColor
-      .map((color) =>
-        allSpecialCard.map((special) =>
-          CardPicker.getCardState(`${color}${special}` as allCard)
-        )
-      )
-      .reduce((curr, acc) => curr.concat(acc));
+  describe.each(allColor)(
+    "Check special card with $color color is special card according to type",
+    ({ color }) => {
+      test.each(allSpecialCard)(
+        `Check if the ${color}$type card is valid special and in the $type type`,
+        ({ type }) => {
+          const cardState = CardPicker.getCardState(
+            `${color}${type}` as allCard
+          );
 
-    expect(
-      allCardState.every((card) => card.state === EGetCardState.VALID_SPECIAL)
-    ).toBe(true);
-    expect(
-      allSpecialCard
-        .map((type) => allCardState.some((card) => card.type === type))
-        .every((combinationType) => combinationType === true)
-    ).toBe(true);
-  });
+          expect(cardState.state).toBe(EGetCardState.VALID_SPECIAL);
+          expect(cardState.type).toBe(type);
+        }
+      );
+    }
+  );
 });
