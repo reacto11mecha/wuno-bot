@@ -70,6 +70,11 @@ export const messageHandler = async (
       case "leavegame":
         emitter.emit("leavegame", chat);
         break;
+      case "leaderboard":
+      case "board":
+      case "lb":
+        emitter.emit("leaderboard", chat);
+        break;
       case "p":
       case "play":
         emitter.emit("play", chat);

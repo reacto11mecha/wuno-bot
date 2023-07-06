@@ -14,6 +14,8 @@ export const emitHandler = (
 ) => {
   const messageHandler = new EventEmitter();
 
+  messageHandler.on("leaderboard", controller.leaderboard);
+
   messageHandler.on("creategame", findOrCreateUser(controller.creategame));
   messageHandler.on("joingame", findOrCreateUser(controller.joingame));
   messageHandler.on("infogame", findOrCreateUser(controller.infogame));
