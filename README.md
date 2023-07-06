@@ -199,6 +199,21 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
   Berhasil mengkick E. Sekarang dia tidak ada dalam permainan.
   ```
 
+- `leaderboard`
+
+  Perintah ini digunakan untuk mengetahui siapa saja terampil dalam bermain.
+
+  Akan terdapat list nama pemain, berapa permainan yang dimainkan, dan rata-rata permainan.
+
+  Contoh penggunaan:
+
+  _`U# leaderboard`_
+
+  Alias: _`board`_, _`lb`_
+
+  Contoh balasan:
+  Papan peringkat pemain saat ini
+
 - `leavegame`
 
   Perintah ini digunakan untuk keluar dari sebuah permainan.
@@ -239,11 +254,11 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
 
   Perintah ini digunakan untuk mengatakan sesuatu dalam sebuah permainan.
 
-  Isi pesan sesuai yang kamu inginkan, tapi perlu di ingat, bercakaplah dengan bahasa yang sopan.
+  Kamu bisa mengirim gambar, gif, dan sticker dengan caption juga. Untuk mengirim gambar dan sticker kamu bisa mengisi caption dan diisikan perintah yang sesuai. Jika ingin mengirimkan sticker maka kamu harus mengirimkan sticker terlebih dahulu, lalu balas sticker dengan mengisikan caption. Kamu juga bisa melakukan teknik balas pada gambar maupun gif. Selain itu, kamu bisa mengirimkan text biasa.
 
   Contoh penggunaan:
 
-  _`U# say <pesan>`_
+  _`U# say <pesan (wajib jika hanya mengirimkan text)>`_
 
   Alias: _`s`_
 

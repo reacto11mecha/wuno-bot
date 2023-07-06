@@ -220,7 +220,7 @@ export const replies = {
     "leaderboard",
     `Perintah ini digunakan untuk mengetahui siapa saja terampil dalam bermain.
     
-Akan terdapat list nama pemain, berapa permainan yang dimainkan, dan rata-rata permainan.`,
+  Akan terdapat list nama pemain, berapa permainan yang dimainkan, dan rata-rata permainan.`,
     ["board", "lb"],
     "Papan peringkat pemain saat ini"
   ),
@@ -238,7 +238,7 @@ Akan terdapat list nama pemain, berapa permainan yang dimainkan, dan rata-rata p
     "play",
     `Perintah ini digunakan untuk mengeluarkan kartu dalam sebuah permainan.
     
-Jika kartu cocok akan ditaruh ke deck dan pemain selanjutnya akan mendapatkan giliran.`,
+  Jika kartu cocok akan ditaruh ke deck dan pemain selanjutnya akan mendapatkan giliran.`,
     ["p"],
     '"Berhasil mengeluarkan kartu *red9*, selanjutnya adalah giliran B untuk bermain"',
     "<kartu>"
@@ -248,7 +248,7 @@ Jika kartu cocok akan ditaruh ke deck dan pemain selanjutnya akan mendapatkan gi
     "say",
     `Perintah ini digunakan untuk mengirim sesuatu dalam sebuah permainan.
     
-Kamu bisa mengirim gambar, gif, dan sticker dengan caption juga. Untuk mengirim gambar dan sticker kamu bisa mengisi caption dan diisikan perintah yang sesuai. Jika ingin mengirimkan sticker maka kamu harus mengirimkan sticker terlebih dahulu, lalu balas sticker dengan mengisikan caption. Kamu juga bisa melakukan teknik balas pada gambar maupun gif. Selain itu, kamu bisa mengirimkan text biasa.`,
+  Anda dapat mengirim gambar, GIF, dan stiker dengan keterangan. Untuk mengirim gambar dan stiker, berikan keterangan dan ikuti perintah yang sesuai. Jika ingin mengirim stiker, kirimkan stiker terlebih dahulu, kemudian balas dengan memberikan keterangan. Anda juga dapat menggunakan teknik balasan untuk gambar dan GIF. Selain itu, bisa mengirim teks biasa.`,
     ["s"],
     '"USERNAME: pesan disini"',
     "<pesan (wajib jika hanya mengirimkan text)>"
@@ -258,7 +258,7 @@ Kamu bisa mengirim gambar, gif, dan sticker dengan caption juga. Untuk mengirim 
     "startgame",
     `Perintah ini digunakan untuk memulai permainan yang belum berjalan.
     
-    Perintah ini hanya bisa digunakan oleh orang yang membuat permainan.`,
+  Perintah ini hanya bisa digunakan oleh orang yang membuat permainan.`,
     ["sg", "start"],
     '"Game berhasil dimulai! Sekarang giliran C untuk bermain"'
   ),
