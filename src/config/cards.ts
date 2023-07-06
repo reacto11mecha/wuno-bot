@@ -388,10 +388,10 @@ export const getSwitchState = (
   )
     return switchState.FIRSTCARD_IS_COLOR_OR_NUMBER_IS_SAME;
   else if (
-    (firstState.state === EGetCardState.VALID_WILD &&
-      firstState.color === secState.color) ||
-    (firstState.state === EGetCardState.VALID_WILD_PLUS4 &&
-      firstState.color === secState.color)
+    (firstState.state === EGetCardState.VALID_WILD ||
+      firstState.state === EGetCardState.VALID_WILD_PLUS4) &&
+    firstState.color === secState.color &&
+    !secState.type
   )
     return switchState.FIRSTCARD_IS_WILD_OR_WILD4_IS_SAME_SECOND_COLOR;
   else if (

@@ -18,67 +18,72 @@ const allValidNumbers = Array.from({ length: 10 }).map((_, number) => ({
 
 const allNormalColor = allValidNumbers.flatMap(({ number }) =>
   allColor.flatMap(({ color }) => ({
-    card: `${color}${number}`,
+    card: `${color}${number}` as allCard,
   }))
 );
 
 describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
-  test.each(
-    // Create an array of firstCard
-    // and secondCard with same color
-    allColor.flatMap((colorItem) =>
-      allValidNumbers.flatMap((numberItem) => {
-        const firstCard = `${colorItem.color}${numberItem.number}`;
-        const secondCard = allValidNumbers.map(
-          (secondNumberItem) => `${colorItem.color}${secondNumberItem.number}`
-        );
+  describe("Stack card because the cards have same color", () => {
+    test.each(
+      // Create an array of deckCard
+      // and givenCard with same color
+      allColor.flatMap((colorItem) =>
+        allValidNumbers.flatMap((numberItem) => {
+          const deckCard = `${colorItem.color}${numberItem.number}` as allCard;
+          const givenCard = allValidNumbers.map(
+            (secondNumberItem) =>
+              `${colorItem.color}${secondNumberItem.number}` as allCard
+          );
 
-        return secondCard.map((sc) => ({ firstCard, secondCard: sc }));
-      })
-    )
-  )(
-    "Should be succesfully stack $firstCard and $secondCard because it has same color",
-    ({ firstCard, secondCard }) => {
-      const status = compareTwoCard(
-        firstCard as allCard,
-        secondCard as allCard
-      );
+          return givenCard.map((gc) => ({ deckCard, givenCard: gc }));
+        })
+      )
+    )(
+      "Should be succesfully stack $deckCard and $givenCard",
+      ({ deckCard, givenCard }) => {
+        const status = compareTwoCard(deckCard, givenCard);
 
-      expect(status).toBe("STACK");
-    }
-  );
+        expect(status).toBe("STACK");
+      }
+    );
+  });
 
-  // Stack all card with the same color
-  test.each(
-    // Create an array of firstCard and secondCard
-    // with different color but with the same number
-    allValidNumbers.flatMap(({ number }) =>
-      allColor.map(({ color }) => ({
-        firstCard: `${color}${number}`,
-        secondCard: `${color}${number}`,
-      }))
-    )
-  )(
-    "Should be succesfully stack $firstCard and $secondCard because it has same number",
-    ({ firstCard, secondCard }) => {
-      const status = compareTwoCard(
-        firstCard as allCard,
-        secondCard as allCard
-      );
+  describe("Stack card because the cards have same number", () => {
+    // Stack all card with the same number
+    test.each(
+      // Create an array of deckCard and givenCard
+      // with different color but with the same number
+      allValidNumbers.flatMap(({ number }) =>
+        allColor.flatMap(({ color }) => {
+          const deckCard = `${color}${number}` as allCard;
 
-      expect(status).toBe("STACK");
-    }
-  );
+          return allColor
+            .filter((currentColor) => currentColor.color !== color)
+            .map((currentColor) => ({
+              deckCard,
+              givenCard: `${currentColor.color}${number}` as allCard,
+            }));
+        })
+      )
+    )(
+      "Should be succesfully stack $deckCard and $givenCard",
+      ({ deckCard, givenCard }) => {
+        const status = compareTwoCard(deckCard, givenCard);
+
+        expect(status).toBe("STACK");
+      }
+    );
+  });
 
   // Stack wild plus 4 to the deck
   describe.each(
     // Create wilddraw4 with all color
-    allColor.map(({ color }) => ({ wildPlus4: `wilddraw4${color}` }))
+    allColor.map(({ color }) => ({ wildPlus4: `wilddraw4${color}` as allCard }))
   )("Test if plus 4 card could stack on normal color", ({ wildPlus4 }) => {
     test.each(allNormalColor)(
-      "Plus 4 card could stack on normal color ($card)",
+      "Plus 4 card could stack on $card",
       ({ card }) => {
-        const status = compareTwoCard(card as allCard, wildPlus4 as allCard);
+        const status = compareTwoCard(card, wildPlus4);
 
         expect(status).toBe("STACK_PLUS_4");
       }
@@ -88,14 +93,17 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
   // The plus 4 is already on the deck, player will stack their card
   describe.each(
     // Create wilddraw4 card with all color
-    allColor.map(({ color }) => ({ wildDraw4: `wilddraw4${color}`, color }))
+    allColor.map(({ color }) => ({
+      wildDraw4: `wilddraw4${color}` as allCard,
+      color,
+    }))
   )(
     "Test if normal coloured card can stack normally on specific wilddraw4 on the deck",
     ({ wildDraw4, color }) => {
       test.each(allNormalColor.filter(({ card }) => card.includes(color)))(
         `$card could be stacked on ${wildDraw4}`,
         ({ card }) => {
-          const status = compareTwoCard(wildDraw4 as allCard, card as allCard);
+          const status = compareTwoCard(wildDraw4, card);
 
           expect(status).toBe("STACK");
         }
@@ -106,12 +114,12 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
   // Stack wild color to the deck, it'll bypass all normal coloured card
   describe.each(
     // Create wild card with all color
-    allColor.map(({ color }) => ({ wild: `wild${color}` }))
+    allColor.map(({ color }) => ({ wild: `wild${color}` as allCard }))
   )("Test if wild card can bypass all normal coloured card", ({ wild }) => {
     test.each(allNormalColor)(
-      `${wild} card could stack on normal color ($card)`,
+      `${wild} card could stack on $card`,
       ({ card }) => {
-        const status = compareTwoCard(card as allCard, wild as allCard);
+        const status = compareTwoCard(card, wild);
 
         expect(status).toBe("STACK_WILD");
       }
@@ -122,14 +130,14 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
   // player want to stack the card with normal card
   describe.each(
     // Create wild card with all color
-    allColor.map(({ color }) => ({ wild: `wild${color}`, color }))
+    allColor.map(({ color }) => ({ wild: `wild${color}` as allCard, color }))
   )(
     "Test if normal coloured card can stack normally on specific wild on the deck",
     ({ wild, color }) => {
       test.each(allNormalColor.filter(({ card }) => card.includes(color)))(
         `$card could be stacked on ${wild}`,
         ({ card }) => {
-          const status = compareTwoCard(wild as allCard, card as allCard);
+          const status = compareTwoCard(wild, card);
 
           expect(status).toBe("STACK");
         }
@@ -143,7 +151,7 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
     allColor.map(({ color }) => ({ skipCard: `${color}skip`, color }))
   )("Test all skip card with same card color", ({ skipCard, color }) => {
     test.each(allNormalColor.filter(({ card }) => card.includes(color)))(
-      `${skipCard} could be stacked on $card because they are the same by card color`,
+      `${skipCard} could be stacked on $card`,
       ({ card }) => {
         const status = compareTwoCard(card as allCard, skipCard as allCard);
 
@@ -158,7 +166,7 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
     allColor.map(({ color }) => ({ reverseCard: `${color}reverse`, color }))
   )("Test all reverse card with same card color", ({ reverseCard, color }) => {
     test.each(allNormalColor.filter(({ card }) => card.includes(color)))(
-      `${reverseCard} could be stacked on $card because they are the same by card color`,
+      `${reverseCard} could be stacked on $card`,
       ({ card }) => {
         const status = compareTwoCard(card as allCard, reverseCard as allCard);
 
@@ -173,7 +181,7 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
     allColor.map(({ color }) => ({ draw2: `${color}draw2`, color }))
   )("Test all draw2 card with same card color", ({ draw2, color }) => {
     test.each(allNormalColor.filter(({ card }) => card.includes(color)))(
-      `${draw2} could be stacked on $card because they are the same by card color`,
+      `${draw2} could be stacked on $card`,
       ({ card }) => {
         const status = compareTwoCard(card as allCard, draw2 as allCard);
 
@@ -182,122 +190,204 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
     );
   });
 
-  // Stack same special card type to the deck
-  test.each(
-    allColor.flatMap(({ color }) =>
-      allColor
-        .filter((type) => type.color !== color)
-        .flatMap((opposite) =>
-          allSpecialCard.map((special) => {
-            const firstCard = `${opposite.color}${special.type}` as allCard;
-            const secondCard = `${color}${special.type}` as allCard;
+  describe("Stack same special card type but with different color", () => {
+    // Stack same special card type to the deck
+    test.each(
+      allColor.flatMap(({ color }) =>
+        allColor
+          .filter((type) => type.color !== color)
+          .flatMap((opposite) =>
+            allSpecialCard.map((special) => {
+              const deckCard = `${opposite.color}${special.type}` as allCard;
+              const givenCard = `${color}${special.type}` as allCard;
 
-            return {
-              firstCard,
-              secondCard,
-              expected:
-                special.type === "reverse"
-                  ? "VALID_SPECIAL_REVERSE"
-                  : special.type === "skip"
-                  ? "VALID_SPECIAL_SKIP"
-                  : special.type === "draw2"
-                  ? "VALID_SPECIAL_DRAW2"
-                  : null,
-            };
-          })
-        )
-    )
-  )(
-    "$firstCard and $secondCard can be stacked because they are special card but different color",
-    ({ firstCard, secondCard, expected }) => {
-      const state = compareTwoCard(firstCard, secondCard);
+              return {
+                deckCard,
+                givenCard,
+                expected:
+                  special.type === "reverse"
+                    ? "VALID_SPECIAL_REVERSE"
+                    : special.type === "skip"
+                    ? "VALID_SPECIAL_SKIP"
+                    : special.type === "draw2"
+                    ? "VALID_SPECIAL_DRAW2"
+                    : null,
+              };
+            })
+          )
+      )
+    )(
+      "$deckCard and $givenCard can be stacked ($expected)",
+      ({ deckCard, givenCard, expected }) => {
+        const state = compareTwoCard(deckCard, givenCard);
 
-      expect(state).toBe(expected);
-    }
-  );
+        expect(state).toBe(expected);
+      }
+    );
+  });
+
+  describe("Stack special card to plus 4 card and still doing the special card thing", () => {
+    test.each(
+      allColor.flatMap(({ color }) =>
+        allSpecialCard.map((special) => {
+          const deckCard = `wilddraw4${color}` as allCard;
+          const givenCard = `${color}${special.type}` as allCard;
+
+          return {
+            deckCard,
+            givenCard,
+            expected:
+              special.type === "reverse"
+                ? "VALID_SPECIAL_REVERSE"
+                : special.type === "skip"
+                ? "VALID_SPECIAL_SKIP"
+                : special.type === "draw2"
+                ? "VALID_SPECIAL_DRAW2"
+                : null,
+          };
+        })
+      )
+    )(
+      "Can stack $givenCard to $deckCard ($expected)",
+      ({ deckCard, givenCard, expected }) => {
+        const state = compareTwoCard(deckCard, givenCard);
+
+        expect(state).toBe(expected);
+      }
+    );
+  });
+
+  describe("Stack wild card to plus 4 card and still valid wild", () => {
+    test.each(
+      allColor.flatMap(({ color }) =>
+        allColor.map((given) => ({
+          deckCard: `wilddraw4${color}` as allCard,
+          givenCard: `wild${given.color}` as allCard,
+        }))
+      )
+    )("Can stack $givenCard to $deckCard", ({ deckCard, givenCard }) => {
+      const state = compareTwoCard(deckCard, givenCard);
+
+      expect(state).toBe("STACK_WILD");
+    });
+  });
 });
 
 describe("Card comparer unit test [UNMATCH]", () => {
-  it("Normal card compared to normal card but all card are unmatch", () => {
-    const allPossibleCombination = allColor.flatMap((type) =>
-      allColor
-        .filter(({ color }) => color !== type.color)
-        .flatMap((opposite) => {
-          const deckCard = `${type.color}4` as allCard;
-          const givenCard = `${opposite}5` as allCard;
+  const fnTest = ({
+    deckCard,
+    givenCard,
+  }: {
+    deckCard: allCard;
+    givenCard: allCard;
+  }) => {
+    const status = compareTwoCard(deckCard, givenCard);
 
-          return compareTwoCard(deckCard, givenCard);
-        })
-    );
+    expect(status).toBe("UNMATCH");
+  };
 
-    expect(allPossibleCombination.length).toEqual(12);
-    expect(
-      allPossibleCombination.every((combination) => combination === "UNMATCH")
-    ).toBe(true);
-  });
-
-  it("Stack plus 4 compared to normal card but all card are unmatch", () => {
-    const allPossibleCombination = allColor.flatMap((type) =>
-      allColor
-        .filter(({ color }) => color !== type.color)
-        .flatMap((opposite) => {
-          const deckCard = `wildddraw4${type.color}` as allCard;
-          const givenCard = `${opposite.color}4` as allCard;
-
-          return compareTwoCard(deckCard, givenCard);
-        })
-    );
-
-    expect(allPossibleCombination.length).toEqual(12);
-    expect(
-      allPossibleCombination.every((combination) => combination === "UNMATCH")
-    ).toBe(true);
-  });
-
-  it("Stack wild compared to normal card but all card are unmatch", () => {
-    const allPossibleCombination = allColor.flatMap((type) =>
-      allColor
-        .filter(({ color }) => color !== type.color)
-        .flatMap((opposite) => {
-          const deckCard = `wild${opposite.color}` as allCard;
-          const givenCard = `${type.color}4` as allCard;
-
-          return compareTwoCard(deckCard, givenCard);
-        })
-    );
-
-    expect(allPossibleCombination.length).toEqual(12);
-    expect(
-      allPossibleCombination.every((combination) => combination === "UNMATCH")
-    ).toBe(true);
-  });
-
-  it("Stack special compared to special card but all card are unmatch", () => {
-    const allPossibleCombination = allSpecialCard
-      .flatMap((special) =>
-        allSpecialCard
-          .filter(({ type }) => type !== special.type)
-          .flatMap((oppositeType) =>
-            allColor.flatMap((color) =>
-              allColor
-                .filter((type) => type.color !== color.color)
-                .flatMap((oppositeColor) => {
-                  const deckCard =
-                    `${oppositeColor.color}${oppositeType.type}` as allCard;
-                  const givenCard = `${color.color}${special.type}` as allCard;
-
-                  return compareTwoCard(deckCard, givenCard);
-                })
+  describe("Normal card compared to normal card but all card are unmatch", () => {
+    test.each(
+      allColor.flatMap((type) =>
+        allColor
+          .filter(({ color }) => color !== type.color)
+          .flatMap((opposite) =>
+            allValidNumbers.flatMap((validNumberDeck) =>
+              allValidNumbers
+                .filter((given) => given.number !== validNumberDeck.number)
+                .flatMap((validNumberGiven) => ({
+                  deckCard: `${type.color}${validNumberDeck.number}` as allCard,
+                  givenCard:
+                    `${opposite.color}${validNumberGiven.number}` as allCard,
+                }))
             )
           )
       )
-      .flat(4);
+    )("$deckCard can't be stacked by $givenCard", fnTest);
+  });
 
-    console.log(JSON.stringify(allPossibleCombination, null, 2));
+  describe("Stack plus 4 compared to normal card but all card are unmatch", () => {
+    test.each(
+      allColor.flatMap((type) =>
+        allColor
+          .filter(({ color }) => color !== type.color)
+          .flatMap((opposite) => {
+            const deckCard = `wildddraw4${type.color}` as allCard;
 
-    expect(allPossibleCombination.length).toEqual(72);
-    expect(
-      allPossibleCombination.every((combination) => combination === "UNMATCH")
-    ).toBe(true);
+            return allValidNumbers.map(({ number }) => ({
+              deckCard,
+              givenCard: `${opposite.color}${number}` as allCard,
+            }));
+          })
+      )
+    )("$deckCard can't be stacked by $givenCard", fnTest);
+  });
+
+  describe("Stack wild compared to normal card but all card are unmatch", () => {
+    test.each(
+      allColor.flatMap((type) =>
+        allColor
+          .filter(({ color }) => color !== type.color)
+          .flatMap((opposite) => {
+            const deckCard = `wild${opposite.color}` as allCard;
+
+            return allValidNumbers.map(({ number }) => ({
+              deckCard,
+              givenCard: `${type.color}${number}` as allCard,
+            }));
+          })
+      )
+    )("Can't stack $givenCard to $deckCard", fnTest);
+  });
+
+  describe("Can't stack different special card", () => {
+    it.each(
+      allSpecialCard
+        .flatMap((special) =>
+          allSpecialCard
+            .filter(({ type }) => type !== special.type)
+            .flatMap((oppositeType) =>
+              allColor.flatMap((color) =>
+                allColor
+                  .filter((type) => type.color !== color.color)
+                  .flatMap((oppositeColor) => {
+                    const deckCard =
+                      `${oppositeColor.color}${oppositeType.type}` as allCard;
+                    const givenCard =
+                      `${color.color}${special.type}` as allCard;
+
+                    return {
+                      deckCard,
+                      givenCard,
+                    };
+                  })
+              )
+            )
+        )
+        .flat(4)
+    )(
+      "Can't stack special $deckCard compared to special card $givenCard",
+      fnTest
+    );
+  });
+
+  describe("Can't stack special card to plus 4 card if it isn't the same color", () => {
+    test.each(
+      allColor.flatMap(({ color }) => {
+        const deckCard = `wilddraw4${color}` as allCard;
+
+        return allColor
+          .filter((given) => given.color !== color)
+          .flatMap((given) =>
+            allSpecialCard.flatMap(({ type }) => ({
+              deckCard,
+              givenCard: `${given.color}${type}` as allCard,
+            }))
+          );
+      })
+    )(
+      "Can't stack plus 4 $deckCard compared to special card $givenCard",
+      fnTest
+    );
   });
 });
