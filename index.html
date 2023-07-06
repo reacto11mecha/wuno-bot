@@ -178,14 +178,7 @@ Papan peringkat pemain saat ini</p>
 <a id="md:menginstall-package" class="tsd-anchor"></a><h3><a href="#md:menginstall-package">Menginstall package</a></h3><p>Anda ke root directory project dan menginstall package yang diperlukan.</p>
 <pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">install</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">install</span>
 </code><button>Copy</button></pre>
-<a id="md:mengenerate-dan-push-schema-ke-database" class="tsd-anchor"></a><h3><a href="#md:mengenerate-dan-push-schema-ke-database">Mengenerate dan push schema ke database</a></h3><p>Karena menggunakan database yang SQL-Based dan prisma, diperlukan untuk mengenerate dan push schema ke database. Di bawah ini adalah perintah-perintah yang harus dilaksanakan.</p>
-<p>Generate schema prisma:</p>
-<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">db:generate</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">db:generate</span>
-</code><button>Copy</button></pre>
-<p>Push schema prisma ke database:</p>
-<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">db:push</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">db:push</span>
-</code><button>Copy</button></pre>
-<a id="md:menjalankan-bot" class="tsd-anchor"></a><h3><a href="#md:menjalankan-bot">Menjalankan Bot</a></h3><p>Pertama-tama, copy file <code>env.example</code> menjadi <code>.env</code> dan isikan value yang sesuai.</p>
+<a id="md:buat-file-env" class="tsd-anchor"></a><h3><a href="#md:buat-file-env">Buat file <code>.env</code></a></h3><p>Pertama-tama, copy file <code>env.example</code> menjadi <code>.env</code> dan isikan value yang sesuai.</p>
 <p>Keterangan <code>.env</code>:</p>
 <ul>
 <li><code>DATABASE_URL</code>: URL Database MySQL yang akan dijadikan penyimpanan data (<strong>WAJIB</strong>)</li>
@@ -195,7 +188,14 @@ Papan peringkat pemain saat ini</p>
 <blockquote>
 <p>Di perlukan google chrome supaya bisa menerima dan mengirim gif, sticker, dan gambar secara konsisten. Penjelasan lebih lanjut, cek dokumentasi <a href="https://wwebjs.dev/guide/handling-attachments.html#caveat-for-sending-videos-and-gifs">wwebjs</a>.</p>
 </blockquote>
-<p>Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.</p>
+<a id="md:mengenerate-dan-push-schema-ke-database" class="tsd-anchor"></a><h3><a href="#md:mengenerate-dan-push-schema-ke-database">Mengenerate dan push schema ke database</a></h3><p>Karena menggunakan database yang SQL-Based dan prisma, diperlukan untuk mengenerate dan push schema ke database. Di bawah ini adalah perintah-perintah yang harus dilaksanakan.</p>
+<p>Generate schema prisma:</p>
+<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">db:generate</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">db:generate</span>
+</code><button>Copy</button></pre>
+<p>Push schema prisma ke database:</p>
+<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">db:push</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">db:push</span>
+</code><button>Copy</button></pre>
+<a id="md:menjalankan-bot" class="tsd-anchor"></a><h3><a href="#md:menjalankan-bot">Menjalankan Bot</a></h3><p>Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.</p>
 <pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">build</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">build</span>
 </code><button>Copy</button></pre>
 <p>Selesai mem-build bot, <strong>jangan lupa menjalankan database MySQL/MariaDB</strong>. Jika sudah berjalan baru bisa menggunakan bot dengan mengetikkan</p>
@@ -242,6 +242,7 @@ Papan peringkat pemain saat ini</p>
 <li><a href="#md:daftar-perintah"><span>Daftar <wbr/>Perintah</span></a></li>
 <li><a href="#md:cloning-dari-github"><span>Cloning <wbr/>Dari <wbr/>Github</span></a></li>
 <li><a href="#md:menginstall-package"><span>Menginstall package</span></a></li>
+<li><a href="#md:buat-file-env"><span>Buat file .env</span></a></li>
 <li><a href="#md:mengenerate-dan-push-schema-ke-database"><span>Mengenerate dan push schema ke database</span></a></li>
 <li><a href="#md:menjalankan-bot"><span>Menjalankan <wbr/>Bot</span></a></li>
 <li><a href="#md:lisensi"><span>Lisensi</span></a></li></ul></li></ul></li></ul></li></ul></div></details></div>
