@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { DateTime } from "luxon";
+import { DateTime, Duration } from "luxon";
 
 /**
  * Random number value generator that generated form webcrypto
@@ -26,6 +26,26 @@ export const df = (date: Date) =>
     .format(date)
     .replace(/\./g, ":");
 
+const getHumanReadable = (time: string) => {
+  const [hours, minutes, seconds] = time.split(":");
+
+  let humanReadableFormat = "";
+
+  if (parseInt(hours) > 0) {
+    humanReadableFormat += `${hours} jam `;
+  }
+
+  if (parseInt(minutes) > 0) {
+    humanReadableFormat += `${minutes} menit `;
+  }
+
+  if (parseInt(seconds) > 0) {
+    humanReadableFormat += `${seconds} detik`;
+  }
+
+  return humanReadableFormat.trim();
+};
+
 /**
  * Util for calculating elapsed time from the given start time to the end time and format it to human readable time
  * @param start Start time js date object
@@ -36,15 +56,24 @@ export const calcElapsedTime = (start: Date, end: Date) => {
   const luxonStart = DateTime.fromJSDate(start);
   const luxonEnd = DateTime.fromJSDate(end);
 
-  const diffHours = luxonEnd.diff(luxonStart, "hours").hours;
   const diff = luxonEnd.diff(luxonStart);
 
-  const decidedString = diff.toFormat(`${diffHours >= 1 ? "hh: " : ""}mm, ss.`);
+  const decidedString = diff.toFormat("H':'mm':'ss");
 
-  return decidedString
-    .replace(":", " jam")
-    .replace(",", " menit")
-    .replace(".", " detik");
+  return getHumanReadable(decidedString);
+};
+
+/**
+ * Util for formatting human readable duration
+ * @param duration Duration in milisecond
+ * @returns Human readable duration
+ */
+export const calcDuration = (duration: number) => {
+  const luxonDuration = Duration.fromMillis(duration);
+
+  const decidedString = luxonDuration.toFormat("H':'mm':'ss");
+
+  return getHumanReadable(decidedString);
 };
 
 /**
