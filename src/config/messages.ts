@@ -17,7 +17,7 @@ export const GITHUB_URL: string = packageInfo.repository.url
 /**
  * Greeting template for all help message
  */
-export const greeting = `Halo, saya bot untuk bermain uno.
+export const greeting = `Halo, saya adalah bot untuk bermain uno.
 Prefix: \`\`\`${env.PREFIX}\`\`\``;
 
 /**
@@ -127,9 +127,7 @@ const replyBuilder = (
 ) => `${greeting}
 
   ${command.charAt(0).toUpperCase() + command.slice(1)}
-  ${Array.from(new Array(command.length))
-    .map(() => "=")
-    .join("")}
+  ${Array.from({ length: command.length }).fill("=").join("")}
   ${explanation}
   
   Contoh penggunaan:
@@ -218,6 +216,15 @@ export const replies = {
     "<nama yang ingin di kick>"
   ),
 
+  leaderboard: replyBuilder(
+    "leaderboard",
+    `Perintah ini digunakan untuk mengetahui siapa saja terampil dalam bermain.
+    
+Akan terdapat list nama pemain, berapa permainan yang dimainkan, dan rata-rata permainan.`,
+    ["board", "lb"],
+    "Papan peringkat pemain saat ini"
+  ),
+
   leavegame: replyBuilder(
     "leavegame",
     `Perintah ini digunakan untuk keluar dari sebuah permainan.
@@ -239,12 +246,12 @@ Jika kartu cocok akan ditaruh ke deck dan pemain selanjutnya akan mendapatkan gi
 
   say: replyBuilder(
     "say",
-    `Perintah ini digunakan untuk mengatakan sesuatu dalam sebuah permainan.
+    `Perintah ini digunakan untuk mengirim sesuatu dalam sebuah permainan.
     
-  Isi pesan sesuai yang kamu inginkan, tapi perlu di ingat, bercakaplah dengan bahasa yang sopan.`,
+Kamu bisa mengirim gambar, gif, dan sticker dengan caption juga. Untuk mengirim gambar dan sticker kamu bisa mengisi caption dan diisikan perintah yang sesuai. Jika ingin mengirimkan sticker maka kamu harus mengirimkan sticker terlebih dahulu, lalu balas sticker dengan mengisikan caption. Kamu juga bisa melakukan teknik balas pada gambar maupun gif. Selain itu, kamu bisa mengirimkan text biasa.`,
     ["s"],
     '"USERNAME: pesan disini"',
-    "<pesan>"
+    "<pesan (wajib jika hanya mengirimkan text)>"
   ),
 
   startgame: replyBuilder(

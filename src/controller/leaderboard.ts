@@ -56,7 +56,7 @@ export default async function leaderboard(chat: Chat) {
 
       return {
         average,
-        username: user!.username,
+        username: user?.username ?? "????? (Pemain Sudah Dihapus)",
         count: winner.count,
       };
     })
