@@ -12,17 +12,21 @@
 <div class="col-content">
 <div class="tsd-page-title">
 <h2>wuno-bot</h2></div>
-<div class="tsd-panel tsd-typography"><p align="center">
+<div class="tsd-panel tsd-typography"><p><img src="./assets/og.png" alt="Gambar WUNO bot"></p>
+<p align="center">
     <h2 align="center">WUNO (Whatsapp UNO) Bot</h2>
     <span><p align="center">Bot whatsapp yang berguna untuk bermain UNO.</p></span>
 </p>
+
+<br/>
 
 <p><a href="https://github.com/reacto11mecha/wuno-bot/actions/workflows/lint-typing.yml"><img src="https://github.com/reacto11mecha/wuno-bot/actions/workflows/lint-typing.yml/badge.svg" alt="ES Lint &amp; Typing test"></a> <a href="https://github.com/reacto11mecha/wuno-bot/actions/workflows/unit-test.yml"><img src="https://github.com/reacto11mecha/wuno-bot/actions/workflows/unit-test.yml/badge.svg" alt="Unit test"></a></p>
 <blockquote>
 <p>Project ini terinspirasi dari <a href="https://github.com/Exium1/UnoBot">Exium1/UnoBot</a> dan <a href="https://github.com/mjsalerno/UnoBot">mjsalerno/UnoBot</a> yang beberapa asset dan logika pemrograman juga terdapat dalam project ini.</p>
 </blockquote>
 <p>Bot ini adalah bot whatsapp yang memungkinkan pengguna untuk bermain UNO langsung di whatsapp. Dengan menjapri bot, mengirimkan kode permainan ke teman anda, dan memulai permainan kamu bisa bermain UNO seperti kamu bermain dengan teman langsung.</p>
-<a id="md:sebelum-menggunakan" class="tsd-anchor"></a><h2><a href="#md:sebelum-menggunakan">Sebelum Menggunakan</a></h2><p>Bot ini menyimpan data <strong>nomor telepon</strong> serta <strong>username</strong> pemain untuk keperluan mekanisme permainan.</p>
+<a id="md:sebelum-menggunakan" class="tsd-anchor"></a><h2><a href="#md:sebelum-menggunakan">Sebelum Menggunakan</a></h2><p>Bot ini tidak terafiliasi dan didukung oleh WhatsApp maupun UNO. Mohon pengertian jika menemukan masalah suatu saat nomor bot diblokir oleh pihak WhatsApp.</p>
+<p>Bot ini menyimpan data <strong>nomor telepon</strong> serta <strong>username</strong> pemain untuk keperluan mekanisme permainan.</p>
 <p>Jika kamu adalah orang yang menjalankan bot ini, kamu <strong>wajib</strong> bertanggung jawab atas data-data pemain yang tersimpan. <strong>Jangan</strong> melimpahkan data pribadi ke pihak yang tidak bertanggung jawab. Jika mereka ingin menghapus data pribadi mereka, kamu <strong>wajib</strong> menghapusnya.</p>
 <p>Jika kamu adalah pemain, kamu berarti telah <strong>mengetahui</strong> serta <strong>menyetujui</strong> bahwa kamu <strong>mengizinkan</strong> datamu untuk disimpan ke bot lawan bicara. Jika ingin <strong>menghapus</strong> data, silahkan <strong>hubungi operator bot</strong> yang bertanggung jawab.</p>
 <a id="md:pesan-untuk-administrator" class="tsd-anchor"></a><h3><a href="#md:pesan-untuk-administrator">Pesan untuk Administrator</a></h3><p>Untuk menghindari kejadian yang tidak diinginkan, lebih baik menggunakan Database MySQL yang di host secara local. Kemudian, disarankan untuk tidak menghosting bot secara 24 jam, host bot secara local memang pada saat dibutuhkan.</p>
@@ -34,12 +38,46 @@
 <li>Akun whatsapp tak terpakai</li>
 <li>Google chrome</li>
 </ul>
-<a id="md:pemakaian" class="tsd-anchor"></a><h2><a href="#md:pemakaian">Pemakaian</a></h2><a id="md:penjelasan-awal" class="tsd-anchor"></a><h3><a href="#md:penjelasan-awal">Penjelasan Awal</a></h3><p>Bot ini adalah bot yang digunakan untuk bermain uno di whatsapp. Cara kerjanya dengan mengirimkan perintah lewat DM pribadi ke bot ini, tapi juga bisa digunakan di grup namun terbatas untuk membuat dan bergabung dalam permainan.</p>
+<a id="md:pemakaian" class="tsd-anchor"></a><h2><a href="#md:pemakaian">Pemakaian</a></h2><a id="md:cloning-dari-github" class="tsd-anchor"></a><h3><a href="#md:cloning-dari-github">Cloning Dari Github</a></h3><p>Jalankan perintah ini Command Line.</p>
+<pre><code class="language-sh"><span class="hl-0"># HTTPS</span><br/><span class="hl-1">git</span><span class="hl-2"> </span><span class="hl-3">clone</span><span class="hl-2"> </span><span class="hl-3">https://github.com/reacto11mecha/wuno-bot.git</span><br/><br/><span class="hl-0"># SSH</span><br/><span class="hl-1">git</span><span class="hl-2"> </span><span class="hl-3">clone</span><span class="hl-2"> </span><span class="hl-3">git@github.com:reacto11mecha/wuno-bot.git</span>
+</code><button>Copy</button></pre>
+<a id="md:menginstall-package" class="tsd-anchor"></a><h3><a href="#md:menginstall-package">Menginstall package</a></h3><p>Anda ke root directory project dan menginstall package yang diperlukan.</p>
+<pre><code class="language-sh"><span class="hl-1">npm</span><span class="hl-2"> </span><span class="hl-3">install</span><br/><br/><span class="hl-0"># atau menggunakan pnpm</span><br/><span class="hl-1">pnpm</span><span class="hl-2"> </span><span class="hl-3">install</span>
+</code><button>Copy</button></pre>
+<a id="md:buat-file-env" class="tsd-anchor"></a><h3><a href="#md:buat-file-env">Buat file <code>.env</code></a></h3><p>Pertama-tama, copy file <code>env.example</code> menjadi <code>.env</code> dan isikan value yang sesuai.</p>
+<p>Keterangan <code>.env</code>:</p>
+<ul>
+<li><code>DATABASE_URL</code>: URL Database MySQL yang akan dijadikan penyimpanan data (<strong>WAJIB</strong>)</li>
+<li><code>CHROME_PATH</code>: Path ke executable google chrome yang terinstall (<strong>WAJIB</strong>)</li>
+<li><code>PREFIX</code>: Prefix bot agar bisa dipanggil dan digunakan, default <code>U#</code> (Opsional)</li>
+</ul>
+<blockquote>
+<p>Di perlukan google chrome supaya bisa menerima dan mengirim gif, sticker, dan gambar secara konsisten. Penjelasan lebih lanjut, cek dokumentasi <a href="https://wwebjs.dev/guide/handling-attachments.html#caveat-for-sending-videos-and-gifs">wwebjs</a>.</p>
+</blockquote>
+<a id="md:mengenerate-dan-push-schema-ke-database" class="tsd-anchor"></a><h3><a href="#md:mengenerate-dan-push-schema-ke-database">Mengenerate dan push schema ke database</a></h3><p>Karena menggunakan database yang SQL-Based dan prisma, diperlukan untuk mengenerate dan push schema ke database. Di bawah ini adalah perintah-perintah yang harus dilaksanakan.</p>
+<p>Generate schema prisma:</p>
+<pre><code class="language-sh"><span class="hl-1">npm</span><span class="hl-2"> </span><span class="hl-3">run</span><span class="hl-2"> </span><span class="hl-3">db:generate</span><br/><br/><span class="hl-0"># atau menggunakan pnpm</span><br/><span class="hl-1">pnpm</span><span class="hl-2"> </span><span class="hl-3">db:generate</span>
+</code><button>Copy</button></pre>
+<p>Push schema prisma ke database:</p>
+<pre><code class="language-sh"><span class="hl-1">npm</span><span class="hl-2"> </span><span class="hl-3">run</span><span class="hl-2"> </span><span class="hl-3">db:push</span><br/><br/><span class="hl-0"># atau menggunakan pnpm</span><br/><span class="hl-1">pnpm</span><span class="hl-2"> </span><span class="hl-3">db:push</span>
+</code><button>Copy</button></pre>
+<a id="md:menjalankan-bot" class="tsd-anchor"></a><h3><a href="#md:menjalankan-bot">Menjalankan Bot</a></h3><p>Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.</p>
+<pre><code class="language-sh"><span class="hl-1">npm</span><span class="hl-2"> </span><span class="hl-3">run</span><span class="hl-2"> </span><span class="hl-3">build</span><br/><br/><span class="hl-0"># atau menggunakan pnpm</span><br/><span class="hl-1">pnpm</span><span class="hl-2"> </span><span class="hl-3">build</span>
+</code><button>Copy</button></pre>
+<p>Selesai mem-build bot, <strong>jangan lupa menjalankan database MySQL/MariaDB</strong>. Jika sudah berjalan baru bisa menggunakan bot dengan mengetikkan</p>
+<pre><code class="language-sh"><span class="hl-1">npm</span><span class="hl-2"> </span><span class="hl-3">start</span><br/><br/><span class="hl-0"># atau menggunakan pnpm</span><br/><span class="hl-1">pnpm</span><span class="hl-2"> </span><span class="hl-3">start</span>
+</code><button>Copy</button></pre>
+<p>Jika baru pertama kali menjalankan, scan barcode di terminal untuk dihubungkan ke whatsapp di handphone.</p>
+<p>Jika ingin dijalankan seperti mode production menggunakan <code>pm2</code> bisa menjalankan perintah di bawah ini, jangan lupa autentikasi terlebih dahulu mengikuti langkah di atas karena lebih mudah. Jangan lupa untuk menginstall <code>pm2</code> secara global.</p>
+<pre><code class="language-sh"><span class="hl-1">pm2</span><span class="hl-2"> </span><span class="hl-3">start</span><span class="hl-2"> </span><span class="hl-3">ecosystem.config.js</span>
+</code><button>Copy</button></pre>
+<a id="md:penjelasan-permainan" class="tsd-anchor"></a><h3><a href="#md:penjelasan-permainan">Penjelasan Permainan</a></h3><p>Bot ini adalah bot yang digunakan untuk bermain uno di whatsapp. Cara kerjanya dengan mengirimkan perintah lewat DM pribadi ke bot ini, tapi juga bisa digunakan di grup namun terbatas untuk membuat dan bergabung dalam permainan.</p>
 <p>Untuk membuat permainan caranya dengan menjalankan <code>U#creategame</code> (atau <code>U#cg</code>) dan akan membuat kode yang bisa diteruskan ke orang lain.</p>
 <p>Orang yang diberikan meneruskan kembali kode itu ke bot dan akan masuk ke sesi permainan sesuai dengan kode yang sudah diberikan sebelumnya.</p>
 <p>Setelah dirasa sudah cukup orang, permainan bisa dimulai menggunakan <code>U#startgame</code> (atau <code>U#sg</code>) kartu akan diberikan dan permainan dimulai.</p>
 <p>Untuk bermain, gunakan <code>U#play &lt;kartu kamu&gt;</code>
 (atau <code>U#p &lt;kartu kamu&gt;</code>) untuk menaruh kartu yang sesuai dengan apa yang ada di deck. Jika valid, kartu akan ditaruh dan giliran bermain akan beralih ke pemain selanjutnya.</p>
+<p>Kartu di bot ini memiliki sebuah format. Kartu yang ini memiliki 4 warna yaitu warna merah, kuning hijau, dan biru yang di ikuti dengan nomor 0 sampai 9, misal <code>red0</code>. Kemudian kartu pilih warna <code>wild</code> juga tambah 4 <code>wilddraw4</code> yang bisa di sebutkan warnanya. Kemudian kartu spesial yang terdiri reverse (memutar giliran main), skip (melewati giliran main), dan <code>draw2</code> (tambah dua kartu) dengan format warna disebut terlebih dahulu baru jenis kartu spesial disebutkan.</p>
 <p>Jika kamu tidak memiliki kartu ambilah kartu baru dengan menggunakan <code>U#draw</code> (atau <code>U#d</code>) maka kartu baru akan diambil dan giliran bermain akan beralih ke pemain selanjutnya.</p>
 <p>Untuk berkomunikasi dengan pemain lain di game, gunakan <code>U#say &lt;pesan mu&gt;</code>.</p>
 <p>Untuk melihat lebih jelas apa maksud dari perintah, gunakan <code>U#help &lt;nama lengkap perintah&gt;</code>.</p>
@@ -51,7 +89,7 @@
 <p><em><code>U# ban &lt;nama yang ingin di ban&gt;</code></em></p>
 <p>Alias: <em><code>b</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-0">Berhasil</span><span class="hl-1"> </span><span class="hl-0">menge</span><span class="hl-1">-</span><span class="hl-0">ban</span><span class="hl-1"> </span><span class="hl-2">E</span><span class="hl-1">. </span><span class="hl-0">Sekarang</span><span class="hl-1"> </span><span class="hl-0">dia</span><span class="hl-1"> </span><span class="hl-0">tidak</span><span class="hl-1"> </span><span class="hl-0">ada</span><span class="hl-1"> </span><span class="hl-0">dalam</span><span class="hl-1"> </span><span class="hl-0">permainan</span><span class="hl-1">.</span>
+<pre><code><span class="hl-4">Berhasil</span><span class="hl-2"> </span><span class="hl-4">menge</span><span class="hl-2">-</span><span class="hl-4">ban</span><span class="hl-2"> </span><span class="hl-5">E</span><span class="hl-2">. </span><span class="hl-4">Sekarang</span><span class="hl-2"> </span><span class="hl-4">dia</span><span class="hl-2"> </span><span class="hl-4">tidak</span><span class="hl-2"> </span><span class="hl-4">ada</span><span class="hl-2"> </span><span class="hl-4">dalam</span><span class="hl-2"> </span><span class="hl-4">permainan</span><span class="hl-2">.</span>
 </code><button>Copy</button></pre>
 </li>
 <li><p><code>cards</code></p>
@@ -60,7 +98,7 @@
 <p><em><code>U# cards</code></em></p>
 <p>Alias: <em><code>c</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-0">Kartu</span><span class="hl-1"> </span><span class="hl-3">kamu</span><span class="hl-1">: </span><span class="hl-0">greenskip</span><span class="hl-1">, </span><span class="hl-0">yellow4</span><span class="hl-1">, </span><span class="hl-0">red6</span><span class="hl-1">, </span><span class="hl-0">blue1</span>
+<pre><code><span class="hl-4">Kartu</span><span class="hl-2"> </span><span class="hl-6">kamu</span><span class="hl-2">: </span><span class="hl-4">greenskip</span><span class="hl-2">, </span><span class="hl-4">yellow4</span><span class="hl-2">, </span><span class="hl-4">red6</span><span class="hl-2">, </span><span class="hl-4">blue1</span>
 </code><button>Copy</button></pre>
 </li>
 <li><p><code>creategame</code></p>
@@ -70,7 +108,7 @@
 <p><code>U# creategame</code></p>
 <p>Alias: <em><code>cg</code></em>, <em><code>create</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-0">Game</span><span class="hl-1"> </span><span class="hl-0">berhasil</span><span class="hl-1"> </span><span class="hl-0">dibuat</span><span class="hl-1">.</span><br/><br/><span class="hl-0">Ajak</span><span class="hl-1"> </span><span class="hl-0">teman</span><span class="hl-1"> </span><span class="hl-0">kamu</span><span class="hl-1"> </span><span class="hl-0">untuk</span><span class="hl-1"> </span><span class="hl-0">bermain</span><span class="hl-1">...</span>
+<pre><code><span class="hl-4">Game</span><span class="hl-2"> </span><span class="hl-4">berhasil</span><span class="hl-2"> </span><span class="hl-4">dibuat</span><span class="hl-2">.</span><br/><br/><span class="hl-4">Ajak</span><span class="hl-2"> </span><span class="hl-4">teman</span><span class="hl-2"> </span><span class="hl-4">kamu</span><span class="hl-2"> </span><span class="hl-4">untuk</span><span class="hl-2"> </span><span class="hl-4">bermain</span><span class="hl-2">...</span>
 </code><button>Copy</button></pre>
 </li>
 <li><p><code>draw</code></p>
@@ -80,7 +118,7 @@
 <p><em><code>U# draw</code></em></p>
 <p>Alias: <em><code>d</code></em>, <em><code>pickup</code></em>, <em><code>newcard</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-0">Berhasil</span><span class="hl-1"> </span><span class="hl-0">mengambil</span><span class="hl-1"> </span><span class="hl-0">kartu</span><span class="hl-1"> </span><span class="hl-0">baru</span><span class="hl-1">, </span><span class="hl-0">red6</span><span class="hl-1">. </span><span class="hl-0">Selanjutnya</span><span class="hl-1"> </span><span class="hl-0">adalah</span><span class="hl-1"> </span><span class="hl-0">giliran</span><span class="hl-1"> </span><span class="hl-2">A</span><span class="hl-1"> </span><span class="hl-0">untuk</span><span class="hl-1"> </span><span class="hl-0">bermain</span>
+<pre><code><span class="hl-4">Berhasil</span><span class="hl-2"> </span><span class="hl-4">mengambil</span><span class="hl-2"> </span><span class="hl-4">kartu</span><span class="hl-2"> </span><span class="hl-4">baru</span><span class="hl-2">, </span><span class="hl-4">red6</span><span class="hl-2">. </span><span class="hl-4">Selanjutnya</span><span class="hl-2"> </span><span class="hl-4">adalah</span><span class="hl-2"> </span><span class="hl-4">giliran</span><span class="hl-2"> </span><span class="hl-5">A</span><span class="hl-2"> </span><span class="hl-4">untuk</span><span class="hl-2"> </span><span class="hl-4">bermain</span>
 </code><button>Copy</button></pre>
 </li>
 <li><p><code>endgame</code></p>
@@ -90,7 +128,7 @@
 <p><em><code>U# endgame</code></em></p>
 <p>Alias: <em><code>eg</code></em>, <em><code>end</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-2">A</span><span class="hl-1"> </span><span class="hl-0">telah</span><span class="hl-1"> </span><span class="hl-0">menghentikan</span><span class="hl-1"> </span><span class="hl-0">permainan</span><span class="hl-1">. </span><span class="hl-0">Terimakasih</span><span class="hl-1"> </span><span class="hl-0">sudah</span><span class="hl-1"> </span><span class="hl-0">bermain</span><span class="hl-1">!</span>
+<pre><code><span class="hl-5">A</span><span class="hl-2"> </span><span class="hl-4">telah</span><span class="hl-2"> </span><span class="hl-4">menghentikan</span><span class="hl-2"> </span><span class="hl-4">permainan</span><span class="hl-2">. </span><span class="hl-4">Terimakasih</span><span class="hl-2"> </span><span class="hl-4">sudah</span><span class="hl-2"> </span><span class="hl-4">bermain</span><span class="hl-2">!</span>
 </code><button>Copy</button></pre>
 </li>
 <li><p><code>infogame</code></p>
@@ -100,7 +138,7 @@
 <p><em><code>U# infogame &lt;id game&gt;</code></em></p>
 <p>Alias: <em><code>i</code></em>, <em><code>ig</code></em>, <em><code>info</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-2">A</span><span class="hl-1"> </span><span class="hl-0">telah</span><span class="hl-1"> </span><span class="hl-0">menghentikan</span><span class="hl-1"> </span><span class="hl-0">permainan</span><span class="hl-1">. </span><span class="hl-0">Terimakasih</span><span class="hl-1"> </span><span class="hl-0">sudah</span><span class="hl-1"> </span><span class="hl-0">bermain</span><span class="hl-1">!</span>
+<pre><code><span class="hl-5">A</span><span class="hl-2"> </span><span class="hl-4">telah</span><span class="hl-2"> </span><span class="hl-4">menghentikan</span><span class="hl-2"> </span><span class="hl-4">permainan</span><span class="hl-2">. </span><span class="hl-4">Terimakasih</span><span class="hl-2"> </span><span class="hl-4">sudah</span><span class="hl-2"> </span><span class="hl-4">bermain</span><span class="hl-2">!</span>
 </code><button>Copy</button></pre>
 </li>
 <li><p><code>joingame</code></p>
@@ -110,7 +148,7 @@
 <p><em><code>U# joingame &lt;id game&gt;</code></em></p>
 <p>Alias: <em><code>j</code></em>, <em><code>jg</code></em>, <em><code>join</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-0">Berhasil</span><span class="hl-1"> </span><span class="hl-0">join</span><span class="hl-1"> </span><span class="hl-0">ke</span><span class="hl-1"> </span><span class="hl-0">game</span><span class="hl-1"> </span><span class="hl-4">&quot;XXXX&quot;</span><span class="hl-1">, </span><span class="hl-0">tunggu</span><span class="hl-1"> </span><span class="hl-0">pembuat</span><span class="hl-1"> </span><span class="hl-0">ruang</span><span class="hl-1"> </span><span class="hl-0">game</span><span class="hl-1"> </span><span class="hl-0">ini</span><span class="hl-1"> </span><span class="hl-0">memulai</span><span class="hl-1"> </span><span class="hl-0">permainannya</span><span class="hl-1">!</span>
+<pre><code><span class="hl-4">Berhasil</span><span class="hl-2"> </span><span class="hl-4">join</span><span class="hl-2"> </span><span class="hl-4">ke</span><span class="hl-2"> </span><span class="hl-4">game</span><span class="hl-2"> </span><span class="hl-3">&quot;XXXX&quot;</span><span class="hl-2">, </span><span class="hl-4">tunggu</span><span class="hl-2"> </span><span class="hl-4">pembuat</span><span class="hl-2"> </span><span class="hl-4">ruang</span><span class="hl-2"> </span><span class="hl-4">game</span><span class="hl-2"> </span><span class="hl-4">ini</span><span class="hl-2"> </span><span class="hl-4">memulai</span><span class="hl-2"> </span><span class="hl-4">permainannya</span><span class="hl-2">!</span>
 </code><button>Copy</button></pre>
 </li>
 <li><p><code>kick</code></p>
@@ -119,7 +157,7 @@
 <p><em><code>U# kick &lt;nama yang ingin di kick&gt;</code></em></p>
 <p>Alias: <em><code>k</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-0">Berhasil</span><span class="hl-1"> </span><span class="hl-0">mengkick</span><span class="hl-1"> </span><span class="hl-2">E</span><span class="hl-1">. </span><span class="hl-0">Sekarang</span><span class="hl-1"> </span><span class="hl-0">dia</span><span class="hl-1"> </span><span class="hl-0">tidak</span><span class="hl-1"> </span><span class="hl-0">ada</span><span class="hl-1"> </span><span class="hl-0">dalam</span><span class="hl-1"> </span><span class="hl-0">permainan</span><span class="hl-1">.</span>
+<pre><code><span class="hl-4">Berhasil</span><span class="hl-2"> </span><span class="hl-4">mengkick</span><span class="hl-2"> </span><span class="hl-5">E</span><span class="hl-2">. </span><span class="hl-4">Sekarang</span><span class="hl-2"> </span><span class="hl-4">dia</span><span class="hl-2"> </span><span class="hl-4">tidak</span><span class="hl-2"> </span><span class="hl-4">ada</span><span class="hl-2"> </span><span class="hl-4">dalam</span><span class="hl-2"> </span><span class="hl-4">permainan</span><span class="hl-2">.</span>
 </code><button>Copy</button></pre>
 </li>
 <li><p><code>leaderboard</code></p>
@@ -138,7 +176,7 @@ Papan peringkat pemain saat ini</p>
 <p><em><code>U# leavegame</code></em></p>
 <p>Alias: <em><code>l</code></em>, <em><code>lg</code></em>, <em><code>quit</code></em>, <em><code>leave</code></em>, <em><code>leavegame</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-0">Anda</span><span class="hl-1"> </span><span class="hl-0">berhasil</span><span class="hl-1"> </span><span class="hl-0">keluar</span><span class="hl-1"> </span><span class="hl-0">dari</span><span class="hl-1"> </span><span class="hl-0">game</span><span class="hl-1">. </span><span class="hl-0">Terimakasih</span><span class="hl-1"> </span><span class="hl-0">telah</span><span class="hl-1"> </span><span class="hl-0">bermain</span><span class="hl-1">!</span>
+<pre><code><span class="hl-4">Anda</span><span class="hl-2"> </span><span class="hl-4">berhasil</span><span class="hl-2"> </span><span class="hl-4">keluar</span><span class="hl-2"> </span><span class="hl-4">dari</span><span class="hl-2"> </span><span class="hl-4">game</span><span class="hl-2">. </span><span class="hl-4">Terimakasih</span><span class="hl-2"> </span><span class="hl-4">telah</span><span class="hl-2"> </span><span class="hl-4">bermain</span><span class="hl-2">!</span>
 </code><button>Copy</button></pre>
 </li>
 <li><p><code>play</code></p>
@@ -148,7 +186,7 @@ Papan peringkat pemain saat ini</p>
 <p><em><code>U# play &lt;kartu&gt;</code></em></p>
 <p>Alias: <em><code>p</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-0">Berhasil</span><span class="hl-1"> </span><span class="hl-0">mengeluarkan</span><span class="hl-1"> </span><span class="hl-0">kartu</span><span class="hl-1"> *</span><span class="hl-0">red9</span><span class="hl-1">*, </span><span class="hl-0">selanjutnya</span><span class="hl-1"> </span><span class="hl-0">adalah</span><span class="hl-1"> </span><span class="hl-0">giliran</span><span class="hl-1"> </span><span class="hl-2">B</span><span class="hl-1"> </span><span class="hl-0">untuk</span><span class="hl-1"> </span><span class="hl-0">bermain</span>
+<pre><code><span class="hl-4">Berhasil</span><span class="hl-2"> </span><span class="hl-4">mengeluarkan</span><span class="hl-2"> </span><span class="hl-4">kartu</span><span class="hl-2"> *</span><span class="hl-4">red9</span><span class="hl-2">*, </span><span class="hl-4">selanjutnya</span><span class="hl-2"> </span><span class="hl-4">adalah</span><span class="hl-2"> </span><span class="hl-4">giliran</span><span class="hl-2"> </span><span class="hl-5">B</span><span class="hl-2"> </span><span class="hl-4">untuk</span><span class="hl-2"> </span><span class="hl-4">bermain</span>
 </code><button>Copy</button></pre>
 </li>
 <li><p><code>say</code></p>
@@ -158,7 +196,7 @@ Papan peringkat pemain saat ini</p>
 <p><em><code>U# say &lt;pesan (wajib jika hanya mengirimkan text)&gt;</code></em></p>
 <p>Alias: <em><code>s</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-3">USERNAME</span><span class="hl-1">: </span><span class="hl-0">pesan</span><span class="hl-1"> </span><span class="hl-0">disini</span>
+<pre><code><span class="hl-6">USERNAME</span><span class="hl-2">: </span><span class="hl-4">pesan</span><span class="hl-2"> </span><span class="hl-4">disini</span>
 </code><button>Copy</button></pre>
 </li>
 <li><p><code>startgame</code></p>
@@ -168,43 +206,16 @@ Papan peringkat pemain saat ini</p>
 <p><em><code>U# startgame</code></em></p>
 <p>Alias: <em><code>sg</code></em>, <em><code>start</code></em></p>
 <p>Contoh balasan:</p>
-<pre><code><span class="hl-0">Game</span><span class="hl-1"> </span><span class="hl-0">berhasil</span><span class="hl-1"> </span><span class="hl-0">dimulai</span><span class="hl-1">! </span><span class="hl-0">Sekarang</span><span class="hl-1"> </span><span class="hl-0">giliran</span><span class="hl-1"> </span><span class="hl-2">C</span><span class="hl-1"> </span><span class="hl-0">untuk</span><span class="hl-1"> </span><span class="hl-0">bermain</span>
+<pre><code><span class="hl-4">Game</span><span class="hl-2"> </span><span class="hl-4">berhasil</span><span class="hl-2"> </span><span class="hl-4">dimulai</span><span class="hl-2">! </span><span class="hl-4">Sekarang</span><span class="hl-2"> </span><span class="hl-4">giliran</span><span class="hl-2"> </span><span class="hl-5">C</span><span class="hl-2"> </span><span class="hl-4">untuk</span><span class="hl-2"> </span><span class="hl-4">bermain</span>
 </code><button>Copy</button></pre>
 </li>
 </ul>
-<a id="md:cloning-dari-github" class="tsd-anchor"></a><h3><a href="#md:cloning-dari-github">Cloning Dari Github</a></h3><p>Jalankan perintah ini Command Line.</p>
-<pre><code class="language-sh"><span class="hl-5"># HTTPS</span><br/><span class="hl-6">git</span><span class="hl-1"> </span><span class="hl-4">clone</span><span class="hl-1"> </span><span class="hl-4">https://github.com/reacto11mecha/wuno-bot.git</span><br/><br/><span class="hl-5"># SSH</span><br/><span class="hl-6">git</span><span class="hl-1"> </span><span class="hl-4">clone</span><span class="hl-1"> </span><span class="hl-4">git@github.com:reacto11mecha/wuno-bot.git</span>
-</code><button>Copy</button></pre>
-<a id="md:menginstall-package" class="tsd-anchor"></a><h3><a href="#md:menginstall-package">Menginstall package</a></h3><p>Anda ke root directory project dan menginstall package yang diperlukan.</p>
-<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">install</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">install</span>
-</code><button>Copy</button></pre>
-<a id="md:buat-file-env" class="tsd-anchor"></a><h3><a href="#md:buat-file-env">Buat file <code>.env</code></a></h3><p>Pertama-tama, copy file <code>env.example</code> menjadi <code>.env</code> dan isikan value yang sesuai.</p>
-<p>Keterangan <code>.env</code>:</p>
+<a id="md:to-do" class="tsd-anchor"></a><h3><a href="#md:to-do">TO-DO</a></h3><p>Fitur yang kedepannya mungkin ditambahkan</p>
 <ul>
-<li><code>DATABASE_URL</code>: URL Database MySQL yang akan dijadikan penyimpanan data (<strong>WAJIB</strong>)</li>
-<li><code>CHROME_PATH</code>: Path ke executable google chrome yang terinstall (<strong>WAJIB</strong>)</li>
-<li><code>PREFIX</code>: Prefix bot agar bisa dipanggil dan digunakan, default <code>U#</code> (Opsional)</li>
+<li><input disabled="" type="checkbox"> Bisa mengeluarkan kartu banyak yang valid dalam sekali giliran</li>
+<li><input disabled="" type="checkbox"> Support multi bahasa</li>
+<li><input disabled="" type="checkbox"> <a id="md:menerapkan-disappear-message-ketika-user-berbicara-dengan-bot" class="tsd-anchor"></a><h1><a href="#md:menerapkan-disappear-message-ketika-user-berbicara-dengan-bot">Menerapkan disappear message ketika user berbicara dengan bot</a></h1></li>
 </ul>
-<blockquote>
-<p>Di perlukan google chrome supaya bisa menerima dan mengirim gif, sticker, dan gambar secara konsisten. Penjelasan lebih lanjut, cek dokumentasi <a href="https://wwebjs.dev/guide/handling-attachments.html#caveat-for-sending-videos-and-gifs">wwebjs</a>.</p>
-</blockquote>
-<a id="md:mengenerate-dan-push-schema-ke-database" class="tsd-anchor"></a><h3><a href="#md:mengenerate-dan-push-schema-ke-database">Mengenerate dan push schema ke database</a></h3><p>Karena menggunakan database yang SQL-Based dan prisma, diperlukan untuk mengenerate dan push schema ke database. Di bawah ini adalah perintah-perintah yang harus dilaksanakan.</p>
-<p>Generate schema prisma:</p>
-<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">db:generate</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">db:generate</span>
-</code><button>Copy</button></pre>
-<p>Push schema prisma ke database:</p>
-<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">db:push</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">db:push</span>
-</code><button>Copy</button></pre>
-<a id="md:menjalankan-bot" class="tsd-anchor"></a><h3><a href="#md:menjalankan-bot">Menjalankan Bot</a></h3><p>Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.</p>
-<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">run</span><span class="hl-1"> </span><span class="hl-4">build</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">build</span>
-</code><button>Copy</button></pre>
-<p>Selesai mem-build bot, <strong>jangan lupa menjalankan database MySQL/MariaDB</strong>. Jika sudah berjalan baru bisa menggunakan bot dengan mengetikkan</p>
-<pre><code class="language-sh"><span class="hl-6">npm</span><span class="hl-1"> </span><span class="hl-4">start</span><br/><br/><span class="hl-5"># atau menggunakan pnpm</span><br/><span class="hl-6">pnpm</span><span class="hl-1"> </span><span class="hl-4">start</span>
-</code><button>Copy</button></pre>
-<p>Jika baru pertama kali menjalankan, scan barcode di terminal untuk dihubungkan ke whatsapp di handphone.</p>
-<p>Jika ingin dijalankan seperti mode production menggunakan <code>pm2</code> bisa menjalankan perintah di bawah ini, jangan lupa autentikasi terlebih dahulu mengikuti langkah di atas karena lebih mudah. Jangan lupa untuk menginstall <code>pm2</code> secara global.</p>
-<pre><code class="language-sh"><span class="hl-6">pm2</span><span class="hl-1"> </span><span class="hl-4">start</span><span class="hl-1"> </span><span class="hl-4">ecosystem.config.js</span>
-</code><button>Copy</button></pre>
 <a id="md:lisensi" class="tsd-anchor"></a><h3><a href="#md:lisensi">Lisensi</a></h3><p>Semua kode yang ada di repositori ini bernaung dibawah <a href="LICENSE">MIT License</a>.</p>
 </div></div>
 <div class="col-sidebar">
@@ -238,14 +249,18 @@ Papan peringkat pemain saat ini</p>
 <li><a href="#md:pemakaian"><span>Pemakaian</span></a></li>
 <li>
 <ul>
-<li><a href="#md:penjelasan-awal"><span>Penjelasan <wbr/>Awal</span></a></li>
-<li><a href="#md:daftar-perintah"><span>Daftar <wbr/>Perintah</span></a></li>
 <li><a href="#md:cloning-dari-github"><span>Cloning <wbr/>Dari <wbr/>Github</span></a></li>
 <li><a href="#md:menginstall-package"><span>Menginstall package</span></a></li>
 <li><a href="#md:buat-file-env"><span>Buat file .env</span></a></li>
 <li><a href="#md:mengenerate-dan-push-schema-ke-database"><span>Mengenerate dan push schema ke database</span></a></li>
 <li><a href="#md:menjalankan-bot"><span>Menjalankan <wbr/>Bot</span></a></li>
-<li><a href="#md:lisensi"><span>Lisensi</span></a></li></ul></li></ul></li></ul></li></ul></div></details></div>
+<li><a href="#md:penjelasan-permainan"><span>Penjelasan <wbr/>Permainan</span></a></li>
+<li><a href="#md:daftar-perintah"><span>Daftar <wbr/>Perintah</span></a></li>
+<li><a href="#md:to-do"><span>TO-<wbr/>DO</span></a></li></ul></li></ul></li>
+<li><a href="#md:menerapkan-disappear-message-ketika-user-berbicara-dengan-bot"><span>Menerapkan disappear message ketika user berbicara dengan bot</span></a></li>
+<li>
+<ul>
+<li><a href="#md:lisensi"><span>Lisensi</span></a></li></ul></li></ul></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="index.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>wuno-<wbr/>bot</span></a>
 <ul class="tsd-small-nested-navigation">
