@@ -65,6 +65,18 @@ npm install
 pnpm install
 ```
 
+### Buat file `.env`
+
+Pertama-tama, copy file `env.example` menjadi `.env` dan isikan value yang sesuai.
+
+Keterangan `.env`:
+
+- `DATABASE_URL`: URL Database MySQL yang akan dijadikan penyimpanan data (**WAJIB**)
+- `CHROME_PATH`: Path ke executable google chrome yang terinstall (**WAJIB**)
+- `PREFIX`: Prefix bot agar bisa dipanggil dan digunakan, default `U#` (Opsional)
+
+> Di perlukan google chrome supaya bisa menerima dan mengirim gif, sticker, dan gambar secara konsisten. Penjelasan lebih lanjut, cek dokumentasi [wwebjs](https://wwebjs.dev/guide/handling-attachments.html#caveat-for-sending-videos-and-gifs).
+
 ### Mengenerate dan push schema ke database
 
 Karena menggunakan database yang SQL-Based dan prisma, diperlukan untuk mengenerate dan push schema ke database. Di bawah ini adalah perintah-perintah yang harus dilaksanakan.
@@ -88,16 +100,6 @@ pnpm db:push
 ```
 
 ### Menjalankan Bot
-
-Pertama-tama, copy file `env.example` menjadi `.env` dan isikan value yang sesuai.
-
-Keterangan `.env`:
-
-- `DATABASE_URL`: URL Database MySQL yang akan dijadikan penyimpanan data (**WAJIB**)
-- `CHROME_PATH`: Path ke executable google chrome yang terinstall (**WAJIB**)
-- `PREFIX`: Prefix bot agar bisa dipanggil dan digunakan, default `U#` (Opsional)
-
-> Di perlukan google chrome supaya bisa menerima dan mengirim gif, sticker, dan gambar secara konsisten. Penjelasan lebih lanjut, cek dokumentasi [wwebjs](https://wwebjs.dev/guide/handling-attachments.html#caveat-for-sending-videos-and-gifs).
 
 Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.
 
@@ -383,7 +385,7 @@ Fitur yang kedepannya mungkin ditambahkan
 
 - [ ] Bisa mengeluarkan kartu banyak yang valid dalam sekali giliran
 - [ ] Support multi bahasa
-- [ ] Menerapkan disappear message ketika user berbicara dengan bot
+- [ ] # Menerapkan disappear message ketika user berbicara dengan bot
 
 ### Lisensi
 
