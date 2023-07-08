@@ -13,6 +13,8 @@
 
 Bot ini adalah bot whatsapp yang memungkinkan pengguna untuk bermain UNO langsung di whatsapp. Dengan menjapri bot, mengirimkan kode permainan ke teman anda, dan memulai permainan kamu bisa bermain UNO seperti kamu bermain dengan teman langsung.
 
+Jika masih bingung atau ingin mengetahui bagaimana bot ini bekerja, tonton video penjelasan [ini](https://youtu.be/c43occbi7Fw) di youtube.
+
 ## Sebelum Menggunakan
 
 Bot ini tidak terafiliasi dan didukung oleh WhatsApp maupun UNO. Mohon pengertian jika menemukan masalah suatu saat nomor bot diblokir oleh pihak WhatsApp.
@@ -385,7 +387,7 @@ Fitur yang kedepannya mungkin ditambahkan
 
 - [ ] Bisa mengeluarkan kartu banyak yang valid dalam sekali giliran
 - [ ] Support multi bahasa
-- [ ] # Menerapkan disappear message ketika user berbicara dengan bot
+- [ ] Menerapkan disappear message ketika user berbicara dengan bot
 
 ### Lisensi
 
