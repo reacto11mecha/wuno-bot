@@ -1,7 +1,11 @@
+![Gambar WUNO bot](./assets/og.png)
+
 <p align="center">
     <h2 align="center">WUNO (Whatsapp UNO) Bot</h2>
     <span><p align="center">Bot whatsapp yang berguna untuk bermain UNO.</p></span>
 </p>
+
+<br/>
 
 [![ES Lint & Typing test](https://github.com/reacto11mecha/wuno-bot/actions/workflows/lint-typing.yml/badge.svg)](https://github.com/reacto11mecha/wuno-bot/actions/workflows/lint-typing.yml) [![Unit test](https://github.com/reacto11mecha/wuno-bot/actions/workflows/unit-test.yml/badge.svg)](https://github.com/reacto11mecha/wuno-bot/actions/workflows/unit-test.yml)
 
@@ -10,6 +14,8 @@
 Bot ini adalah bot whatsapp yang memungkinkan pengguna untuk bermain UNO langsung di whatsapp. Dengan menjapri bot, mengirimkan kode permainan ke teman anda, dan memulai permainan kamu bisa bermain UNO seperti kamu bermain dengan teman langsung.
 
 ## Sebelum Menggunakan
+
+Bot ini tidak terafiliasi dan didukung oleh WhatsApp maupun UNO. Mohon pengertian jika menemukan masalah suatu saat nomor bot diblokir oleh pihak WhatsApp.
 
 Bot ini menyimpan data **nomor telepon** serta **username** pemain untuk keperluan mekanisme permainan.
 
@@ -36,7 +42,90 @@ Anda butuh
 
 ## Pemakaian
 
-### Penjelasan Awal
+### Cloning Dari Github
+
+Jalankan perintah ini Command Line.
+
+```sh
+# HTTPS
+git clone https://github.com/reacto11mecha/wuno-bot.git
+
+# SSH
+git clone git@github.com:reacto11mecha/wuno-bot.git
+```
+
+### Menginstall package
+
+Anda ke root directory project dan menginstall package yang diperlukan.
+
+```sh
+npm install
+
+# atau menggunakan pnpm
+pnpm install
+```
+
+### Mengenerate dan push schema ke database
+
+Karena menggunakan database yang SQL-Based dan prisma, diperlukan untuk mengenerate dan push schema ke database. Di bawah ini adalah perintah-perintah yang harus dilaksanakan.
+
+Generate schema prisma:
+
+```sh
+npm run db:generate
+
+# atau menggunakan pnpm
+pnpm db:generate
+```
+
+Push schema prisma ke database:
+
+```sh
+npm run db:push
+
+# atau menggunakan pnpm
+pnpm db:push
+```
+
+### Menjalankan Bot
+
+Pertama-tama, copy file `env.example` menjadi `.env` dan isikan value yang sesuai.
+
+Keterangan `.env`:
+
+- `DATABASE_URL`: URL Database MySQL yang akan dijadikan penyimpanan data (**WAJIB**)
+- `CHROME_PATH`: Path ke executable google chrome yang terinstall (**WAJIB**)
+- `PREFIX`: Prefix bot agar bisa dipanggil dan digunakan, default `U#` (Opsional)
+
+> Di perlukan google chrome supaya bisa menerima dan mengirim gif, sticker, dan gambar secara konsisten. Penjelasan lebih lanjut, cek dokumentasi [wwebjs](https://wwebjs.dev/guide/handling-attachments.html#caveat-for-sending-videos-and-gifs).
+
+Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.
+
+```sh
+npm run build
+
+# atau menggunakan pnpm
+pnpm build
+```
+
+Selesai mem-build bot, **jangan lupa menjalankan database MySQL/MariaDB**. Jika sudah berjalan baru bisa menggunakan bot dengan mengetikkan
+
+```sh
+npm start
+
+# atau menggunakan pnpm
+pnpm start
+```
+
+Jika baru pertama kali menjalankan, scan barcode di terminal untuk dihubungkan ke whatsapp di handphone.
+
+Jika ingin dijalankan seperti mode production menggunakan `pm2` bisa menjalankan perintah di bawah ini, jangan lupa autentikasi terlebih dahulu mengikuti langkah di atas karena lebih mudah. Jangan lupa untuk menginstall `pm2` secara global.
+
+```sh
+pm2 start ecosystem.config.js
+```
+
+### Penjelasan Permainan
 
 Bot ini adalah bot yang digunakan untuk bermain uno di whatsapp. Cara kerjanya dengan mengirimkan perintah lewat DM pribadi ke bot ini, tapi juga bisa digunakan di grup namun terbatas untuk membuat dan bergabung dalam permainan.
 
@@ -48,6 +137,8 @@ Setelah dirasa sudah cukup orang, permainan bisa dimulai menggunakan `U#startgam
 
 Untuk bermain, gunakan `U#play <kartu kamu>`
 (atau `U#p <kartu kamu>`) untuk menaruh kartu yang sesuai dengan apa yang ada di deck. Jika valid, kartu akan ditaruh dan giliran bermain akan beralih ke pemain selanjutnya.
+
+Kartu di bot ini memiliki sebuah format. Kartu yang ini memiliki 4 warna yaitu warna merah, kuning hijau, dan biru yang di ikuti dengan nomor 0 sampai 9, misal `red0`. Kemudian kartu pilih warna `wild` juga tambah 4 `wilddraw4` yang bisa di sebutkan warnanya. Kemudian kartu spesial yang terdiri reverse (memutar giliran main), skip (melewati giliran main), dan `draw2` (tambah dua kartu) dengan format warna disebut terlebih dahulu baru jenis kartu spesial disebutkan.
 
 Jika kamu tidak memiliki kartu ambilah kartu baru dengan menggunakan `U#draw` (atau `U#d`) maka kartu baru akan diambil dan giliran bermain akan beralih ke pemain selanjutnya.
 
@@ -286,88 +377,13 @@ Berikut daftar perintah yang sudah dibuat. Jika konfigurasi prefix diubah maka p
   Game berhasil dimulai! Sekarang giliran C untuk bermain
   ```
 
-### Cloning Dari Github
+### TO-DO
 
-Jalankan perintah ini Command Line.
+Fitur yang kedepannya mungkin ditambahkan
 
-```sh
-# HTTPS
-git clone https://github.com/reacto11mecha/wuno-bot.git
-
-# SSH
-git clone git@github.com:reacto11mecha/wuno-bot.git
-```
-
-### Menginstall package
-
-Anda ke root directory project dan menginstall package yang diperlukan.
-
-```sh
-npm install
-
-# atau menggunakan pnpm
-pnpm install
-```
-
-### Mengenerate dan push schema ke database
-
-Karena menggunakan database yang SQL-Based dan prisma, diperlukan untuk mengenerate dan push schema ke database. Di bawah ini adalah perintah-perintah yang harus dilaksanakan.
-
-Generate schema prisma:
-
-```sh
-npm run db:generate
-
-# atau menggunakan pnpm
-pnpm db:generate
-```
-
-Push schema prisma ke database:
-
-```sh
-npm run db:push
-
-# atau menggunakan pnpm
-pnpm db:push
-```
-
-### Menjalankan Bot
-
-Pertama-tama, copy file `env.example` menjadi `.env` dan isikan value yang sesuai.
-
-Keterangan `.env`:
-
-- `DATABASE_URL`: URL Database MySQL yang akan dijadikan penyimpanan data (**WAJIB**)
-- `CHROME_PATH`: Path ke executable google chrome yang terinstall (**WAJIB**)
-- `PREFIX`: Prefix bot agar bisa dipanggil dan digunakan, default `U#` (Opsional)
-
-> Di perlukan google chrome supaya bisa menerima dan mengirim gif, sticker, dan gambar secara konsisten. Penjelasan lebih lanjut, cek dokumentasi [wwebjs](https://wwebjs.dev/guide/handling-attachments.html#caveat-for-sending-videos-and-gifs).
-
-Sebelum menjalankan, terlebih dahulu mem-build kode typescript supaya bisa dijalankan di production mode.
-
-```sh
-npm run build
-
-# atau menggunakan pnpm
-pnpm build
-```
-
-Selesai mem-build bot, **jangan lupa menjalankan database MySQL/MariaDB**. Jika sudah berjalan baru bisa menggunakan bot dengan mengetikkan
-
-```sh
-npm start
-
-# atau menggunakan pnpm
-pnpm start
-```
-
-Jika baru pertama kali menjalankan, scan barcode di terminal untuk dihubungkan ke whatsapp di handphone.
-
-Jika ingin dijalankan seperti mode production menggunakan `pm2` bisa menjalankan perintah di bawah ini, jangan lupa autentikasi terlebih dahulu mengikuti langkah di atas karena lebih mudah. Jangan lupa untuk menginstall `pm2` secara global.
-
-```sh
-pm2 start ecosystem.config.js
-```
+- [ ] Bisa mengeluarkan kartu banyak yang valid dalam sekali giliran
+- [ ] Support multi bahasa
+- [ ] Menerapkan disappear message ketika user berbicara dengan bot
 
 ### Lisensi
 
