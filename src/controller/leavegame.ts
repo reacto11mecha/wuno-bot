@@ -11,7 +11,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
       const copiedPlayers = [...game.players];
       const afterPlayerWantToLeave = copiedPlayers.filter(
-        (player) => player.playerId !== chat.user!.id
+        (player) => player.playerId !== chat.user!.id,
       );
 
       if (afterPlayerWantToLeave.length < 2) {
@@ -26,11 +26,11 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
         await Promise.all([
           chat.replyToCurrentPerson(
-            "Anda berhasil keluar dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!"
+            "Anda berhasil keluar dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!",
           ),
           chat.sendToOtherPerson(
             oppositePlayer!.phoneNumber,
-            `Pemain ${chat.message.userName} sudah keluar dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!`
+            `Pemain ${chat.message.userName} sudah keluar dari permainan, tetapi karena pemain kurang dari dua orang maka game otomatis dihentikan. Terimakasih sudah bermain!`,
           ),
         ]);
 
@@ -50,7 +50,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           });
 
           const playerList = afterPlayerWantToLeave.filter(
-            (player) => player.playerId !== nextAuthorId.playerId
+            (player) => player.playerId !== nextAuthorId.playerId,
           );
 
           await game.removeUserFromArray(chat.user!.id);
@@ -60,11 +60,11 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             chat.replyToCurrentPerson(
               `Anda berhasil keluar dari permainan, sekarang host jatuh ke tangan ${
                 nextAuthor!.username
-              } dan permainan masih tetap berjalan. Terima kasih sudah bermain!`
+              } dan permainan masih tetap berjalan. Terima kasih sudah bermain!`,
             ),
             chat.sendToOtherPerson(
               nextAuthor!.phoneNumber,
-              `${chat.message.userName} sudah keluar dari permainan, saat ini anda adalah hostnya. Lanjutkan permainannya!`
+              `${chat.message.userName} sudah keluar dari permainan, saat ini anda adalah hostnya. Lanjutkan permainannya!`,
             ),
             game.sendToSpecificPlayerList(
               `${
@@ -72,7 +72,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
               } sudah keluar dari permainan, sekarang host jatuh ke tangan ${
                 nextAuthor!.username
               }. Lanjutkan permainannya!`,
-              playerList
+              playerList,
             ),
           ]);
 
@@ -106,7 +106,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           const [currentCardImage, frontCardsImage, backCardsImage] =
             await createAllCardImage(
               game.currentCard as allCard,
-              nextPlayerCards?.cards.map((card) => card.cardName) as allCard[]
+              nextPlayerCards?.cards.map((card) => card.cardName) as allCard[],
             );
 
           await game.setCreatorId(nextAuthor!.id);
@@ -119,19 +119,19 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                 nextAuthor!.username
               } dan giliran main ke ${
                 nextPlayer!.username
-              }. Terima kasih sudah bermain!`
+              }. Terima kasih sudah bermain!`,
             ),
             (async () => {
               // If the next author is also the next player
               if (nextAuthor!.id === nextPlayer!.id) {
                 await chat.sendToOtherPerson(
                   nextPlayer!.phoneNumber,
-                  `${chat.message.userName} sudah keluar dari permainan. Sekarang posisi bermain dan host jatuh ke tangan anda.`
+                  `${chat.message.userName} sudah keluar dari permainan. Sekarang posisi bermain dan host jatuh ke tangan anda.`,
                 );
                 await chat.sendToOtherPerson(
                   nextPlayer!.phoneNumber,
                   { caption: `Kartu saat ini: ${game.currentCard}` },
-                  currentCardImage
+                  currentCardImage,
                 );
                 await chat.sendToOtherPerson(
                   nextPlayer!.phoneNumber,
@@ -140,7 +140,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                       .map((card) => card.cardName)
                       .join(", ")}.`,
                   },
-                  frontCardsImage
+                  frontCardsImage,
                 );
               } else {
                 await Promise.all([
@@ -152,17 +152,17 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                         chat.message.userName
                       } sudah keluar dari permainan. Saat ini host permainan ada di tangan anda. Waktunya giliran ${
                         nextPlayer!.username
-                      } untuk bermain`
+                      } untuk bermain`,
                     );
                     await chat.sendToOtherPerson(
                       nextAuthor!.phoneNumber,
                       { caption: `Kartu saat ini: ${game.currentCard}` },
-                      currentCardImage
+                      currentCardImage,
                     );
                     await chat.sendToOtherPerson(
                       nextAuthor!.phoneNumber,
                       { caption: `Kartu yang ${nextPlayer!.username} miliki` },
-                      backCardsImage
+                      backCardsImage,
                     );
                   })(),
 
@@ -174,12 +174,12 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                         chat.message.userName
                       } sudah keluar dari permainan. Sekarang posisi bermain dan host jatuh ke tangan ${
                         nextAuthor!.username
-                      }. Sekarang adalah giliranmu untuk bermain`
+                      }. Sekarang adalah giliranmu untuk bermain`,
                     );
                     await chat.sendToOtherPerson(
                       nextPlayer!.phoneNumber,
                       { caption: `Kartu saat ini: ${game.currentCard}` },
-                      currentCardImage
+                      currentCardImage,
                     );
                     await chat.sendToOtherPerson(
                       nextPlayer!.phoneNumber,
@@ -188,7 +188,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                           .map((card) => card.cardName)
                           .join(", ")}.`,
                       },
-                      frontCardsImage
+                      frontCardsImage,
                     );
                   })(),
                 ]);
@@ -214,12 +214,12 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
               await game.sendToSpecificPlayerList(
                 { caption: `Kartu saat ini: ${game.currentCard}` },
                 playerList,
-                currentCardImage
+                currentCardImage,
               );
               await game.sendToSpecificPlayerList(
                 { caption: `Kartu yang ${nextPlayer!.username} miliki` },
                 playerList,
-                backCardsImage
+                backCardsImage,
               );
             })(),
           ]);
@@ -231,7 +231,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             const nextPlayerTurnId = game.getNextPosition();
 
             const playerList = afterPlayerWantToLeave.filter(
-              (player) => player.playerId !== nextPlayerTurnId!.playerId
+              (player) => player.playerId !== nextPlayerTurnId!.playerId,
             );
 
             const [nextPlayer, nextPlayerCards] = await Promise.all([
@@ -251,26 +251,28 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             const [currentCardImage, frontCardsImage, backCardsImage] =
               await createAllCardImage(
                 game.currentCard as allCard,
-                nextPlayerCards?.cards.map((card) => card.cardName) as allCard[]
+                nextPlayerCards?.cards.map(
+                  (card) => card.cardName,
+                ) as allCard[],
               );
 
             await Promise.all([
               chat.replyToCurrentPerson(
                 `Anda berhasil keluar dari permainan. Sekarang giliran ${
                   nextPlayer!.username
-                } untuk bermain. Terimakasih sudah bermain!`
+                } untuk bermain. Terimakasih sudah bermain!`,
               ),
 
               // Send message to next player
               (async () => {
                 await chat.sendToOtherPerson(
                   nextPlayer!.phoneNumber,
-                  `${chat.message.userName} telah keluar dari game, selanjutnya adalah giliran kamu untuk bermain`
+                  `${chat.message.userName} telah keluar dari game, selanjutnya adalah giliran kamu untuk bermain`,
                 );
                 await chat.sendToOtherPerson(
                   nextPlayer!.phoneNumber,
                   { caption: `Kartu saat ini: ${game.currentCard}` },
-                  currentCardImage
+                  currentCardImage,
                 );
                 await chat.sendToOtherPerson(
                   nextPlayer!.phoneNumber,
@@ -279,7 +281,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                       .map((card) => card.cardName)
                       .join(", ")}.`,
                   },
-                  frontCardsImage
+                  frontCardsImage,
                 );
               })(),
 
@@ -291,17 +293,17 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                   } sudah keluar dari permainan. Sekarang giliran ${
                     nextPlayer!.username
                   } untuk bermain`,
-                  playerList
+                  playerList,
                 );
                 await game.sendToSpecificPlayerList(
                   { caption: `Kartu saat ini: ${game.currentCard}` },
                   playerList,
-                  currentCardImage
+                  currentCardImage,
                 );
                 await game.sendToSpecificPlayerList(
                   { caption: `Kartu yang ${nextPlayer!.username} miliki` },
                   playerList,
-                  backCardsImage
+                  backCardsImage,
                 );
               })(),
             ]);
@@ -314,11 +316,11 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
           await Promise.all([
             chat.replyToCurrentPerson(
-              "Anda berhasil keluar dari game. Terimakasih telah bermain!"
+              "Anda berhasil keluar dari game. Terimakasih telah bermain!",
             ),
             game.sendToSpecificPlayerList(
               `${chat.message.userName} telah keluar dari game`,
-              afterPlayerWantToLeave
+              afterPlayerWantToLeave,
             ),
           ]);
         }
@@ -340,7 +342,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           await game.endGame();
 
           await chat.replyToCurrentPerson(
-            "Anda berhasil keluar dari game, tetapi karena hanya anda saja yang berada otomatis game dihentikan. Terimakasih sudah bermain!"
+            "Anda berhasil keluar dari game, tetapi karena hanya anda saja yang berada otomatis game dihentikan. Terimakasih sudah bermain!",
           );
         } else if (copiedPlayers.length > 1) {
           // Current chatter is the creator that want to leave
@@ -361,15 +363,15 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
             await Promise.all([
               chat.replyToCurrentPerson(
-                `Anda berhasil keluar dari permainan! Posisi host jatuh ke tangan ${nextPlayer?.username}. Terimakasih sudah bergabung!`
+                `Anda berhasil keluar dari permainan! Posisi host jatuh ke tangan ${nextPlayer?.username}. Terimakasih sudah bergabung!`,
               ),
               chat.sendToOtherPerson(
                 nextPlayer!.phoneNumber,
-                `${creator.username} telah keluar dari permainan dan kamu adalah host untuk permainan saat ini.`
+                `${creator.username} telah keluar dari permainan dan kamu adalah host untuk permainan saat ini.`,
               ),
               game.sendToSpecificPlayerList(
                 `${creator.username} telah keluar dari permainan dan host berpindah tangan ke ${nextPlayer?.username} untuk permainan saat ini.`,
-                playersList
+                playersList,
               ),
             ]);
 
@@ -378,18 +380,18 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
           // Current chatter isn't the creator and want to leave
           const playersList = copiedPlayers.filter(
-            (player) => player.playerId !== chat.user!.id
+            (player) => player.playerId !== chat.user!.id,
           );
 
           await game.removeUserFromArray(chat.user!.id);
 
           await Promise.all([
             chat.replyToCurrentPerson(
-              "Anda berhasil keluar dari permainan. Terimakasih telah bermain!"
+              "Anda berhasil keluar dari permainan. Terimakasih telah bermain!",
             ),
             game.sendToSpecificPlayerList(
               `${chat.message.userName} telah keluar dari permainan`,
-              playersList
+              playersList,
             ),
           ]);
         }

@@ -23,19 +23,19 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       .filter((player) => player.playerId !== chat.user!.id);
 
     const afterPlayerGetKicked = game.players.filter(
-      (player) => player.playerId !== player.id
+      (player) => player.playerId !== player.id,
     );
 
     if (player.id === chat.user!.id)
       return await chat.replyToCurrentPerson(
-        "Kamu tidak bisa ban dirimu sendiri. Jika ingin keluar dari game, gunakan perintah *leavegame*!"
+        "Kamu tidak bisa ban dirimu sendiri. Jika ingin keluar dari game, gunakan perintah *leavegame*!",
       );
 
     switch (true) {
       case game.state.PLAYING: {
         if (afterPlayerGetKicked.length < 2) {
           chat.replyToCurrentPerson(
-            `Kamu tidak bisa ban pemain jika hanya ada dua orang. Kamu bisa menghentikan permainan atau keluar permainan dengan \`\`\`${env.PREFIX}eg\`\`\` atau \`\`\`${env.PREFIX}lg\`\`\`.`
+            `Kamu tidak bisa ban pemain jika hanya ada dua orang. Kamu bisa menghentikan permainan atau keluar permainan dengan \`\`\`${env.PREFIX}eg\`\`\` atau \`\`\`${env.PREFIX}lg\`\`\`.`,
           );
 
           return;
@@ -62,11 +62,11 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           const [currentCardImage, frontCardsImage, backCardsImage] =
             await createAllCardImage(
               game.currentCard as allCard,
-              nextPlayerCards?.cards.map((card) => card.cardName) as allCard[]
+              nextPlayerCards?.cards.map((card) => card.cardName) as allCard[],
             );
 
           const actualPlayerList = playerList.filter(
-            (player) => player.playerId !== nextPlayerId!.playerId
+            (player) => player.playerId !== nextPlayerId!.playerId,
           );
 
           await game.updatePosition(nextPlayer!.id);
@@ -77,7 +77,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             // Send message to the kicked player
             chat.sendToOtherPerson(
               player.phoneNumber,
-              "Anda sudah di banned dari permainan, sekarang kamu tidak lagi bermain."
+              "Anda sudah di banned dari permainan, sekarang kamu tidak lagi bermain.",
             ),
 
             // Send message to game creator
@@ -87,15 +87,15 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                   player.username
                 } dari permainan, sekarang giliran ${
                   nextPlayer!.username
-                } untuk bermain`
+                } untuk bermain`,
               );
               await chat.replyToCurrentPerson(
                 { caption: `Kartu saat ini: ${game.currentCard}` },
-                currentCardImage
+                currentCardImage,
               );
               await chat.replyToCurrentPerson(
                 { caption: `Kartu yang ${nextPlayer!.username} miliki` },
-                backCardsImage
+                backCardsImage,
               );
             })(),
 
@@ -103,12 +103,12 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             (async () => {
               await chat.sendToOtherPerson(
                 nextPlayer!.phoneNumber,
-                `${player.username} telah di banned oleh ${chat.message.userName}. Sekarang giliran kamu untuk bermain`
+                `${player.username} telah di banned oleh ${chat.message.userName}. Sekarang giliran kamu untuk bermain`,
               );
               await chat.sendToOtherPerson(
                 nextPlayer!.phoneNumber,
                 { caption: `Kartu saat ini: ${game.currentCard}` },
-                currentCardImage
+                currentCardImage,
               );
               await chat.sendToOtherPerson(
                 nextPlayer!.phoneNumber,
@@ -117,7 +117,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                     .map((card) => card.cardName)
                     .join(", ")}.`,
                 },
-                frontCardsImage
+                frontCardsImage,
               );
             })(),
 
@@ -127,17 +127,17 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
                 `${player.username} sudah di banned dari permainan oleh ${
                   chat.message.userName
                 }. Sekarang giliran ${nextPlayer!.username} untuk bermain`,
-                actualPlayerList
+                actualPlayerList,
               );
               await game.sendToSpecificPlayerList(
                 { caption: `Kartu saat ini: ${game.currentCard}` },
                 actualPlayerList,
-                currentCardImage
+                currentCardImage,
               );
               await game.sendToSpecificPlayerList(
                 { caption: `Kartu yang ${nextPlayer!.username} miliki` },
                 actualPlayerList,
-                backCardsImage
+                backCardsImage,
               );
             })(),
           ]);
@@ -158,18 +158,18 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
           // Send message to the kicked player
           chat.sendToOtherPerson(
             player.phoneNumber,
-            "Anda sudah di banned dari permainan, sekarang kamu tidak lagi bermain."
+            "Anda sudah di banned dari permainan, sekarang kamu tidak lagi bermain.",
           ),
 
           // Send message to game creator
           await chat.replyToCurrentPerson(
-            `Berhasil ban ${player.id} dari permainan.`
+            `Berhasil ban ${player.id} dari permainan.`,
           ),
 
           // Rest of the players
           game.sendToSpecificPlayerList(
             `${player.username} sudah di banned permainan oleh ${chat.message.userName}, sekarang dia tidak ada lagi dalam permainan.`,
-            playerList
+            playerList,
           ),
         ]);
 
@@ -178,7 +178,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     }
   } else {
     await chat.replyToCurrentPerson(
-      `Tidak ada pemain yang bernama "${message}"`
+      `Tidak ada pemain yang bernama "${message}"`,
     );
   }
 });

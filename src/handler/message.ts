@@ -19,7 +19,7 @@ import { botInfo } from "../config/messages";
 export const messageHandler = async (
   client: Client,
   logger: Logger,
-  limitter: ReturnType<typeof pLimit>
+  limitter: ReturnType<typeof pLimit>,
 ) => {
   const controller = await getController();
   const emitter = emitHandler(controller);
@@ -110,7 +110,7 @@ export const messageHandler = async (
         await chat.sendToCurrentPerson(
           command.length > 0
             ? `Tidak ada perintah yang bernama "${command}"`
-            : botInfo
+            : botInfo,
         );
         break;
       }

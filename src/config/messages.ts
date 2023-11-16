@@ -4,7 +4,7 @@ import path from "path";
 import { env } from "../env";
 
 const packageInfo = JSON.parse(
-  fs.readFileSync(path.resolve("package.json"), "utf-8")
+  fs.readFileSync(path.resolve("package.json"), "utf-8"),
 );
 
 /**
@@ -50,7 +50,7 @@ ${commands
   .sort((a, b) => a.localeCompare(b))
   .map(
     (command, idx) =>
-      `- ${`\`\`\`${command}\`\`\``}${idx !== commands.length - 1 ? "\n" : ""}`
+      `- ${`\`\`\`${command}\`\`\``}${idx !== commands.length - 1 ? "\n" : ""}`,
   )
   .join("")}
 
@@ -123,7 +123,7 @@ const replyBuilder = (
   explanation: string,
   alias: string[],
   messageExample: string,
-  param?: string
+  param?: string,
 ) => `${greeting}
 
   ${command.charAt(0).toUpperCase() + command.slice(1)}
@@ -149,14 +149,14 @@ export const replies = {
     "Perintah ini digunakan untuk menge-ban seseorang, semisal ada orang yang tidak dikenali masuk ke permainan.",
     ["b"],
     '"Berhasil menge-ban E. Sekarang dia tidak ada dalam permainan."',
-    "<nama yang ingin di ban>"
+    "<nama yang ingin di ban>",
   ),
 
   cards: replyBuilder(
     "cards",
     "Perintah ini digunakan untuk mengecek kartu yang ada pada saat kamu bermain.",
     ["c"],
-    '"Kartu kamu: greenskip, yellow4, red6, blue1"'
+    '"Kartu kamu: greenskip, yellow4, red6, blue1"',
   ),
 
   creategame: replyBuilder(
@@ -167,7 +167,7 @@ export const replies = {
     ["cg", "create"],
     `"Game berhasil dibuat.
     
-  Ajak teman kamu untuk bermain..."`
+  Ajak teman kamu untuk bermain..."`,
   ),
 
   draw: replyBuilder(
@@ -176,7 +176,7 @@ export const replies = {
   
   Terkadang kamu tidak memiliki kartu yang pas pada saat bermain, perintah ini bertujuan untuk mengambil kartu baru.`,
     ["d", "pickup", "newcard"],
-    '"Berhasil mengambil kartu baru, *red6*. Selanjutnya adalah giliran A untuk bermain"'
+    '"Berhasil mengambil kartu baru, *red6*. Selanjutnya adalah giliran A untuk bermain"',
   ),
 
   endgame: replyBuilder(
@@ -185,7 +185,7 @@ export const replies = {
     
   Perintah ini hanya bisa digunakan oleh orang yang membuat permainan.`,
     ["eg", "end"],
-    '"A telah menghentikan permainan. Terimakasih sudah bermain!"'
+    '"A telah menghentikan permainan. Terimakasih sudah bermain!"',
   ),
 
   infogame: replyBuilder(
@@ -195,7 +195,7 @@ export const replies = {
   Jika kamu sudah memasuki sebuah permainan, tidak perlu memasukan id game, tetapi kalau belum diperlukan id game tersebut.`,
     ["i", "ig", "info"],
     '"Game ID: XXXXXX..."',
-    "<id game>"
+    "<id game>",
   ),
 
   joingame: replyBuilder(
@@ -205,7 +205,7 @@ export const replies = {
   Diperlukan id dari game yang sudah dibuat, biasanya tidak perlu mengetikkan lagi karena sudah diberikan oleh pembuat gamenya langsung.`,
     ["j", "jg", "join"],
     '"Berhasil join ke game "XXXX", tunggu pembuat ruang game ini memulai permainannya!"',
-    "<id game>"
+    "<id game>",
   ),
 
   kick: replyBuilder(
@@ -213,7 +213,7 @@ export const replies = {
     "Perintah ini digunakan untuk kick seseorang, semisal ada teman yang AFK pada saat permainan.",
     ["k"],
     '"Berhasil mengkick E. Sekarang dia tidak ada dalam permainan."',
-    "<nama yang ingin di kick>"
+    "<nama yang ingin di kick>",
   ),
 
   leaderboard: replyBuilder(
@@ -222,7 +222,7 @@ export const replies = {
     
   Akan terdapat list nama pemain, berapa permainan yang dimainkan, dan rata-rata permainan.`,
     ["board", "lb"],
-    "Papan peringkat pemain saat ini"
+    "Papan peringkat pemain saat ini",
   ),
 
   leavegame: replyBuilder(
@@ -231,7 +231,7 @@ export const replies = {
     
   Perintah ini bisa digunakan pada saat permainan atau saat menunggu.`,
     ["l", "lg", "quit", "leave", "leavegame"],
-    '"Anda berhasil keluar dari game. Terimakasih telah bermain!"'
+    '"Anda berhasil keluar dari game. Terimakasih telah bermain!"',
   ),
 
   play: replyBuilder(
@@ -241,7 +241,7 @@ export const replies = {
   Jika kartu cocok akan ditaruh ke deck dan pemain selanjutnya akan mendapatkan giliran.`,
     ["p"],
     '"Berhasil mengeluarkan kartu *red9*, selanjutnya adalah giliran B untuk bermain"',
-    "<kartu>"
+    "<kartu>",
   ),
 
   say: replyBuilder(
@@ -251,7 +251,7 @@ export const replies = {
   Anda dapat mengirim gambar, GIF, dan stiker dengan keterangan. Untuk mengirim gambar dan stiker, berikan keterangan dan ikuti perintah yang sesuai. Jika ingin mengirim stiker, kirimkan stiker terlebih dahulu, kemudian balas dengan memberikan keterangan. Anda juga dapat menggunakan teknik balasan untuk gambar dan GIF. Selain itu, bisa mengirim teks biasa.`,
     ["s"],
     '"USERNAME: pesan disini"',
-    "<pesan (wajib jika hanya mengirimkan text)>"
+    "<pesan (wajib jika hanya mengirimkan text)>",
   ),
 
   startgame: replyBuilder(
@@ -260,6 +260,6 @@ export const replies = {
     
   Perintah ini hanya bisa digunakan oleh orang yang membuat permainan.`,
     ["sg", "start"],
-    '"Game berhasil dimulai! Sekarang giliran C untuk bermain"'
+    '"Game berhasil dimulai! Sekarang giliran C untuk bermain"',
   ),
 };

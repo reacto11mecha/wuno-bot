@@ -6,7 +6,7 @@ export default atLeastGameID(
   async ({ chat, game }) => {
     if (game.state.PLAYING) {
       return await chat.replyToCurrentPerson(
-        "Game ini sedang bermain, konfirmasikan ke orang yang membuat game atau tunggu giliran selanjutnya!"
+        "Game ini sedang bermain, konfirmasikan ke orang yang membuat game atau tunggu giliran selanjutnya!",
       );
     } else if (game.state.ENDED) {
       return await chat.replyToCurrentPerson("Game ini sudah selesai!");
@@ -14,7 +14,7 @@ export default atLeastGameID(
 
     if (game.isPlayerGotBanned(chat.user!.id))
       return await chat.sendToCurrentPerson(
-        "Kamu sudah di banned dari permainan ini!"
+        "Kamu sudah di banned dari permainan ini!",
       );
 
     // Copy all available players before new player join in
@@ -24,11 +24,11 @@ export default atLeastGameID(
 
     await Promise.all([
       await chat.replyToCurrentPerson(
-        `Berhasil join ke game "${game.gameID}", tunggu pembuat ruang game ini memulai permainannya!`
+        `Berhasil join ke game "${game.gameID}", tunggu pembuat ruang game ini memulai permainannya!`,
       ),
       await game.sendToSpecificPlayerList(
         `Pemain dengan username "${chat.message.userName}" memasuki ruang permainan! Sapa dia dengan menggunakan "${env.PREFIX}say Halo ${chat.message.userName}!"`,
-        playerList
+        playerList,
       ),
     ]);
   },
@@ -36,6 +36,6 @@ export default atLeastGameID(
     await chat.replyToCurrentPerson(
       `Kamu sudah masuk ke sesi game ${
         chat.isGroupChat ? "[REDACTED]" : game.gameID
-      }`
-    )
+      }`,
+    ),
 );

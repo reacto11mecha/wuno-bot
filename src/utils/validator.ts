@@ -74,11 +74,11 @@ export const atLeastGameID =
       if (!chat.isJoiningGame) {
         if (!gameID || gameID === "") {
           return await chat.replyToCurrentPerson(
-            "Diperlukan parameter game id!"
+            "Diperlukan parameter game id!",
           );
         } else if (gameID.length < 11) {
           return await chat.replyToCurrentPerson(
-            "Minimal panjang game id adalah 11 karakter!"
+            "Minimal panjang game id adalah 11 karakter!",
           );
         }
 
@@ -129,7 +129,7 @@ export const atLeastGameID =
       chat.logger.error({ timeReference });
 
       await chat.sendToCurrentPerson(
-        `Terjadi sebuah kesalahan internal. Laporkan kesalahan ini kepada administrator bot.\n\n\`\`\`timeReference\`\`\`: ${timeReference}.`
+        `Terjadi sebuah kesalahan internal. Laporkan kesalahan ini kepada administrator bot.\n\n\`\`\`timeReference\`\`\`: ${timeReference}.`,
       );
     }
   };

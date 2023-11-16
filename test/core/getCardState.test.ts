@@ -30,13 +30,13 @@ describe("Get card state unit test", () => {
         `The card ${color}$number should be a VALID_NORMAL`,
         ({ number }) => {
           const cardState = CardPicker.getCardState(
-            `${color}${number}` as allCard
+            `${color}${number}` as allCard,
           );
 
           expect(cardState.state).toBe(EGetCardState.VALID_NORMAL);
-        }
+        },
       );
-    }
+    },
   );
 
   describe.each(allColor)(
@@ -44,12 +44,12 @@ describe("Get card state unit test", () => {
     ({ color }) => {
       it(`Card wilddraw4${color} is VALID_WILD`, () => {
         const cardState = CardPicker.getCardState(
-          `wilddraw4${color}` as allCard
+          `wilddraw4${color}` as allCard,
         );
 
         expect(cardState.state).toBe(EGetCardState.VALID_WILD_PLUS4);
       });
-    }
+    },
   );
 
   describe.each(allColor)(
@@ -60,7 +60,7 @@ describe("Get card state unit test", () => {
 
         expect(cardState.state).toBe(EGetCardState.VALID_WILD);
       });
-    }
+    },
   );
 
   describe.each(allColor)(
@@ -70,13 +70,13 @@ describe("Get card state unit test", () => {
         `Check if the ${color}$type card is valid special and in the $type type`,
         ({ type }) => {
           const cardState = CardPicker.getCardState(
-            `${color}${type}` as allCard
+            `${color}${type}` as allCard,
           );
 
           expect(cardState.state).toBe(EGetCardState.VALID_SPECIAL);
           expect(cardState.type).toBe(type);
-        }
+        },
       );
-    }
+    },
   );
 });

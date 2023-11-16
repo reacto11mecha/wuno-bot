@@ -151,7 +151,7 @@ export class filterCardByGivenCard {
   static ValidNormal(
     actualCard: allCard,
     color: color,
-    number: possibleNumber
+    number: possibleNumber,
   ): allCard[] {
     const sameByColor = [...filteredWildColor]
       .filter((card) => card.includes(color))
@@ -166,7 +166,7 @@ export class filterCardByGivenCard {
       .filter((card) => !card.includes("skip"));
 
     return [...new Set([...sameByColor, ...sameByNumber])].filter(
-      (card) => !card.includes(actualCard)
+      (card) => !card.includes(actualCard),
     );
   }
 
@@ -249,7 +249,7 @@ export class CardPicker {
         givenCardCondition.ByMagicCard,
         givenCardCondition.ByRandomPick,
       ],
-      [50, 20, 10]
+      [50, 20, 10],
     );
 
     switch (status) {
@@ -261,7 +261,7 @@ export class CardPicker {
             const filteredCard = filterCardByGivenCard.ValidNormal(
               card,
               state.color!,
-              state.number!
+              state.number!,
             );
 
             const idxCard = Math.floor(random() * filteredCard.length);
@@ -302,10 +302,10 @@ export class CardPicker {
     switch (true) {
       case regexValidNormal.test(normalizeCard): {
         const color = normalizeCard.match(
-          regexValidNormal
+          regexValidNormal,
         )![1] as IGetCardState["color"];
         const number = Number(
-          normalizeCard.slice(color!.length)
+          normalizeCard.slice(color!.length),
         )! as IGetCardState["number"];
 
         return { state: EGetCardState.VALID_NORMAL, color, number };
@@ -313,7 +313,7 @@ export class CardPicker {
 
       case regexValidWildColorPlus4Only.test(normalizeCard): {
         const color = normalizeCard.match(
-          regexValidWildColorPlus4Only
+          regexValidWildColorPlus4Only,
         )![2] as IGetCardState["color"];
 
         return { state: EGetCardState.VALID_WILD_PLUS4, color };
@@ -321,7 +321,7 @@ export class CardPicker {
 
       case regexValidWildColorOnly.test(normalizeCard): {
         const color = normalizeCard.match(
-          regexValidWildColorOnly
+          regexValidWildColorOnly,
         )![2] as IGetCardState["color"];
 
         return {
@@ -332,10 +332,10 @@ export class CardPicker {
 
       case regexValidSpecial.test(normalizeCard): {
         const color = normalizeCard.match(
-          regexValidSpecial
+          regexValidSpecial,
         )![1]! as IGetCardState["color"];
         const type = normalizeCard.match(
-          regexValidSpecial
+          regexValidSpecial,
         )![2]! as IGetCardState["type"];
 
         return {
@@ -375,7 +375,7 @@ export const switchState = {
  */
 export const getSwitchState = (
   firstState: IGetCardState,
-  secState: IGetCardState
+  secState: IGetCardState,
 ) => {
   if (secState.state === EGetCardState.VALID_WILD)
     return switchState.SECONDCARD_IS_WILD;

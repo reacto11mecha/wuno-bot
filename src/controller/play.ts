@@ -41,13 +41,13 @@ export default requiredJoinGameSession(async ({ chat, game, card }) => {
 
 Coba tetapkan warna di antara warna \`\`\`red\`\`\` (merah), \`\`\`green\`\`\` (hijau), \`\`\`blue\`\`\` (biru), atau \`\`\`yellow\`\`\` (kuning) dengan menggunakan perintah
 
-  \`\`\`${env.PREFIX}p ${choosenCard} <warna yang di inginkan>\`\`\``
+  \`\`\`${env.PREFIX}p ${choosenCard} <warna yang di inginkan>\`\`\``,
       );
     } else if (!Card.isValidCard(choosenCard)) {
       await chat.replyToCurrentPerson(`${choosenCard} bukanlah sebuah kartu!`);
     } else if (!card.isIncluded(choosenCard)) {
       await chat.replyToCurrentPerson(
-        `Kamu tidak memiliki kartu ${choosenCard}!`
+        `Kamu tidak memiliki kartu ${choosenCard}!`,
       );
     } else {
       await card.solve(choosenCard as allCard);

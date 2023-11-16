@@ -5,16 +5,16 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
   if (!game) {
     return await chat.replyToCurrentPerson(
-      "Sebuah kesalahan, game tidak ditemukan!"
+      "Sebuah kesalahan, game tidak ditemukan!",
     );
   } else if (game.players!.length < 1) {
     return await chat.replyToCurrentPerson(
-      "Tidak ada lawan bicara yang bisa diajak berkomunikasi."
+      "Tidak ada lawan bicara yang bisa diajak berkomunikasi.",
     );
   }
 
   const playerList = game.players.filter(
-    (player) => player.playerId !== chat.user!.id
+    (player) => player.playerId !== chat.user!.id,
   );
 
   // Media handler
@@ -33,7 +33,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
               : `${chat.message.userName}: ${message}`,
         },
         playerList,
-        quotedMessageMedia
+        quotedMessageMedia,
       );
 
       await chat.reactToCurrentPerson("👍");
@@ -44,7 +44,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     // Check if it's not an image
     if (!quotedMessageMedia.mimetype.startsWith("image/")) {
       await chat.replyToCurrentPerson(
-        "Pesan yang bisa dikutip hanya berupa gambar, gif, dan sticker!"
+        "Pesan yang bisa dikutip hanya berupa gambar, gif, dan sticker!",
       );
 
       return;
@@ -58,14 +58,14 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
       await game.sendToSpecificPlayerList(
         { sendMediaAsSticker: true },
         playerList,
-        quotedMessageMedia
+        quotedMessageMedia,
       );
 
       await game.sendToSpecificPlayerList(
         message === ""
           ? `Sticker dari ${chat.message.userName}`
           : `${chat.message.userName}: ${message}`,
-        playerList
+        playerList,
       );
 
       await chat.reactToCurrentPerson("👍");
@@ -81,7 +81,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             : `${chat.message.userName}: ${message}`,
       },
       playerList,
-      quotedMessageMedia
+      quotedMessageMedia,
     );
 
     await chat.reactToCurrentPerson("👍");
@@ -104,7 +104,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
               : `${chat.message.userName}: ${message}`,
         },
         playerList,
-        currentMedia
+        currentMedia,
       );
 
       await chat.reactToCurrentPerson("👍");
@@ -115,7 +115,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
     // Check if it's not an image
     if (!currentMedia.mimetype.startsWith("image/")) {
       await chat.replyToCurrentPerson(
-        "Pesan yang bisa dikutip hanya berupa gambar, gif, dan sticker!"
+        "Pesan yang bisa dikutip hanya berupa gambar, gif, dan sticker!",
       );
 
       return;
@@ -129,7 +129,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
             : `${chat.message.userName}: ${message}`,
       },
       playerList,
-      quotedMessageMedia
+      quotedMessageMedia,
     );
 
     await chat.reactToCurrentPerson("👍");
@@ -145,7 +145,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
   await game.sendToSpecificPlayerList(
     `${chat.message.userName}: ${message}`,
-    playerList
+    playerList,
   );
 
   await chat.reactToCurrentPerson("👍");

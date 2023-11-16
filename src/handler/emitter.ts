@@ -10,7 +10,7 @@ import { handleHelpCommand } from "./help";
  * @returns Event emitter instance that used for handling command to the actual controller
  */
 export const emitHandler = (
-  controller: Awaited<ReturnType<typeof getController>>
+  controller: Awaited<ReturnType<typeof getController>>,
 ) => {
   const messageHandler = new EventEmitter();
 
@@ -22,12 +22,12 @@ export const emitHandler = (
 
   messageHandler.on(
     "startgame",
-    isDMChat(findOrCreateUser(controller.startgame))
+    isDMChat(findOrCreateUser(controller.startgame)),
   );
   messageHandler.on("endgame", isDMChat(findOrCreateUser(controller.endgame)));
   messageHandler.on(
     "leavegame",
-    isDMChat(findOrCreateUser(controller.leavegame))
+    isDMChat(findOrCreateUser(controller.leavegame)),
   );
   messageHandler.on("play", isDMChat(findOrCreateUser(controller.play)));
   messageHandler.on("say", isDMChat(findOrCreateUser(controller.say)));

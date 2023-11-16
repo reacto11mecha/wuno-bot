@@ -59,7 +59,7 @@ export const createCardsImageFront = async (cards: allCard[]) => {
         input: path.join(cardsDir, `${card}.png`),
         left: 95 * idx,
         top: 0,
-      }))
+      })),
     )
     .toFormat("png")
     .toBuffer();
@@ -86,7 +86,7 @@ export const createCardsImageBack = async (cardsLength: number) => {
         input: path.join(cardsDir, "back.png"),
         left: 95 * idx,
         top: 0,
-      }))
+      })),
     )
     .toFormat("png")
     .toBuffer();
@@ -105,7 +105,7 @@ export const createCardsImageBack = async (cardsLength: number) => {
  */
 export const createAllCardImage = async (
   currentCard: allCard,
-  cards: allCard[]
+  cards: allCard[],
 ) => {
   const currentCardImage = getCardImage(currentCard);
   const [frontCardsImage, backCardsImage] = await Promise.all([

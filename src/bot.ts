@@ -59,14 +59,16 @@ export default class Bot {
       this.waClient.setStatus(
         `Ketik "${
           env.PREFIX
-        }" untuk memulai percakapan! Dinyalakan pada ${formatTime(new Date())}.`
+        }" untuk memulai percakapan! Dinyalakan pada ${formatTime(
+          new Date(),
+        )}.`,
       );
     });
     this.waClient.on("authenticated", () =>
-      this.logger.info("[BOT] Berhasil melakukan proses autentikasi")
+      this.logger.info("[BOT] Berhasil melakukan proses autentikasi"),
     );
     this.waClient.on("change_state", (state) =>
-      this.logger.info(`[BOT] State bot berubah, saat ini: ${state}`)
+      this.logger.info(`[BOT] State bot berubah, saat ini: ${state}`),
     );
 
     this.queue.start();
@@ -81,7 +83,7 @@ export default class Bot {
     const onMessageQueue = await messageHandler(
       this.waClient,
       this.logger,
-      this.messageLimitter
+      this.messageLimitter,
     );
 
     this.waClient.on("message", async (message) => {

@@ -75,7 +75,7 @@ export class Game {
             playerId,
             playerOrder: idx + 1,
           },
-        })
+        }),
       ),
     ]);
 
@@ -86,8 +86,8 @@ export class Game {
             gameId: this.game.id,
             playerId,
           },
-        })
-      )
+        }),
+      ),
     );
 
     await prisma.$transaction(
@@ -100,8 +100,8 @@ export class Game {
               cardName: CardPicker.pickCardByGivenCard(startCard),
               cardId: userCard.id,
             },
-          })
-        )
+          }),
+        ),
     );
 
     const updatedGameState = await prisma.game.findUnique({
@@ -201,7 +201,7 @@ export class Game {
             isJoiningGame: false,
             gameID: null,
           },
-        })
+        }),
       ),
     ]);
 
@@ -382,8 +382,8 @@ export class Game {
                 },
               },
             },
-          })
-        )
+          }),
+        ),
       );
 
       const updatedGameState = await prisma.game.findUnique({
@@ -411,15 +411,15 @@ export class Game {
   async sendToSpecificPlayerList(
     message: MessageContent | MessageSendOptions,
     players: Player[],
-    image?: MessageMedia
+    image?: MessageMedia,
   ) {
     if (players.length > 0) {
       const users = await Promise.all(
         players.map((player) =>
           prisma.user.findUnique({
             where: { id: player.playerId },
-          })
-        )
+          }),
+        ),
       );
 
       await Promise.all(
@@ -428,9 +428,9 @@ export class Game {
             return this.chat.sendToOtherPerson(
               user.phoneNumber,
               message,
-              image
+              image,
             );
-        })
+        }),
       );
     }
   }
@@ -515,8 +515,8 @@ export class Game {
   async getAllPlayerUserObject() {
     return await Promise.all(
       this.players.map((player) =>
-        prisma.user.findUnique({ where: { id: player.playerId } })
-      )
+        prisma.user.findUnique({ where: { id: player.playerId } }),
+      ),
     );
   }
 
@@ -530,19 +530,19 @@ export class Game {
 
     if (this.game.playerOrders.length > 0 && this.game.currentPlayerId) {
       const playersOrder = this.game.playerOrders.sort(
-        (a, b) => a.playerOrder - b.playerOrder
+        (a, b) => a.playerOrder - b.playerOrder,
       );
       const currentPlayer = this.game.currentPlayerId;
 
       const currentIndex = playersOrder.findIndex(
-        (player) => player.playerId === currentPlayer
+        (player) => player.playerId === currentPlayer,
       );
 
       const nextPlayerID =
         playersOrder[(currentIndex + increment) % playersOrder.length];
 
       return this.players.find(
-        (player) => player.playerId === nextPlayerID.playerId
+        (player) => player.playerId === nextPlayerID.playerId,
       );
     }
   }

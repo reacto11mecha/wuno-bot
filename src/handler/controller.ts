@@ -17,7 +17,7 @@ const files = fs
  * Lists of all controller name
  */
 export const controllerName = files.map((file) =>
-  file.replace(".js", "").replace(".ts", "")
+  file.replace(".js", "").replace(".ts", ""),
 );
 
 /**
@@ -36,7 +36,7 @@ export async function getController() {
       return {
         [keyName]: calledFunction.default,
       };
-    })
+    }),
   );
 
   return controller.reduce((curr, acc) => Object.assign(curr, acc));

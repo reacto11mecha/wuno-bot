@@ -27,7 +27,7 @@ export default async function leaderboard(chat: Chat) {
         playerId,
         preCalculatedAverage: playerAchievement.map(
           ({ started_at, ended_at }) =>
-            ended_at!.getTime() - started_at!.getTime()
+            ended_at!.getTime() - started_at!.getTime(),
         ),
         count: playerAchievement.length,
       };
@@ -47,7 +47,7 @@ export default async function leaderboard(chat: Chat) {
 
       const sumAverage = winner.preCalculatedAverage.reduce(
         (curr, acc) => curr + acc,
-        0
+        0,
       );
       const averagePlayingTime =
         sumAverage / winner.preCalculatedAverage.length;
@@ -59,7 +59,7 @@ export default async function leaderboard(chat: Chat) {
         username: user?.username ?? "????? (Pemain Sudah Dihapus)",
         count: winner.count,
       };
-    })
+    }),
   );
 
   chat.replyToCurrentPerson(`Papan peringkat pemain saat ini
@@ -69,7 +69,7 @@ ${eligibleLeaderboard
     (winner, idx) =>
       `${idx + 1}. ${winner.username} - Menang ${
         winner.count
-      } kali, rata rata durasi ${winner.average}.`
+      } kali, rata rata durasi ${winner.average}.`,
   )
   .join("\n")
   .trim()}`);

@@ -99,7 +99,7 @@ export class Chat {
     IncomingMessage: Message,
     logger: Logger,
     limitter: ReturnType<typeof pLimit>,
-    contact: Contact
+    contact: Contact,
   ) {
     this.client = client;
     this.logger = logger;
@@ -128,7 +128,7 @@ export class Chat {
    */
   async sendToCurrentPerson(
     content: MessageContent | MessageSendOptions,
-    image?: MessageMedia
+    image?: MessageMedia,
   ) {
     await this.sendToOtherPerson(this.message.from, content, image);
   }
@@ -140,7 +140,7 @@ export class Chat {
    */
   async replyToCurrentPerson(
     content: MessageContent | MessageSendOptions,
-    image?: MessageMedia
+    image?: MessageMedia,
   ) {
     if (image) {
       await this.limitter(
@@ -148,12 +148,12 @@ export class Chat {
           await this.incomingMessage.reply(
             image,
             this.message.from,
-            content as MessageSendOptions
-          )
+            content as MessageSendOptions,
+          ),
       );
     } else {
       await this.limitter(
-        async () => await this.incomingMessage.reply(content as MessageContent)
+        async () => await this.incomingMessage.reply(content as MessageContent),
       );
     }
   }
@@ -174,7 +174,7 @@ export class Chat {
   async sendToOtherPerson(
     to: string,
     content: MessageContent | MessageSendOptions,
-    image?: MessageMedia
+    image?: MessageMedia,
   ) {
     if (image) {
       await this.limitter(
@@ -182,12 +182,13 @@ export class Chat {
           await this.client.sendMessage(
             to,
             image,
-            content as MessageSendOptions
-          )
+            content as MessageSendOptions,
+          ),
       );
     } else {
       await this.limitter(
-        async () => await this.client.sendMessage(to, content as MessageContent)
+        async () =>
+          await this.client.sendMessage(to, content as MessageContent),
       );
     }
   }

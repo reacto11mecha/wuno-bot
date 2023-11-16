@@ -19,7 +19,7 @@ const allValidNumbers = Array.from({ length: 10 }).map((_, number) => ({
 const allNormalColor = allValidNumbers.flatMap(({ number }) =>
   allColor.flatMap(({ color }) => ({
     card: `${color}${number}` as allCard,
-  }))
+  })),
 );
 
 describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
@@ -32,19 +32,19 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
           const deckCard = `${colorItem.color}${numberItem.number}` as allCard;
           const givenCard = allValidNumbers.map(
             (secondNumberItem) =>
-              `${colorItem.color}${secondNumberItem.number}` as allCard
+              `${colorItem.color}${secondNumberItem.number}` as allCard,
           );
 
           return givenCard.map((gc) => ({ deckCard, givenCard: gc }));
-        })
-      )
+        }),
+      ),
     )(
       "Should be succesfully stack $deckCard and $givenCard",
       ({ deckCard, givenCard }) => {
         const status = compareTwoCard(deckCard, givenCard);
 
         expect(status).toBe("STACK");
-      }
+      },
     );
   });
 
@@ -63,22 +63,24 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
               deckCard,
               givenCard: `${currentColor.color}${number}` as allCard,
             }));
-        })
-      )
+        }),
+      ),
     )(
       "Should be succesfully stack $deckCard and $givenCard",
       ({ deckCard, givenCard }) => {
         const status = compareTwoCard(deckCard, givenCard);
 
         expect(status).toBe("STACK");
-      }
+      },
     );
   });
 
   // Stack wild plus 4 to the deck
   describe.each(
     // Create wilddraw4 with all color
-    allColor.map(({ color }) => ({ wildPlus4: `wilddraw4${color}` as allCard }))
+    allColor.map(({ color }) => ({
+      wildPlus4: `wilddraw4${color}` as allCard,
+    })),
   )("Test if plus 4 card could stack on normal color", ({ wildPlus4 }) => {
     test.each(allNormalColor)(
       "Plus 4 card could stack on $card",
@@ -86,7 +88,7 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
         const status = compareTwoCard(card, wildPlus4);
 
         expect(status).toBe("STACK_PLUS_4");
-      }
+      },
     );
   });
 
@@ -96,7 +98,7 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
     allColor.map(({ color }) => ({
       wildDraw4: `wilddraw4${color}` as allCard,
       color,
-    }))
+    })),
   )(
     "Test if normal coloured card can stack normally on specific wilddraw4 on the deck",
     ({ wildDraw4, color }) => {
@@ -106,15 +108,15 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
           const status = compareTwoCard(wildDraw4, card);
 
           expect(status).toBe("STACK");
-        }
+        },
       );
-    }
+    },
   );
 
   // Stack wild color to the deck, it'll bypass all normal coloured card
   describe.each(
     // Create wild card with all color
-    allColor.map(({ color }) => ({ wild: `wild${color}` as allCard }))
+    allColor.map(({ color }) => ({ wild: `wild${color}` as allCard })),
   )("Test if wild card can bypass all normal coloured card", ({ wild }) => {
     test.each(allNormalColor)(
       `${wild} card could stack on $card`,
@@ -122,7 +124,7 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
         const status = compareTwoCard(card, wild);
 
         expect(status).toBe("STACK_WILD");
-      }
+      },
     );
   });
 
@@ -130,7 +132,7 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
   // player want to stack the card with normal card
   describe.each(
     // Create wild card with all color
-    allColor.map(({ color }) => ({ wild: `wild${color}` as allCard, color }))
+    allColor.map(({ color }) => ({ wild: `wild${color}` as allCard, color })),
   )(
     "Test if normal coloured card can stack normally on specific wild on the deck",
     ({ wild, color }) => {
@@ -140,15 +142,15 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
           const status = compareTwoCard(wild, card);
 
           expect(status).toBe("STACK");
-        }
+        },
       );
-    }
+    },
   );
 
   // Stack skip card to the deck
   describe.each(
     // Create all skip card with specific color
-    allColor.map(({ color }) => ({ skipCard: `${color}skip`, color }))
+    allColor.map(({ color }) => ({ skipCard: `${color}skip`, color })),
   )("Test all skip card with same card color", ({ skipCard, color }) => {
     test.each(allNormalColor.filter(({ card }) => card.includes(color)))(
       `${skipCard} could be stacked on $card`,
@@ -156,14 +158,14 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
         const status = compareTwoCard(card as allCard, skipCard as allCard);
 
         expect(status).toBe("VALID_SPECIAL_SKIP");
-      }
+      },
     );
   });
 
   // Stack reverse card to the deck
   describe.each(
     // Create all reverse card with specific color
-    allColor.map(({ color }) => ({ reverseCard: `${color}reverse`, color }))
+    allColor.map(({ color }) => ({ reverseCard: `${color}reverse`, color })),
   )("Test all reverse card with same card color", ({ reverseCard, color }) => {
     test.each(allNormalColor.filter(({ card }) => card.includes(color)))(
       `${reverseCard} could be stacked on $card`,
@@ -171,14 +173,14 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
         const status = compareTwoCard(card as allCard, reverseCard as allCard);
 
         expect(status).toBe("VALID_SPECIAL_REVERSE");
-      }
+      },
     );
   });
 
   // Stack plus two card to the deck
   describe.each(
     // Create all draw2 card with specific color
-    allColor.map(({ color }) => ({ draw2: `${color}draw2`, color }))
+    allColor.map(({ color }) => ({ draw2: `${color}draw2`, color })),
   )("Test all draw2 card with same card color", ({ draw2, color }) => {
     test.each(allNormalColor.filter(({ card }) => card.includes(color)))(
       `${draw2} could be stacked on $card`,
@@ -186,7 +188,7 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
         const status = compareTwoCard(card as allCard, draw2 as allCard);
 
         expect(status).toBe("VALID_SPECIAL_DRAW2");
-      }
+      },
     );
   });
 
@@ -208,21 +210,21 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
                   special.type === "reverse"
                     ? "VALID_SPECIAL_REVERSE"
                     : special.type === "skip"
-                    ? "VALID_SPECIAL_SKIP"
-                    : special.type === "draw2"
-                    ? "VALID_SPECIAL_DRAW2"
-                    : null,
+                      ? "VALID_SPECIAL_SKIP"
+                      : special.type === "draw2"
+                        ? "VALID_SPECIAL_DRAW2"
+                        : null,
               };
-            })
-          )
-      )
+            }),
+          ),
+      ),
     )(
       "$deckCard and $givenCard can be stacked ($expected)",
       ({ deckCard, givenCard, expected }) => {
         const state = compareTwoCard(deckCard, givenCard);
 
         expect(state).toBe(expected);
-      }
+      },
     );
   });
 
@@ -240,20 +242,20 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
               special.type === "reverse"
                 ? "VALID_SPECIAL_REVERSE"
                 : special.type === "skip"
-                ? "VALID_SPECIAL_SKIP"
-                : special.type === "draw2"
-                ? "VALID_SPECIAL_DRAW2"
-                : null,
+                  ? "VALID_SPECIAL_SKIP"
+                  : special.type === "draw2"
+                    ? "VALID_SPECIAL_DRAW2"
+                    : null,
           };
-        })
-      )
+        }),
+      ),
     )(
       "Can stack $givenCard to $deckCard ($expected)",
       ({ deckCard, givenCard, expected }) => {
         const state = compareTwoCard(deckCard, givenCard);
 
         expect(state).toBe(expected);
-      }
+      },
     );
   });
 
@@ -263,8 +265,8 @@ describe("Card comparer unit test [STACK | STACK WILD | STACK SPECIAL]", () => {
         allColor.map((given) => ({
           deckCard: `wilddraw4${color}` as allCard,
           givenCard: `wild${given.color}` as allCard,
-        }))
-      )
+        })),
+      ),
     )("Can stack $givenCard to $deckCard", ({ deckCard, givenCard }) => {
       const state = compareTwoCard(deckCard, givenCard);
 
@@ -299,10 +301,10 @@ describe("Card comparer unit test [UNMATCH]", () => {
                   deckCard: `${type.color}${validNumberDeck.number}` as allCard,
                   givenCard:
                     `${opposite.color}${validNumberGiven.number}` as allCard,
-                }))
-            )
-          )
-      )
+                })),
+            ),
+          ),
+      ),
     )("$deckCard can't be stacked by $givenCard", fnTest);
   });
 
@@ -318,8 +320,8 @@ describe("Card comparer unit test [UNMATCH]", () => {
               deckCard,
               givenCard: `${opposite.color}${number}` as allCard,
             }));
-          })
-      )
+          }),
+      ),
     )("$deckCard can't be stacked by $givenCard", fnTest);
   });
 
@@ -335,8 +337,8 @@ describe("Card comparer unit test [UNMATCH]", () => {
               deckCard,
               givenCard: `${type.color}${number}` as allCard,
             }));
-          })
-      )
+          }),
+      ),
     )("Can't stack $givenCard to $deckCard", fnTest);
   });
 
@@ -360,14 +362,14 @@ describe("Card comparer unit test [UNMATCH]", () => {
                       deckCard,
                       givenCard,
                     };
-                  })
-              )
-            )
+                  }),
+              ),
+            ),
         )
-        .flat(4)
+        .flat(4),
     )(
       "Can't stack special $deckCard compared to special card $givenCard",
-      fnTest
+      fnTest,
     );
   });
 
@@ -382,12 +384,12 @@ describe("Card comparer unit test [UNMATCH]", () => {
             allSpecialCard.flatMap(({ type }) => ({
               deckCard,
               givenCard: `${given.color}${type}` as allCard,
-            }))
+            })),
           );
-      })
+      }),
     )(
       "Can't stack plus 4 $deckCard compared to special card $givenCard",
-      fnTest
+      fnTest,
     );
   });
 });

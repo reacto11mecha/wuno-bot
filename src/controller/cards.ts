@@ -13,7 +13,7 @@ export default requiredJoinGameSession(async ({ chat, game, card }) => {
 
     await chat.replyToCurrentPerson(
       { caption: `Kartu kamu: ${cards}.` },
-      image
+      image,
     );
   }
 });

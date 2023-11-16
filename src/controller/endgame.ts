@@ -6,7 +6,7 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
   } else if (game.isGameCreator) {
     if (!game.state.ENDED) {
       const playerList = game.players.filter(
-        (player) => player.playerId !== chat.user!.id
+        (player) => player.playerId !== chat.user!.id,
       );
 
       const creator = await game.getCreatorUser();
@@ -15,13 +15,13 @@ export default requiredJoinGameSession(async ({ chat, game }) => {
 
       await Promise.all([
         chat.replyToCurrentPerson(
-          "Game berhasil dihentikan. Terimakasih sudah bermain!"
+          "Game berhasil dihentikan. Terimakasih sudah bermain!",
         ),
         game.sendToSpecificPlayerList(
           `${
             creator!.username
           } telah menghentikan permainan. Terimakasih sudah bermain!`,
-          playerList
+          playerList,
         ),
       ]);
     } else {

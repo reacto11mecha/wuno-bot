@@ -21,7 +21,7 @@ export const handleHelpCommand =
 
     if (choosenCommand && !commands.includes(choosenCommand)) {
       await chat.sendToCurrentPerson(
-        `Tidak ada perintah yang bernama "${choosenCommand}"`
+        `Tidak ada perintah yang bernama "${choosenCommand}"`,
       );
     } else if (choosenCommand && commands.includes(choosenCommand)) {
       if (Object.keys(replies).includes(choosenCommand)) {

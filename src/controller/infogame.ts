@@ -55,7 +55,7 @@ const commonCallback: commonCb = async ({ chat, game }) => {
 Game Status: ${game.translatedStatus}
 Tanggal Dibuat: ${df(game.created_at)}
 
-${replied}`.trim()
+${replied}`.trim(),
   );
 };
 

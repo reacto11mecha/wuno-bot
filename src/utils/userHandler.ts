@@ -29,7 +29,7 @@ export const findOrCreateUser =
         });
 
         chat.logger.info(
-          `[DB] Berhasil mendaftarkan user dengan username: ${chat.message.userName}`
+          `[DB] Berhasil mendaftarkan user dengan username: ${chat.message.userName}`,
         );
 
         chat.setUserAndGameProperty(newUser, newGameProperty);
@@ -38,7 +38,7 @@ export const findOrCreateUser =
         chat.logger.error(error);
 
         await chat.replyToCurrentPerson(
-          "Terjadi Sebuah Kesalahan. Mohon coba sekali lagi perintah ini. Jika masih berlanjut hubungi administrator."
+          "Terjadi Sebuah Kesalahan. Mohon coba sekali lagi perintah ini. Jika masih berlanjut hubungi administrator.",
         );
       }
     } else {
