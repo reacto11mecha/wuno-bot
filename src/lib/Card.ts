@@ -948,6 +948,26 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
     else return this.cards?.includes(card);
   }
 
+  isArrayIncluded(rawGivenCards: string[]) {
+    const givenCards = rawGivenCards.map((card) => {
+      if (card.match(regexValidWildColorOnly)) return "wild";
+      else if (card.match(regexValidWildColorPlus4Only)) return "wilddraw4";
+
+      return card;
+    });
+
+    for (const card of givenCards) {
+      const countUnoOwnership = this.cards?.filter((c) => c === card).length;
+      const countPlayerCards = givenCards.filter((c) => c === card).length;
+
+      if (countUnoOwnership < countPlayerCards) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   /**
    * Get all cards name from current player
    */
