@@ -442,3 +442,52 @@ export const compareTwoCard = (firstCard: allCard, secCard: allCard) => {
       return "UNMATCH";
   }
 };
+
+export const compareMultipleCards = (
+  baseCard: allCard,
+  inputCards: allCard[],
+) => {
+  // for (const [idx, currentCard] of inputCards.entries()) {
+  //   if(idx === 0) {
+  //     const firstState = CardPicker.getCardState(baseCard);
+  //     const secState = CardPicker.getCardState(currentCard);
+
+  //     const compared = compareTwoCard(baseCard, currentCard);
+
+  //     if (compared === "UNMATCH")
+  //       return {
+  //         status: "UNMATCH",
+  //       }
+  //   } else {
+  //   const cardState = compareTwoCard(inputCards[idx - 1],currentCard)
+  //     console.log(cardState)
+  //   }
+  // }
+
+  const firstCard = inputCards[0];
+
+  const baseCardState = CardPicker.getCardState(baseCard);
+  const firstCardState = CardPicker.getCardState(firstCard);
+
+  const stateCardFirst = compareTwoCard(baseCard, firstCard);
+
+  if (stateCardFirst === "UNMATCH")
+    return {
+      state: "INVALID",
+    };
+
+  if (baseCardState.state === "VALID_NORMAL" && firstCardState.state) {
+    const sameNumberForEveryCard = inputCards
+      .map((card) => CardPicker.getCardState(card))
+      .every((card) => card.number === firstCardState.number);
+
+    if (sameNumberForEveryCard)
+      return {
+        state: "VALID_STACK_MOVE",
+      };
+
+    return {
+      state: "INVALID",
+    };
+  }
+};
