@@ -476,7 +476,10 @@ export const compareMultipleCards = (
       state: "INVALID",
     };
 
-  if (baseCardState.state === "VALID_NORMAL" && firstCardState.state) {
+  if (
+    firstCardState.state === "VALID_NORMAL" &&
+    baseCardState.color === firstCardState.color
+  ) {
     const sameNumberForEveryCard = inputCards
       .map((card) => CardPicker.getCardState(card))
       .every((card) => card.number === firstCardState.number);
@@ -490,4 +493,8 @@ export const compareMultipleCards = (
       state: "INVALID",
     };
   }
+
+  return {
+    state: "INVALID",
+  };
 };

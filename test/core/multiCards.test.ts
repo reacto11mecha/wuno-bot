@@ -23,8 +23,7 @@ import type { allCard } from "../../src/config/cards";
 // );
 
 describe("Multiple Cards | Valid actions tests", () => {
-  it("Apapun yang nomornya sama di deck dan sama dengan semua kartu yang ingin di stack", () => {
-    const base = "bluedraw2" as allCard;
+  describe("Multiple same number cards", () => {
     const multiCards = [
       "blue3",
       "red3",
@@ -33,8 +32,52 @@ describe("Multiple Cards | Valid actions tests", () => {
       "yellow3",
     ] as allCard[];
 
-    const result = compareMultipleCards(base, multiCards);
+    it("Match with normal color base card", () => {
+      const base = "blue1" as allCard;
 
-    expect(result?.state).toBe("VALID_STACK_MOVE");
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_STACK_MOVE");
+    });
+
+    it("Match with wild base card", () => {
+      const base = "wildblue" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_STACK_MOVE");
+    });
+
+    it("Match with wilddraw4 base card", () => {
+      const base = "wilddraw4blue" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_STACK_MOVE");
+    });
+
+    it("Match with reverse base card", () => {
+      const base = "bluereverse" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_STACK_MOVE");
+    });
+
+    it("Match with skip base card", () => {
+      const base = "blueskip" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_STACK_MOVE");
+    });
+
+    it("Match with draw2 base card", () => {
+      const base = "bluedraw2" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_STACK_MOVE");
+    });
   });
 });
