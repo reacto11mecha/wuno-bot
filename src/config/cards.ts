@@ -447,23 +447,6 @@ export const compareMultipleCards = (
   baseCard: allCard,
   inputCards: allCard[],
 ) => {
-  // for (const [idx, currentCard] of inputCards.entries()) {
-  //   if(idx === 0) {
-  //     const firstState = CardPicker.getCardState(baseCard);
-  //     const secState = CardPicker.getCardState(currentCard);
-
-  //     const compared = compareTwoCard(baseCard, currentCard);
-
-  //     if (compared === "UNMATCH")
-  //       return {
-  //         status: "UNMATCH",
-  //       }
-  //   } else {
-  //   const cardState = compareTwoCard(inputCards[idx - 1],currentCard)
-  //     console.log(cardState)
-  //   }
-  // }
-
   const firstCard = inputCards[0];
 
   const baseCardState = CardPicker.getCardState(baseCard);
@@ -477,8 +460,28 @@ export const compareMultipleCards = (
     };
 
   if (
-    firstCardState.state === "VALID_NORMAL" &&
-    baseCardState.color === firstCardState.color
+    firstCardState.state === "VALID_SPECIAL" &&
+    firstCardState.type === "skip" &&
+    firstCardState.color === baseCardState.color
+  ) {
+    const sameSkipTypesForEveryCard = inputCards
+      .map((card) => CardPicker.getCardState(card))
+      .every((card) => card.state === "VALID_SPECIAL" && card.type === "skip");
+
+    if (sameSkipTypesForEveryCard)
+      return {
+        state: "VALID_SKIP_MOVE",
+        count: inputCards.length,
+      };
+
+    return {
+      state: "INVALID",
+    };
+  } else if (
+    (firstCardState.state === "VALID_NORMAL" &&
+      baseCardState.color === firstCardState.color) ||
+    (firstCardState.state === "VALID_NORMAL" &&
+      baseCardState.number === firstCardState.number)
   ) {
     const sameNumberForEveryCard = inputCards
       .map((card) => CardPicker.getCardState(card))
