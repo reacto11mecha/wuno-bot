@@ -443,10 +443,20 @@ export const compareTwoCard = (firstCard: allCard, secCard: allCard) => {
   }
 };
 
+export interface IMultiCards {
+  state:
+    | "VALID_PLUS_MOVE"
+    | "VALID_REVERSE_MOVE"
+    | "VALID_SKIP_MOVE"
+    | "VALID_STACK_MOVE"
+    | "INVALID";
+  count?: number;
+}
+
 export const compareMultipleCards = (
   baseCard: allCard,
   inputCards: allCard[],
-) => {
+): IMultiCards => {
   const firstCard = inputCards[0];
 
   const baseCardState = CardPicker.getCardState(baseCard);
@@ -459,7 +469,49 @@ export const compareMultipleCards = (
       state: "INVALID",
     };
 
-  if (
+  if (firstCardState.state === "VALID_WILD_PLUS4") {
+    // if (true)
+    return {
+      state: "VALID_PLUS_MOVE",
+    };
+
+    // return {
+    //   state: "INVALID"
+    // }
+  } else if (
+    firstCardState.state === "VALID_SPECIAL" &&
+    firstCardState.type === "draw2" &&
+    firstCardState.color === baseCardState.color
+  ) {
+    // if(true)
+    return {
+      state: "VALID_PLUS_MOVE",
+    };
+
+    // return {
+    //   state: "INVALID"
+    // }
+  } else if (
+    firstCardState.state === "VALID_SPECIAL" &&
+    firstCardState.type === "reverse" &&
+    firstCardState.color === baseCardState.color
+  ) {
+    const sameReverseTypesForEveryCard = inputCards
+      .map((card) => CardPicker.getCardState(card))
+      .every(
+        (card) => card.state === "VALID_SPECIAL" && card.type === "reverse",
+      );
+
+    if (sameReverseTypesForEveryCard)
+      return {
+        state: "VALID_REVERSE_MOVE",
+        count: inputCards.length,
+      };
+
+    return {
+      state: "INVALID",
+    };
+  } else if (
     firstCardState.state === "VALID_SPECIAL" &&
     firstCardState.type === "skip" &&
     firstCardState.color === baseCardState.color

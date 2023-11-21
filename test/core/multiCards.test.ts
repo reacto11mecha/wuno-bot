@@ -86,7 +86,7 @@ describe("Multiple Cards | Valid actions tests", () => {
       expect(result?.count).toBe(4);
     });
 
-    it("Match with wild base card", () => {
+    it("Match with wild same color base card", () => {
       const base = "wildblue" as allCard;
 
       const result = compareMultipleCards(base, multiCards);
@@ -95,7 +95,7 @@ describe("Multiple Cards | Valid actions tests", () => {
       expect(result?.count).toBe(4);
     });
 
-    it("Match with wilddraw4 base card", () => {
+    it("Match with wilddraw4 same color base card", () => {
       const base = "wilddraw4blue" as allCard;
 
       const result = compareMultipleCards(base, multiCards);
@@ -104,7 +104,7 @@ describe("Multiple Cards | Valid actions tests", () => {
       expect(result?.count).toBe(4);
     });
 
-    it("Match with reverse base card", () => {
+    it("Match with reverse same color base card", () => {
       const base = "bluereverse" as allCard;
 
       const result = compareMultipleCards(base, multiCards);
@@ -113,7 +113,7 @@ describe("Multiple Cards | Valid actions tests", () => {
       expect(result?.count).toBe(4);
     });
 
-    it("Match with skip base card", () => {
+    it("Match with skip same color base card", () => {
       const base = "blueskip" as allCard;
 
       const result = compareMultipleCards(base, multiCards);
@@ -122,7 +122,7 @@ describe("Multiple Cards | Valid actions tests", () => {
       expect(result?.count).toBe(4);
     });
 
-    it("Match with draw2 base card", () => {
+    it("Match with draw2 same color base card", () => {
       const base = "bluedraw2" as allCard;
 
       const result = compareMultipleCards(base, multiCards);
@@ -130,6 +130,73 @@ describe("Multiple Cards | Valid actions tests", () => {
       expect(result?.state).toBe("VALID_SKIP_MOVE");
       expect(result?.count).toBe(4);
     });
+  });
+
+  describe("Multiple special reverse cards valid actions", () => {
+    const multiCards = [
+      "greenreverse",
+      "bluereverse",
+      "redreverse",
+      "yellowreverse",
+    ] as allCard[];
+
+    it("Must continously stack the same reverse card type", () => {
+      const base = "green5" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_REVERSE_MOVE");
+      expect(result?.count).toBe(4);
+    });
+
+    it("Match with wild same color base card", () => {
+      const base = "wildgreen" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_REVERSE_MOVE");
+      expect(result?.count).toBe(4);
+    });
+
+    it("Match with wilddraw4 same color base card", () => {
+      const base = "wilddraw4green" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_REVERSE_MOVE");
+      expect(result?.count).toBe(4);
+    });
+
+    it("Match with reverse same color base card", () => {
+      const base = "greenreverse" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_REVERSE_MOVE");
+      expect(result?.count).toBe(4);
+    });
+
+    it("Match with skip same color base card", () => {
+      const base = "greenskip" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_REVERSE_MOVE");
+      expect(result?.count).toBe(4);
+    });
+
+    it("Match with draw2 same color base card", () => {
+      const base = "greendraw2" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result?.state).toBe("VALID_REVERSE_MOVE");
+      expect(result?.count).toBe(4);
+    });
+  });
+
+  describe("Multiple special draw2 cards valid actions", () => {
+    it("", () => {});
   });
 });
 
