@@ -69,9 +69,7 @@ Coba tetapkan warna di antara warna \`\`\`red\`\`\` (merah), \`\`\`green\`\`\` (
       return await card.solve(choosenCards[0] as allCard);
     }
 
-    await chat.replyToCurrentPerson(
-      "Mohon maaf, kartu dengan jumlah yang banyak masih dalam pengerjaan 🙏",
-    );
+    await card.solveMany(choosenCards as allCard[]);
   } else {
     await chat.replyToCurrentPerson("Bukan giliranmu saat ini!");
   }

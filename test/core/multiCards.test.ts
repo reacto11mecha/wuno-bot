@@ -196,7 +196,66 @@ describe("Multiple Cards | Valid actions tests", () => {
   });
 
   describe("Multiple special draw2 cards valid actions", () => {
-    it("", () => {});
+    const multiCards = [
+      "bluedraw2",
+      "greendraw2",
+      "reddraw2",
+      "yellowdraw2",
+    ] as allCard[];
+
+    it("Must continously stack the same draw2 card type", () => {
+      const base = "blue8" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result.state).toBe("VALID_PLUS_MOVE");
+      expect(result.count).toBe(8);
+    });
+
+    it("Match with wild same color base card", () => {
+      const base = "wildblue" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result.state).toBe("VALID_PLUS_MOVE");
+      expect(result.count).toBe(8);
+    });
+
+    it("Match with wilddraw4 same color base card", () => {
+      const base = "wilddraw4blue" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result.state).toBe("VALID_PLUS_MOVE");
+      expect(result.count).toBe(8);
+    });
+
+    it("Match with reverse same color base card", () => {
+      const base = "bluereverse" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result.state).toBe("VALID_PLUS_MOVE");
+      expect(result.count).toBe(8);
+    });
+
+    it("Match with skip same color base card", () => {
+      const base = "blueskip" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result.state).toBe("VALID_PLUS_MOVE");
+      expect(result.count).toBe(8);
+    });
+
+    it("Match with draw2 same color base card", () => {
+      const base = "reddraw2" as allCard;
+
+      const result = compareMultipleCards(base, multiCards);
+
+      expect(result.state).toBe("VALID_PLUS_MOVE");
+      expect(result.count).toBe(8);
+    });
   });
 });
 

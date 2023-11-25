@@ -7,6 +7,7 @@ import {
   CardPicker,
   cards,
   compareTwoCard,
+  compareMultipleCards,
   regexValidWildColorOnly,
   regexValidWildColorPlus4Only,
 } from "../config/cards";
@@ -382,7 +383,7 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
   }
 
   /**
-   * Function that handle user play event.
+   * Function that handle user play event for only one card.
    * @param givenCard Valid given card
    */
   async solve(givenCard: allCard) {
@@ -927,9 +928,30 @@ Game otomatis telah dihentikan. Terimakasih sudah bermain!`,
         break;
       }
 
-      case "UNMATCH": {
+      case "UNMATCH":
+      default: {
         await this.chat.sendToCurrentPerson(
           `Kartu *${givenCard}* tidak valid jika disandingkan dengan kartu *${this.game.currentCard}*! Jika tidak memiliki kartu lagi, ambil dengan '${env.PREFIX}d' untuk mengambil kartu baru.`,
+        );
+      }
+    }
+  }
+
+  /**
+   * Function that handle user play event for only one card.
+   * @param givenCard Valid given card
+   */
+  async solveMany(givenCards: allCard[]) {
+    const status = compareMultipleCards(
+      this.game.currentCard as allCard,
+      givenCards,
+    );
+
+    switch (status.state) {
+      case "INVALID":
+      default: {
+        await this.chat.replyToCurrentPerson(
+          "Kartu yang dikeluarkan tidak valid! Mohon cek kembali susunan kartu yang dikeluarkan.",
         );
       }
     }

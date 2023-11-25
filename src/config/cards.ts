@@ -470,27 +470,61 @@ export const compareMultipleCards = (
     };
 
   if (firstCardState.state === "VALID_WILD_PLUS4") {
-    // if (true)
+    const cardStates = inputCards.map(CardPicker.getCardState);
+    const containsOnlyPlusCard = cardStates.every(
+      (card) =>
+        (card.state === "VALID_SPECIAL" && card.type === "draw2") ||
+        card.state !== "VALID_WILD_PLUS4",
+    );
+
+    if (!containsOnlyPlusCard)
+      return {
+        state: "INVALID",
+      };
+
     return {
       state: "VALID_PLUS_MOVE",
-    };
+      count: cardStates
+        .map((card) => {
+          if (card.state === "VALID_SPECIAL" && card.type === "draw2")
+            return 2 as number;
+          else if (card.state === "VALID_WILD_PLUS4") return 4 as number;
 
-    // return {
-    //   state: "INVALID"
-    // }
+          return 0;
+        })
+        .reduce((accumulator, currentValue) => accumulator + currentValue, 0),
+    };
   } else if (
     firstCardState.state === "VALID_SPECIAL" &&
     firstCardState.type === "draw2" &&
-    firstCardState.color === baseCardState.color
+    (firstCardState.color === baseCardState.color ||
+      (baseCardState.state === "VALID_SPECIAL" &&
+        baseCardState.type === "draw2"))
   ) {
-    // if(true)
+    const cardStates = inputCards.map(CardPicker.getCardState);
+    const containsOnlyPlusCard = cardStates.every(
+      (card) =>
+        (card.state === "VALID_SPECIAL" && card.type === "draw2") ||
+        card.state !== "VALID_WILD_PLUS4",
+    );
+
+    if (!containsOnlyPlusCard)
+      return {
+        state: "INVALID",
+      };
+
     return {
       state: "VALID_PLUS_MOVE",
-    };
+      count: cardStates
+        .map((card) => {
+          if (card.state === "VALID_SPECIAL" && card.type === "draw2")
+            return 2 as number;
+          else if (card.state === "VALID_WILD_PLUS4") return 4 as number;
 
-    // return {
-    //   state: "INVALID"
-    // }
+          return 0;
+        })
+        .reduce((accumulator, currentValue) => accumulator + currentValue, 0),
+    };
   } else if (
     firstCardState.state === "VALID_SPECIAL" &&
     firstCardState.type === "reverse" &&
